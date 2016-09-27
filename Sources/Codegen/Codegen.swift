@@ -1,0 +1,723 @@
+import Foundation
+import SwiftyJSON
+
+let ReservedKeywords = ["Error", "Protocol", "Type", "Return", "Public", "Body"]
+
+struct Docs {
+  let operations: [String: String]
+  let shapes: [String: String]
+  let members: [String: String]
+  
+  static func fromJSON(docs: JSON) -> Docs {
+    let operationsAry: [(key: String, value: String)] = docs["operations"].map { (name, html) in
+      let markdown = htmlToMarkdown(html.stringValue)
+      return (name, markdown)
+    }
+    
+    let shapesAry: [(key: String, value: String)] = docs["shapes"].flatMap { (name, shape) in
+      let markdown = shape["base"].string
+      return markdown.flatMap { (name, $0) }
+    }
+    
+    let members = Dictionary(docs["shapes"].map { $1["refs"] }.joined().map { (key: $0, value: $1.stringValue) })
+    
+    return Docs(operations: Dictionary(operationsAry), members: members, shapes: Dictionary(shapesAry))
+  }
+  
+  func docsForField(shape: String, member: String) -> String? {
+    return members["\(shape)$\(member)"]
+  }
+  
+  init(operations: [String: String], members: [String: String], shapes: [String: String]) {
+    self.operations = operations
+    self.shapes = shapes
+    self.members = members
+  }
+  
+  static func htmlToMarkdown(_ html: String) -> String {
+    return html
+    
+    #if os(Linux)
+      let buildProcess = Task()
+    #else
+      let buildProcess = Process()
+    #endif
+    buildProcess.launchPath = "/bin/bash"
+    buildProcess.arguments = ["-c", "upmark"]
+    buildProcess.environment = ProcessInfo.processInfo.environment
+    
+    var outStr = ""
+    let out = Pipe()
+    
+    buildProcess.standardOutput = out
+    out.fileHandleForReading.readabilityHandler = { handle in
+      let str = String(data: handle.availableData, encoding: .utf8)!
+      outStr.append(str)
+    }
+    
+    let inPipe = Pipe()
+    buildProcess.standardInput = inPipe
+    
+    buildProcess.terminationHandler = { task in
+      out.fileHandleForReading.readabilityHandler = nil
+    }
+    
+    buildProcess.launch()
+    inPipe.fileHandleForWriting.write(html.data(using: .utf8)!)
+    inPipe.fileHandleForWriting.closeFile()
+    buildProcess.waitUntilExit()
+    
+    return outStr
+  }
+  
+}
+
+class Member {
+  enum Location: String {
+    case body
+    case header
+    case headers
+    case statusCode
+    case uri
+    case querystring
+  }
+  
+  let name: String
+  let required: Bool
+  var shape: Shape
+  let location: Location
+  let locationName: String
+  
+  static func fromJSON(name: String, required: Bool, json: JSON, LUT: [String: Shape], docs: Docs) -> Member {
+    let shapeName = json["shape"].stringValue
+    let location = Location(rawValue: json["location"].string ?? "body")!
+    
+    return Member(
+      name: name,
+      required: required,
+      shape: LUT[shapeName]!,
+      location: location,
+      locationName: json["locationName"].string ?? name,
+      docs: docs
+    )
+  }
+  
+  init(name: String, required: Bool, shape: Shape, location: Location, locationName: String, docs: Docs) {
+    self.name = name
+    self.required = required
+    self.shape = shape
+    self.location = location
+    self.locationName = locationName
+  }
+  
+  func memberName() -> String {
+    if ReservedKeywords.contains(name) {
+      return "\(shape.service.lowercaseFirst())\(name)"
+    } else {
+      return name.lowercaseFirst()
+    }
+  }
+  
+  func optionalityIndicator() -> String {
+    return required ? "" : "?"
+  }
+  
+  func deserialization() -> String {
+    switch location {
+    case .statusCode: return "      \(memberName()): response.statusCode"
+    case .header: return "      \(memberName()): response.allHeaderFields[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, json: $0) }\(required ? "!" : "")"
+    case .body: return "      \(memberName()): jsonDict[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, json: $0) }\(required ? "!" : "")"
+    case .headers: return "      \(memberName()): Dictionary(response.allHeaderFields.map { (key: $0 as! String, value: $1 as! String) }.filter { $0.key.lowercased().hasPrefix(\"\(locationName)\") })"
+    default: fatalError()
+    }
+  }
+  
+  func declaration() -> String {
+    return "\(memberName()): \(shape.memberType())\(optionalityIndicator())"
+  }
+}
+
+enum ShapeType {
+  case string // enum as well?
+  case `enum`
+  case structure(Structure)
+  case integer
+  case long
+  case boolean
+  case blob
+  case list
+  case timestamp
+  case unknown
+}
+
+protocol Shape {
+  var name: String { get }
+  var service: String { get }
+  func emit() -> String
+  func memberType() -> String
+  
+  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> Self
+}
+
+final class Primitive: Shape {
+  let name: String
+  let service: String
+  let memberTypeStr: String
+  
+  func emit() -> String {
+    return ""
+  }
+  
+  func memberType() -> String {
+    return memberTypeStr
+  }
+  
+  static func fromJSON(name: String, json: JSON, LUT: [String : Shape], service: String, docs: Docs) -> Primitive {
+    //let shapeType: ShapeType
+    switch json["type"].stringValue {
+    case "string":    return Primitive(name: name, memberTypeStr: "String", service: service, docs: docs)
+    case "integer":   return Primitive(name: name, memberTypeStr: "Int", service: service, docs: docs)
+    case "long":      return Primitive(name: name, memberTypeStr: "Int", service: service, docs: docs)
+    case "blob":      return Primitive(name: name, memberTypeStr: "Data", service: service, docs: docs)
+    case "boolean":   return Primitive(name: name, memberTypeStr: "Bool", service: service, docs: docs)
+    case "timestamp": return Primitive(name: name, memberTypeStr: "Date", service: service, docs: docs)
+    case "double":    return Primitive(name: name, memberTypeStr: "Double", service: service, docs: docs)
+    case "float":     return Primitive(name: name, memberTypeStr: "Float", service: service, docs: docs)
+    default: fatalError()
+    }
+    //return Primitive(shapeType: shapeType)
+  }
+  
+  init(name: String, memberTypeStr: String, service: String, docs: Docs) {
+    self.name = name
+    self.memberTypeStr = memberTypeStr
+    self.service = service
+  }
+}
+
+final class List: Shape {
+  let name: String
+  let service: String
+  let memberShape: Shape
+  
+  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> List {
+    let shapeName = json["member"]["shape"].stringValue
+    let memberShape = LUT[shapeName]!
+    
+    return List(
+      name: name,
+      memberShape: memberShape,
+      service: service,
+      docs: docs
+    )
+  }
+  
+  init(name: String, memberShape: Shape, service: String, docs: Docs) {
+    self.name = name
+    self.memberShape = memberShape
+    self.service = service
+  }
+  
+  func memberType() -> String {
+    return "[\(memberShape.memberType())]"
+  }
+  
+  func emit() -> String {
+    var str = ""
+    return str
+  }
+}
+
+final class AwsEnum: Shape {
+  let name: String
+  let service: String
+  let cases: [String]
+  
+  func emit() -> String {
+    var str = ""
+    let e = { line in str = str + line + "\n" }
+    
+    e("enum \(memberType()): String, RestJsonDeserializable, RestJsonSerializable {")
+    cases.forEach { e("  case `\(enumize($0))` = \"\($0)\"") }
+    
+    e("")
+    e("  static func deserialize(response: HTTPURLResponse, json: Any) -> \(memberType()) {")
+    e("    return \(memberType())(rawValue: json as! String)!")
+    e("  }")
+    e("")
+    e("  func serialize() -> SerializedForm {")
+    e("    return SerializedForm(uri: [:], queryString: [:], header: [:], body: .raw(rawValue.data(using: .utf8)!))")
+    e("  }")
+    
+    e("}")
+    
+    return str
+  }
+  
+  func enumize(_ value: String) -> String {
+    // TODO: really should camelCase words
+    let invalid = Set(".:-*/ ()".characters)
+    let filtered = value.characters.filter { !invalid.contains($0) }
+    return String(filtered).lowercaseFirst()
+  }
+  
+  func memberType() -> String {
+    let n = name.capitalized
+    if ReservedKeywords.contains(n) {
+      return "\(service)\(n)"
+    } else {
+      return n
+    }
+  }
+  
+  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> AwsEnum {
+    let cases = json["enum"].map { $1.stringValue }
+    return AwsEnum(name: name, cases: cases, service: service, docs: docs)
+  }
+  
+  init(name: String, cases: [String], service: String, docs: Docs) {
+    self.name = name
+    self.cases = cases
+    self.service = service
+  }
+}
+
+final class Structure: Shape {
+  let name: String
+  let service: String
+  let members: [Member]
+  let docs: Docs
+  
+  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> Structure {
+    let required = json["required"].flatMap { $1.string }
+    let members = json["members"].map { Member.fromJSON(name: $0, required: required.contains($0), json: $1, LUT: LUT, docs: docs) }
+    
+    return Structure(
+      name: name,
+      members: members,
+      LUT: LUT,
+      service: service,
+      docs: docs
+    )
+  }
+  
+  init(name: String, members: [Member], LUT: [String: Shape], service: String, docs: Docs) {
+    self.name = name
+    self.members = members
+    self.service = service
+    self.docs = docs
+  }
+  
+  func memberType() -> String {
+    if ReservedKeywords.contains(name) {
+      return "\(service)\(name)"
+    } else {
+      return name
+    }
+  }
+  
+  func emitSerializeMethod() -> [String] {
+    if name.hasSuffix("Response") || name.hasSuffix("Exception") || name.hasSuffix("Output") {
+      return []
+    }
+    
+    let grouped = members.categorise { $0.location }
+    
+    let toLine: (String, Member) -> (String) = { l, m in
+      if m.required {
+        return "  \(l)[\"\(m.locationName)\"] = \"\\(\(m.memberName()))\""
+      } else {
+        return "  if \(m.memberName()) != nil { \(l)[\"\(m.locationName)\"] = \"\\(\(m.memberName())!)\" }"
+      }
+    }
+    
+    let uriLines = grouped[.uri]?.map { toLine("uri", $0) } ?? []
+    let qsLines = grouped[.querystring]?.map { toLine("querystring", $0) } ?? []
+    let headerLines = grouped[.header]?.map { toLine("header", $0) } ?? []
+    
+    let bodyLines: [String] = grouped[.body]?.map { m in
+      if m.required {
+        return "  body[\"\(m.locationName)\"] = \(m.memberName())"
+      } else {
+        return "  if \(m.memberName()) != nil { body[\"\(m.locationName)\"] = \(m.memberName())! }"
+      }
+      } ?? []
+    
+    let firstLines = [
+      "func serialize() -> SerializedForm {",
+      "  \(uriLines.count    == 0 ? "let" : "var") uri: [String: String] = [:]",
+      "  \(qsLines.count     == 0 ? "let" : "var") querystring: [String: String] = [:]",
+      "  \(headerLines.count == 0 ? "let" : "var") header: [String: String] = [:]",
+      "  \(bodyLines.count   == 0 ? "" : "var body: [String: Any] = [:]")",
+      ""
+    ]
+    
+    let body = bodyLines.count == 0 ? ".empty" : ".json(body)"
+    
+    let lastLines = [
+      "",
+      "  return SerializedForm(uri: uri, queryString: querystring, header: header, body: \(body))",
+      "}"
+    ]
+    
+    // TODO lame code because swift compiler inference is SLOW at adding together arrays
+    return [firstLines, uriLines, qsLines, headerLines, bodyLines, lastLines].flatMap { $0 }
+  }
+  
+  func emitDeserializeMethod() -> [String] {
+    if name.hasSuffix("Request") && name != "CancelledSpotInstanceRequest" && name != "SpotInstanceRequest" {
+      return []
+    }
+    
+    
+    let fieldInitLines = members.map { $0.deserialization() }
+    let fieldLines = fieldInitLines.joined(separator: ",\n")
+    
+    let dictLine = members.filter({ $0.location == .body }).count > 0 ? "  let jsonDict = json as! [String: Any]" : ""
+    
+    return [
+      "static func deserialize(response: HTTPURLResponse, json: Any) -> \(memberType()) {",
+      dictLine,
+      "  return \(memberType())(",
+      fieldLines,
+      "  )",
+      "}"
+    ]
+  }
+  
+  func emit() -> String {
+    var str = ""
+    let e = { line in str = str + line + "\n" }
+    
+    let protocols: String
+    if name == "CancelledSpotInstanceRequest" || name == "SpotInstanceRequest" {
+      protocols = "RestJsonSerializable, RestJsonDeserializable"
+    } else if name.hasSuffix("Request") {
+      protocols = "RestJsonSerializable"
+    } else if name.hasSuffix("Response") || name.hasSuffix("Output") {
+      protocols = "RestJsonDeserializable"
+    } else if name.hasSuffix("Exception") {
+      protocols = "Error, RestJsonDeserializable"
+    } else {
+      protocols = "RestJsonSerializable, RestJsonDeserializable"
+    }
+    
+    e("public struct \(memberType()): \(protocols) {")
+    
+    members.forEach { m in
+      if let doc = docs.docsForField(shape: name, member: m.name) {
+        e("/**")
+        e(doc)
+        e(" */")
+      }
+      e("  public let \(m.declaration())")
+    }
+    
+    e("")
+    emitSerializeMethod().forEach { e("  \($0)") }
+    e("")
+    emitDeserializeMethod().forEach { e("  \($0)") }
+    e("")
+    
+    e("/**")
+    e("    - parameters:")
+    members.forEach { e("      - \($0.memberName()): \(docs.docsForField(shape: name, member: $0.name)!)") }
+    e(" */")
+    let decls = members.map { $0.declaration() }.joined(separator: ", ")
+    e("  public init(\(decls)) {")
+    members.forEach { e("self.\($0.memberName()) = \($0.memberName())") }
+    e("  }")
+    
+    e("}")
+    
+    return str
+  }
+}
+
+final class Map: Shape {
+  let name: String
+  let service: String
+  let key: Shape
+  let value: Shape
+  
+  func emit() -> String {
+    return ""
+  }
+  
+  func memberType() -> String {
+    return "[\(key.memberType()): \(value.memberType())]"
+  }
+  
+  static func fromJSON(name: String, json: JSON, LUT: [String : Shape], service: String, docs: Docs) -> Map {
+    let keyName = json["key"]["shape"].stringValue
+    let valueName = json["value"]["shape"].stringValue
+    return Map(name: name, key: LUT[keyName]!, value: LUT[valueName]!, service: service, docs: docs)
+  }
+  
+  init(name: String, key: Shape, value: Shape, service: String, docs: Docs) {
+    self.name = name
+    self.service = service
+    self.key = key
+    self.value = value
+  }
+}
+
+class Operation {
+  let name: String
+  let method: String
+  let uri: String
+  let respCode: Int?
+  let input: Shape?
+  let output: Shape?
+  let errors: [Shape]
+  let docs: Docs
+  
+  
+  static func fromJSON(json: JSON, docs: Docs, LUT: [String: Shape]) -> Operation {
+    let name = json["name"].stringValue
+    let http = json["http"]
+    let method = http["method"].stringValue
+    let uri = http["requestUri"].stringValue
+    let respCode = http["responseCode"].int
+    
+    let inputName = json["input"]["shape"].string
+    let outputName = json["output"]["shape"].string
+    let errorNames = json["errors"].map { $1["shape"].stringValue }
+    
+    let input = inputName.map { LUT[$0]! }
+    let output = outputName.map { LUT[$0]! }
+    let errors = errorNames.map { LUT[$0]! }
+    
+    return Operation(
+      name: name,
+      method: method,
+      uri: uri,
+      respCode: respCode,
+      input: input,
+      output: output,
+      errors: errors,
+      docs: docs
+    )
+  }
+  
+  init(name: String, method: String, uri: String, respCode: Int?, input: Shape?, output: Shape?, errors: [Shape], docs: Docs) {
+    self.name = name
+    self.method = method
+    self.uri = uri
+    self.respCode = respCode
+    self.input = input
+    self.output = output
+    self.errors = errors
+    self.docs = docs
+  }
+  
+  func emit(api: API) -> String {
+    var str = ""
+    let e = { line in str = str + line + "\n" }
+    
+    let outputType = output?.memberType() ?? "AwsApiVoidOutput"
+    let inputType = input?.memberType() ?? "AwsApiVoidInput"
+    
+    if let doc = docs.operations[name] {
+      e("/**")
+      e(doc)
+      e(" */")
+    }
+    
+    let hostname: String
+    switch api.endpoint {
+    case .regional(let prefix): hostname = "\(prefix).\\(self.region).amazonaws.com"
+    case .global(let endpoint): hostname = endpoint
+    case .s3: hostname = "s3-\\(self.region).amazonaws.com"
+    }
+    
+    e("func \(name.lowercaseFirst())(input: \(inputType)) -> ApiCallTask<\(outputType)> {")
+    e("  return ApiCallTask { cb in")
+    e("    let task = awsApiCallTask(")
+    e("      session: self.session,")
+    e("      credentials: self.credentialsProvider.provideAwsCredentials()!,")
+    e("      scope: self.scope(),")
+    e("      queue: self.queue,")
+    e("      urlString: \"https://\(hostname)\(uri)\", ")
+    e("      httpMethod: \"\(method)\", ")
+    e("      expectedStatus: \(respCode == nil ? "nil" : "\(respCode!)"), ")
+    e("      input: input, ")
+    e("      completionHandler: cb")
+    e("    )")
+    e("    task.resume()")
+    e("  }")
+    e("}")
+    e("")
+    
+    return str
+  }
+}
+
+struct API {
+  enum ApiProtocol {
+    case restJson
+    case restXml
+    case ec2
+    case query
+    case json
+  }
+  
+  enum SignatureVersion {
+    case v4
+    case v2
+    case s3
+  }
+  
+  enum EndpointType {
+    case regional(prefix: String)
+    case global(endpoint: String)
+    case s3
+  }
+  
+  let name: String
+  let shapes: [String: Shape]
+  let operations: [Operation]
+  let version: String
+  let endpoint: EndpointType
+  let apiProtocol: ApiProtocol
+  let signatureVersion: SignatureVersion
+  let docs: Docs
+  
+  static func fromJSON(json: JSON, docs: Docs) -> API {
+    let metadata = json["metadata"]
+    
+    let version = metadata["apiVersion"].stringValue
+    let name = metadata["endpointPrefix"].stringValue
+    
+    let apiProtocol: ApiProtocol
+    switch metadata["protocol"].stringValue {
+    case "rest-json": apiProtocol = .restJson
+    case "rest-xml": apiProtocol = .restXml
+    case "ec2": apiProtocol = .ec2
+    case "query": apiProtocol = .query
+    case "json": apiProtocol = .json
+    default: fatalError()
+    }
+    
+    let signatureVersion: SignatureVersion
+    switch metadata["signatureVersion"].stringValue {
+    case "v2": signatureVersion = .v2
+    case "v4": signatureVersion = .v4
+    case "s3": signatureVersion = .s3
+    default: fatalError()
+    }
+    
+    let endpoint: EndpointType
+    if name == "s3" {
+      endpoint = .s3
+    } else if let global = metadata["globalEndpoint"].string {
+      endpoint = .global(endpoint: global)
+    } else {
+      endpoint = .regional(prefix: name)
+    }
+    
+    let shapesJson = json["shapes"]
+    
+    var LUT: [String: Shape] = [:]
+    let sortedNames = sortedShapeNames(unsorted: shapesJson)
+    
+    for name in sortedNames {
+      let shapeJson = shapesJson[name]
+      LUT[name] = shapeFromJSON(name: name, json: shapeJson, LUT: LUT, service: name.capitalized, docs: docs)
+    }
+    
+    let operations: [Operation] = json["operations"].map { (key, json) in
+      return Operation.fromJSON(json: json, docs: docs, LUT: LUT)
+    }
+    
+    return API(name: name, shapes: LUT, operations: operations, version: version, endpoint: endpoint, apiProtocol: apiProtocol, signatureVersion: signatureVersion, docs: docs)
+  }
+  
+  static func sortedShapeNames(unsorted: JSON) -> [String] {
+    let deps = NSMutableDictionary()
+    
+    for (name, shape) in unsorted {
+      var memberShapes = shape["members"].map { $1["shape"].stringValue }
+      shape["member"]["shape"].string.map { memberShapes.append($0) }
+      shape["key"]["shape"].string.map { memberShapes.append($0) }
+      shape["value"]["shape"].string.map { memberShapes.append($0) }
+      deps[name] = memberShapes
+    }
+    
+    // TODO: come back to this with swiftyjson
+    let jsonHack = try! JSONSerialization.data(withJSONObject: deps, options: [])
+    let unjsonHack = try! JSONSerialization.jsonObject(with: jsonHack, options: []) as! [String: [String]]
+    let sorted = try! topo_sort(dependency_list: unjsonHack)
+    return sorted
+  }
+  
+  static func shapeFromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> Shape {
+    switch json["type"].stringValue {
+    case "structure": return Structure.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
+    case "list": return List.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
+    case "string" where json["enum"].exists(): return AwsEnum.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
+    case "map": return Map.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
+    default: return Primitive.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
+    }
+  }
+  
+  init(name: String, shapes: [String: Shape], operations: [Operation], version: String, endpoint: EndpointType, apiProtocol: ApiProtocol, signatureVersion: SignatureVersion, docs: Docs) {
+    self.name = name
+    self.shapes = shapes
+    self.operations = operations
+    self.version = version
+    self.endpoint = endpoint
+    self.apiProtocol = apiProtocol
+    self.signatureVersion = signatureVersion
+    self.docs = docs
+  }
+  
+  func emit() -> String {
+    var str = ""
+    let e = { line in str = str + line + "\n" }
+    
+    e("import Foundation")
+    e("import Signer")
+    e("struct \(name.capitalized) {")
+    e("  struct Client {")
+    e("    let region: String")
+    e("    let credentialsProvider: AwsCredentialsProvider")
+    e("    let session: URLSession")
+    e("    let queue: DispatchQueue")
+    e("")
+    e("    init(region: String) {")
+    e("      self.region = region")
+    e("      self.credentialsProvider = DefaultChainProvider()")
+    e("      self.session = URLSession(configuration: URLSessionConfiguration.default)")
+    e("      self.queue = DispatchQueue(label: \"awswift.\(name.capitalized).Client.queue\")")
+    e("    }")
+    e("")
+    if name == "s3" {
+      e("    func scope() -> AwsCredentialsScope {")
+      e("      return AwsCredentialsScope(date: Date(), region: region, service: \"s3\")")
+      e("    }")
+      e("")
+    } else {
+      e("    func scope() -> AwsCredentialsScope {")
+      e("      return AwsCredentialsScope(url: URL(string: \"https://\")!)!")
+      e("    }")
+      e("")
+    }
+    
+    operations.forEach { e($0.emit(api: self)) }
+    e("  }")
+    
+    shapes.forEach { (name, shape) in
+      if let doc = docs.shapes[name] {
+        e("/**")
+        e(doc)
+        e(" */")
+      }
+      e(shape.emit())
+    }
+    
+    e("}")
+    
+    return str
+  }
+}
