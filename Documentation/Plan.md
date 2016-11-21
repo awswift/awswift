@@ -30,14 +30,12 @@
 
 * Swift package published to Github
 * Can take a `URLRequest` object and return the `Authorization` header
-* Prototype package is here: https://github.com/awswift/signer
 
 ### Step 3: Flesh out AWS SDK for Swift
 
 * Modelled based on Objc/Ruby SDKs. Client class per service with instance methods for each API method
 * Maximise Swiftiness
 * Support both sync and async call patterns - maybe promises too?
-* Prototype codegen for SDK is here: https://github.com/awswift/codegen
 
 ### Step 4: Pipeline for deploying long-running services to EB/ECS
 
