@@ -72,6 +72,20 @@ struct Docs {
   
 }
 
+class ApiContext {
+  let name: String
+  var LUT: [String: Shape]
+  let docs: Docs
+  let apiProtocol: API.ApiProtocol
+  
+  init(name: String, LUT: [String : Shape], docs: Docs, apiProtocol: API.ApiProtocol) {
+    self.name = name
+    self.LUT = LUT
+    self.docs = docs
+    self.apiProtocol = apiProtocol
+  }
+}
+
 class Member {
   enum Location: String {
     case body
@@ -88,21 +102,20 @@ class Member {
   let location: Location
   let locationName: String
   
-  static func fromJSON(name: String, required: Bool, json: JSON, LUT: [String: Shape], docs: Docs) -> Member {
+  static func fromJSON(name: String, required: Bool, json: JSON, context: ApiContext) -> Member {
     let shapeName = json["shape"].stringValue
     let location = Location(rawValue: json["location"].string ?? "body")!
     
     return Member(
       name: name,
       required: required,
-      shape: LUT[shapeName]!,
+      shape: context.LUT[shapeName]!,
       location: location,
-      locationName: json["locationName"].string ?? name,
-      docs: docs
+      locationName: json["locationName"].string ?? name
     )
   }
   
-  init(name: String, required: Bool, shape: Shape, location: Location, locationName: String, docs: Docs) {
+  init(name: String, required: Bool, shape: Shape, location: Location, locationName: String) {
     self.name = name
     self.required = required
     self.shape = shape
@@ -112,7 +125,7 @@ class Member {
   
   func memberName() -> String {
     if ReservedKeywords.contains(name) {
-      return "\(shape.service.lowercaseFirst())\(name)"
+      return "\(shape.context.name.lowercaseFirst())\(name)"
     } else {
       return name.lowercaseFirst()
     }
@@ -125,8 +138,8 @@ class Member {
   func deserialization() -> String {
     switch location {
     case .statusCode: return "      \(memberName()): response.statusCode"
-    case .header: return "      \(memberName()): response.allHeaderFields[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, json: $0) }\(required ? "!" : "")"
-    case .body: return "      \(memberName()): jsonDict[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, json: $0) }\(required ? "!" : "")"
+    case .header: return "      \(memberName()): response.allHeaderFields[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
+    case .body: return "      \(memberName()): jsonDict[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
     case .headers: return "      \(memberName()): Dictionary(response.allHeaderFields.map { (key: $0 as! String, value: $1 as! String) }.filter { $0.key.lowercased().hasPrefix(\"\(locationName)\") })"
     default: fatalError()
     }
@@ -152,16 +165,16 @@ enum ShapeType {
 
 protocol Shape {
   var name: String { get }
-  var service: String { get }
+  var context: ApiContext { get }
   func emit() -> String
   func memberType() -> String
   
-  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> Self
+  static func fromJSON(name: String, json: JSON, context: ApiContext) -> Self
 }
 
 final class Primitive: Shape {
   let name: String
-  let service: String
+  let context: ApiContext
   let memberTypeStr: String
   
   func emit() -> String {
@@ -172,50 +185,49 @@ final class Primitive: Shape {
     return memberTypeStr
   }
   
-  static func fromJSON(name: String, json: JSON, LUT: [String : Shape], service: String, docs: Docs) -> Primitive {
+  static func fromJSON(name: String, json: JSON, context: ApiContext) -> Primitive {
     //let shapeType: ShapeType
     switch json["type"].stringValue {
-    case "string":    return Primitive(name: name, memberTypeStr: "String", service: service, docs: docs)
-    case "integer":   return Primitive(name: name, memberTypeStr: "Int", service: service, docs: docs)
-    case "long":      return Primitive(name: name, memberTypeStr: "Int", service: service, docs: docs)
-    case "blob":      return Primitive(name: name, memberTypeStr: "Data", service: service, docs: docs)
-    case "boolean":   return Primitive(name: name, memberTypeStr: "Bool", service: service, docs: docs)
-    case "timestamp": return Primitive(name: name, memberTypeStr: "Date", service: service, docs: docs)
-    case "double":    return Primitive(name: name, memberTypeStr: "Double", service: service, docs: docs)
-    case "float":     return Primitive(name: name, memberTypeStr: "Float", service: service, docs: docs)
+    case "string":    return Primitive(name: name, memberTypeStr: "String", context: context)
+    case "integer":   return Primitive(name: name, memberTypeStr: "Int", context: context)
+    case "long":      return Primitive(name: name, memberTypeStr: "Int", context: context)
+    case "blob":      return Primitive(name: name, memberTypeStr: "Data", context: context)
+    case "boolean":   return Primitive(name: name, memberTypeStr: "Bool", context: context)
+    case "timestamp": return Primitive(name: name, memberTypeStr: "Date", context: context)
+    case "double":    return Primitive(name: name, memberTypeStr: "Double", context: context)
+    case "float":     return Primitive(name: name, memberTypeStr: "Float", context: context)
     default: fatalError()
     }
     //return Primitive(shapeType: shapeType)
   }
   
-  init(name: String, memberTypeStr: String, service: String, docs: Docs) {
+  init(name: String, memberTypeStr: String, context: ApiContext) {
     self.name = name
     self.memberTypeStr = memberTypeStr
-    self.service = service
+    self.context = context
   }
 }
 
 final class List: Shape {
   let name: String
-  let service: String
+  let context: ApiContext
   let memberShape: Shape
   
-  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> List {
+  static func fromJSON(name: String, json: JSON, context: ApiContext) -> List {
     let shapeName = json["member"]["shape"].stringValue
-    let memberShape = LUT[shapeName]!
+    let memberShape = context.LUT[shapeName]!
     
     return List(
       name: name,
       memberShape: memberShape,
-      service: service,
-      docs: docs
+      context: context
     )
   }
   
-  init(name: String, memberShape: Shape, service: String, docs: Docs) {
+  init(name: String, memberShape: Shape, context: ApiContext) {
     self.name = name
     self.memberShape = memberShape
-    self.service = service
+    self.context = context
   }
   
   func memberType() -> String {
@@ -230,7 +242,7 @@ final class List: Shape {
 
 final class AwsEnum: Shape {
   let name: String
-  let service: String
+  let context: ApiContext
   let cases: [String]
   
   func emit() -> String {
@@ -241,7 +253,8 @@ final class AwsEnum: Shape {
     cases.forEach { e("  case `\(enumize($0))` = \"\($0)\"") }
     
     e("")
-    e("  static func deserialize(response: HTTPURLResponse, json: Any) -> \(memberType()) {")
+    e("  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> \(memberType()) {")
+    e("    guard case let .json(json) = body else { fatalError() }")
     e("    return \(memberType())(rawValue: json as! String)!")
     e("  }")
     e("")
@@ -264,53 +277,49 @@ final class AwsEnum: Shape {
   func memberType() -> String {
     let n = name.capitalized
     if ReservedKeywords.contains(n) {
-      return "\(service)\(n)"
+      return "\(context.name.capitalized)\(n)"
     } else {
       return n
     }
   }
   
-  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> AwsEnum {
+  static func fromJSON(name: String, json: JSON, context: ApiContext) -> AwsEnum {
     let cases = json["enum"].map { $1.stringValue }
-    return AwsEnum(name: name, cases: cases, service: service, docs: docs)
+    return AwsEnum(name: name, cases: cases, context: context)
   }
   
-  init(name: String, cases: [String], service: String, docs: Docs) {
+  init(name: String, cases: [String], context: ApiContext) {
     self.name = name
     self.cases = cases
-    self.service = service
+    self.context = context
   }
 }
 
 final class Structure: Shape {
   let name: String
-  let service: String
+  let context: ApiContext
   let members: [Member]
-  let docs: Docs
   
-  static func fromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> Structure {
+  static func fromJSON(name: String, json: JSON, context: ApiContext) -> Structure {
     let required = json["required"].flatMap { $1.string }
-    let members = json["members"].map { Member.fromJSON(name: $0, required: required.contains($0), json: $1, LUT: LUT, docs: docs) }
+    let members = json["members"].map { Member.fromJSON(name: $0, required: required.contains($0), json: $1, context: context) }
     
     return Structure(
       name: name,
       members: members,
-      LUT: LUT,
-      service: service,
-      docs: docs
+      context: context
     )
   }
   
-  init(name: String, members: [Member], LUT: [String: Shape], service: String, docs: Docs) {
+  init(name: String, members: [Member], context: ApiContext) {
     self.name = name
     self.members = members
-    self.service = service
-    self.docs = docs
+    self.context = context
   }
   
   func memberType() -> String {
     if ReservedKeywords.contains(name) {
-      return "\(service)\(name)"
+      return "\(context.name.capitalized)\(name)"
     } else {
       return name
     }
@@ -373,10 +382,11 @@ final class Structure: Shape {
     let fieldInitLines = members.map { $0.deserialization() }
     let fieldLines = fieldInitLines.joined(separator: ",\n")
     
-    let dictLine = members.filter({ $0.location == .body }).count > 0 ? "  let jsonDict = json as! [String: Any]" : ""
+    
+    let dictLine = members.filter({ $0.location == .body }).count > 0 ? "  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]" : ""
     
     return [
-      "static func deserialize(response: HTTPURLResponse, json: Any) -> \(memberType()) {",
+      "static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> \(memberType()) {",
       dictLine,
       "  return \(memberType())(",
       fieldLines,
@@ -405,7 +415,7 @@ final class Structure: Shape {
     e("public struct \(memberType()): \(protocols) {")
     
     members.forEach { m in
-      if let doc = docs.docsForField(shape: name, member: m.name) {
+      if let doc = context.docs.docsForField(shape: name, member: m.name) {
         e("/**")
         e(doc)
         e(" */")
@@ -421,7 +431,7 @@ final class Structure: Shape {
     
     e("/**")
     e("    - parameters:")
-    members.forEach { e("      - \($0.memberName()): \(docs.docsForField(shape: name, member: $0.name)!)") }
+    members.forEach { e("      - \($0.memberName()): \(context.docs.docsForField(shape: name, member: $0.name)!)") }
     e(" */")
     let decls = members.map { $0.declaration() }.joined(separator: ", ")
     e("  public init(\(decls)) {")
@@ -436,7 +446,7 @@ final class Structure: Shape {
 
 final class Map: Shape {
   let name: String
-  let service: String
+  let context: ApiContext
   let key: Shape
   let value: Shape
   
@@ -448,15 +458,15 @@ final class Map: Shape {
     return "[\(key.memberType()): \(value.memberType())]"
   }
   
-  static func fromJSON(name: String, json: JSON, LUT: [String : Shape], service: String, docs: Docs) -> Map {
+  static func fromJSON(name: String, json: JSON, context: ApiContext) -> Map {
     let keyName = json["key"]["shape"].stringValue
     let valueName = json["value"]["shape"].stringValue
-    return Map(name: name, key: LUT[keyName]!, value: LUT[valueName]!, service: service, docs: docs)
+    return Map(name: name, key: context.LUT[keyName]!, value: context.LUT[valueName]!, context: context)
   }
   
-  init(name: String, key: Shape, value: Shape, service: String, docs: Docs) {
+  init(name: String, key: Shape, value: Shape, context: ApiContext) {
     self.name = name
-    self.service = service
+    self.context = context
     self.key = key
     self.value = value
   }
@@ -616,21 +626,20 @@ struct API {
       endpoint = .regional(prefix: name)
     }
     
+    let context = ApiContext(name: name, LUT: [:], docs: docs, apiProtocol: apiProtocol)
+    
     let shapesJson = json["shapes"]
-    
-    var LUT: [String: Shape] = [:]
     let sortedNames = sortedShapeNames(unsorted: shapesJson)
-    
     for name in sortedNames {
       let shapeJson = shapesJson[name]
-      LUT[name] = shapeFromJSON(name: name, json: shapeJson, LUT: LUT, service: name.capitalized, docs: docs)
+      context.LUT[name] = shapeFromJSON(name: name, json: shapeJson, context: context)
     }
     
     let operations: [Operation] = json["operations"].map { (key, json) in
-      return Operation.fromJSON(json: json, docs: docs, LUT: LUT)
+      return Operation.fromJSON(json: json, docs: docs, LUT: context.LUT)
     }
     
-    return API(name: name, shapes: LUT, operations: operations, version: version, endpoint: endpoint, apiProtocol: apiProtocol, signatureVersion: signatureVersion, docs: docs)
+    return API(name: name, shapes: context.LUT, operations: operations, version: version, endpoint: endpoint, apiProtocol: apiProtocol, signatureVersion: signatureVersion, docs: docs)
   }
   
   static func sortedShapeNames(unsorted: JSON) -> [String] {
@@ -651,13 +660,13 @@ struct API {
     return sorted
   }
   
-  static func shapeFromJSON(name: String, json: JSON, LUT: [String: Shape], service: String, docs: Docs) -> Shape {
+  static func shapeFromJSON(name: String, json: JSON, context: ApiContext) -> Shape {
     switch json["type"].stringValue {
-    case "structure": return Structure.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
-    case "list": return List.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
-    case "string" where json["enum"].exists(): return AwsEnum.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
-    case "map": return Map.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
-    default: return Primitive.fromJSON(name: name, json: json, LUT: LUT, service: service, docs: docs)
+    case "structure": return Structure.fromJSON(name: name, json: json, context: context)
+    case "list": return List.fromJSON(name: name, json: json, context: context)
+    case "string" where json["enum"].exists(): return AwsEnum.fromJSON(name: name, json: json, context: context)
+    case "map": return Map.fromJSON(name: name, json: json, context: context)
+    default: return Primitive.fromJSON(name: name, json: json, context: context)
     }
   }
   

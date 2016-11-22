@@ -435,11 +435,12 @@ public struct ListImagesResponse: RestJsonDeserializable {
   public let imageIds: [ImageIdentifier]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListImagesResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListImagesResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListImagesResponse(
-        nextToken: jsonDict["nextToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      imageIds: jsonDict["imageIds"].flatMap { ($0 is NSNull) ? nil : [ImageIdentifier].deserialize(response: response, json: $0) }
+        nextToken: jsonDict["nextToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      imageIds: jsonDict["imageIds"].flatMap { ($0 is NSNull) ? nil : [ImageIdentifier].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -465,11 +466,12 @@ public struct BatchDeleteImageResponse: RestJsonDeserializable {
   public let imageIds: [ImageIdentifier]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> BatchDeleteImageResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BatchDeleteImageResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return BatchDeleteImageResponse(
-        failures: jsonDict["failures"].flatMap { ($0 is NSNull) ? nil : [ImageFailure].deserialize(response: response, json: $0) },
-      imageIds: jsonDict["imageIds"].flatMap { ($0 is NSNull) ? nil : [ImageIdentifier].deserialize(response: response, json: $0) }
+        failures: jsonDict["failures"].flatMap { ($0 is NSNull) ? nil : [ImageFailure].deserialize(response: response, body: .json($0)) },
+      imageIds: jsonDict["imageIds"].flatMap { ($0 is NSNull) ? nil : [ImageIdentifier].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -515,12 +517,13 @@ public struct AuthorizationData: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> AuthorizationData {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AuthorizationData {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return AuthorizationData(
-        authorizationToken: jsonDict["authorizationToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      expiresAt: jsonDict["expiresAt"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, json: $0) },
-      proxyEndpoint: jsonDict["proxyEndpoint"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        authorizationToken: jsonDict["authorizationToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      expiresAt: jsonDict["expiresAt"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
+      proxyEndpoint: jsonDict["proxyEndpoint"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -547,10 +550,11 @@ public struct LayerPartTooSmallException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> LayerPartTooSmallException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LayerPartTooSmallException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return LayerPartTooSmallException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -573,10 +577,11 @@ public struct RepositoryNotFoundException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> RepositoryNotFoundException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RepositoryNotFoundException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return RepositoryNotFoundException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -599,10 +604,11 @@ public struct InvalidParameterException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidParameterException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidParameterException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidParameterException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -626,11 +632,12 @@ public struct DescribeImagesResponse: RestJsonDeserializable {
   public let imageDetails: [ImageDetail]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DescribeImagesResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DescribeImagesResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DescribeImagesResponse(
-        nextToken: jsonDict["nextToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      imageDetails: jsonDict["imageDetails"].flatMap { ($0 is NSNull) ? nil : [ImageDetail].deserialize(response: response, json: $0) }
+        nextToken: jsonDict["nextToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      imageDetails: jsonDict["imageDetails"].flatMap { ($0 is NSNull) ? nil : [ImageDetail].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -652,10 +659,11 @@ public struct DeleteRepositoryResponse: RestJsonDeserializable {
   public let repository: Repository?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DeleteRepositoryResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteRepositoryResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DeleteRepositoryResponse(
-        repository: jsonDict["repository"].flatMap { ($0 is NSNull) ? nil : Repository.deserialize(response: response, json: $0) }
+        repository: jsonDict["repository"].flatMap { ($0 is NSNull) ? nil : Repository.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -699,12 +707,13 @@ public struct Layer: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Layer {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Layer {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return Layer(
-        layerSize: jsonDict["layerSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      layerAvailability: jsonDict["layerAvailability"].flatMap { ($0 is NSNull) ? nil : Layeravailability.deserialize(response: response, json: $0) },
-      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        layerSize: jsonDict["layerSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      layerAvailability: jsonDict["layerAvailability"].flatMap { ($0 is NSNull) ? nil : Layeravailability.deserialize(response: response, body: .json($0)) },
+      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -810,11 +819,12 @@ public struct ImageIdentifier: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ImageIdentifier {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ImageIdentifier {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ImageIdentifier(
-        imageTag: jsonDict["imageTag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      imageDigest: jsonDict["imageDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        imageTag: jsonDict["imageTag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      imageDigest: jsonDict["imageDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -844,12 +854,13 @@ public struct DeleteRepositoryPolicyResponse: RestJsonDeserializable {
   public let repositoryName: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DeleteRepositoryPolicyResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteRepositoryPolicyResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DeleteRepositoryPolicyResponse(
-        policyText: jsonDict["policyText"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        policyText: jsonDict["policyText"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -876,10 +887,11 @@ public struct UploadNotFoundException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> UploadNotFoundException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UploadNotFoundException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return UploadNotFoundException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -922,12 +934,13 @@ public struct LayerFailure: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> LayerFailure {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LayerFailure {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return LayerFailure(
-        failureReason: jsonDict["failureReason"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      failureCode: jsonDict["failureCode"].flatMap { ($0 is NSNull) ? nil : Layerfailurecode.deserialize(response: response, json: $0) },
-      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        failureReason: jsonDict["failureReason"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      failureCode: jsonDict["failureCode"].flatMap { ($0 is NSNull) ? nil : Layerfailurecode.deserialize(response: response, body: .json($0)) },
+      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -975,12 +988,13 @@ public struct ImageFailure: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ImageFailure {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ImageFailure {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ImageFailure(
-        imageId: jsonDict["imageId"].flatMap { ($0 is NSNull) ? nil : ImageIdentifier.deserialize(response: response, json: $0) },
-      failureCode: jsonDict["failureCode"].flatMap { ($0 is NSNull) ? nil : Imagefailurecode.deserialize(response: response, json: $0) },
-      failureReason: jsonDict["failureReason"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        imageId: jsonDict["imageId"].flatMap { ($0 is NSNull) ? nil : ImageIdentifier.deserialize(response: response, body: .json($0)) },
+      failureCode: jsonDict["failureCode"].flatMap { ($0 is NSNull) ? nil : Imagefailurecode.deserialize(response: response, body: .json($0)) },
+      failureReason: jsonDict["failureReason"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1009,11 +1023,12 @@ public struct BatchGetImageResponse: RestJsonDeserializable {
   public let images: [Image]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> BatchGetImageResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BatchGetImageResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return BatchGetImageResponse(
-        failures: jsonDict["failures"].flatMap { ($0 is NSNull) ? nil : [ImageFailure].deserialize(response: response, json: $0) },
-      images: jsonDict["images"].flatMap { ($0 is NSNull) ? nil : [Image].deserialize(response: response, json: $0) }
+        failures: jsonDict["failures"].flatMap { ($0 is NSNull) ? nil : [ImageFailure].deserialize(response: response, body: .json($0)) },
+      images: jsonDict["images"].flatMap { ($0 is NSNull) ? nil : [Image].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1038,10 +1053,11 @@ public struct RepositoryPolicyNotFoundException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> RepositoryPolicyNotFoundException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RepositoryPolicyNotFoundException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return RepositoryPolicyNotFoundException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1066,10 +1082,11 @@ public struct RepositoryAlreadyExistsException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> RepositoryAlreadyExistsException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RepositoryAlreadyExistsException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return RepositoryAlreadyExistsException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1092,10 +1109,11 @@ public struct InvalidLayerException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidLayerException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidLayerException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidLayerException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1112,7 +1130,8 @@ enum Layeravailability: String, RestJsonDeserializable, RestJsonSerializable {
   case `aVAILABLE` = "AVAILABLE"
   case `uNAVAILABLE` = "UNAVAILABLE"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Layeravailability {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Layeravailability {
+    guard case let .json(json) = body else { fatalError() }
     return Layeravailability(rawValue: json as! String)!
   }
 
@@ -1131,10 +1150,11 @@ public struct LayerAlreadyExistsException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> LayerAlreadyExistsException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LayerAlreadyExistsException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return LayerAlreadyExistsException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1158,10 +1178,11 @@ public struct LimitExceededException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> LimitExceededException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LimitExceededException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return LimitExceededException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1216,12 +1237,13 @@ public struct SetRepositoryPolicyResponse: RestJsonDeserializable {
   public let repositoryName: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> SetRepositoryPolicyResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SetRepositoryPolicyResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return SetRepositoryPolicyResponse(
-        policyText: jsonDict["policyText"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        policyText: jsonDict["policyText"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1248,10 +1270,11 @@ public struct LayersNotFoundException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> LayersNotFoundException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LayersNotFoundException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return LayersNotFoundException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1275,10 +1298,11 @@ public struct ImageAlreadyExistsException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ImageAlreadyExistsException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ImageAlreadyExistsException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ImageAlreadyExistsException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1295,7 +1319,8 @@ enum Layerfailurecode: String, RestJsonDeserializable, RestJsonSerializable {
   case `invalidLayerDigest` = "InvalidLayerDigest"
   case `missingLayerDigest` = "MissingLayerDigest"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Layerfailurecode {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Layerfailurecode {
+    guard case let .json(json) = body else { fatalError() }
     return Layerfailurecode(rawValue: json as! String)!
   }
 
@@ -1349,15 +1374,16 @@ public struct ImageDetail: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ImageDetail {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ImageDetail {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ImageDetail(
-        imageSizeInBytes: jsonDict["imageSizeInBytes"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      imageDigest: jsonDict["imageDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      imageTags: jsonDict["imageTags"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) },
-      imagePushedAt: jsonDict["imagePushedAt"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        imageSizeInBytes: jsonDict["imageSizeInBytes"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      imageDigest: jsonDict["imageDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      imageTags: jsonDict["imageTags"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) },
+      imagePushedAt: jsonDict["imagePushedAt"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1388,10 +1414,11 @@ public struct GetAuthorizationTokenResponse: RestJsonDeserializable {
   public let authorizationData: [AuthorizationData]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetAuthorizationTokenResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetAuthorizationTokenResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetAuthorizationTokenResponse(
-        authorizationData: jsonDict["authorizationData"].flatMap { ($0 is NSNull) ? nil : [AuthorizationData].deserialize(response: response, json: $0) }
+        authorizationData: jsonDict["authorizationData"].flatMap { ($0 is NSNull) ? nil : [AuthorizationData].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1415,11 +1442,12 @@ public struct InitiateLayerUploadResponse: RestJsonDeserializable {
   public let partSize: Int?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InitiateLayerUploadResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InitiateLayerUploadResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InitiateLayerUploadResponse(
-        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      partSize: jsonDict["partSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) }
+        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      partSize: jsonDict["partSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1444,10 +1472,11 @@ public struct LayerInaccessibleException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> LayerInaccessibleException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LayerInaccessibleException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return LayerInaccessibleException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1471,10 +1500,11 @@ public struct EmptyUploadException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> EmptyUploadException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EmptyUploadException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return EmptyUploadException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1573,11 +1603,12 @@ public struct GetDownloadUrlForLayerResponse: RestJsonDeserializable {
   public let layerDigest: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetDownloadUrlForLayerResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetDownloadUrlForLayerResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetDownloadUrlForLayerResponse(
-        downloadUrl: jsonDict["downloadUrl"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        downloadUrl: jsonDict["downloadUrl"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1655,13 +1686,14 @@ public struct Image: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Image {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Image {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return Image(
-        imageManifest: jsonDict["imageManifest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      imageId: jsonDict["imageId"].flatMap { ($0 is NSNull) ? nil : ImageIdentifier.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        imageManifest: jsonDict["imageManifest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      imageId: jsonDict["imageId"].flatMap { ($0 is NSNull) ? nil : ImageIdentifier.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1696,12 +1728,13 @@ public struct GetRepositoryPolicyResponse: RestJsonDeserializable {
   public let repositoryName: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetRepositoryPolicyResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetRepositoryPolicyResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetRepositoryPolicyResponse(
-        policyText: jsonDict["policyText"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        policyText: jsonDict["policyText"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1782,10 +1815,11 @@ public struct ListImagesFilter: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListImagesFilter {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListImagesFilter {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListImagesFilter(
-        tagStatus: jsonDict["tagStatus"].flatMap { ($0 is NSNull) ? nil : Tagstatus.deserialize(response: response, json: $0) }
+        tagStatus: jsonDict["tagStatus"].flatMap { ($0 is NSNull) ? nil : Tagstatus.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1853,10 +1887,11 @@ public struct CreateRepositoryResponse: RestJsonDeserializable {
   public let repository: Repository?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> CreateRepositoryResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateRepositoryResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return CreateRepositoryResponse(
-        repository: jsonDict["repository"].flatMap { ($0 is NSNull) ? nil : Repository.deserialize(response: response, json: $0) }
+        repository: jsonDict["repository"].flatMap { ($0 is NSNull) ? nil : Repository.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1879,10 +1914,11 @@ public struct ImageNotFoundException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ImageNotFoundException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ImageNotFoundException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ImageNotFoundException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1983,10 +2019,11 @@ public struct ServerException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ServerException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ServerException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ServerException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2011,11 +2048,12 @@ public struct BatchCheckLayerAvailabilityResponse: RestJsonDeserializable {
   public let layers: [Layer]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> BatchCheckLayerAvailabilityResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BatchCheckLayerAvailabilityResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return BatchCheckLayerAvailabilityResponse(
-        failures: jsonDict["failures"].flatMap { ($0 is NSNull) ? nil : [LayerFailure].deserialize(response: response, json: $0) },
-      layers: jsonDict["layers"].flatMap { ($0 is NSNull) ? nil : [Layer].deserialize(response: response, json: $0) }
+        failures: jsonDict["failures"].flatMap { ($0 is NSNull) ? nil : [LayerFailure].deserialize(response: response, body: .json($0)) },
+      layers: jsonDict["layers"].flatMap { ($0 is NSNull) ? nil : [Layer].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2090,13 +2128,14 @@ public struct UploadLayerPartResponse: RestJsonDeserializable {
   public let lastByteReceived: Int?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> UploadLayerPartResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UploadLayerPartResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return UploadLayerPartResponse(
-        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      lastByteReceived: jsonDict["lastByteReceived"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) }
+        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      lastByteReceived: jsonDict["lastByteReceived"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2127,11 +2166,12 @@ public struct DescribeRepositoriesResponse: RestJsonDeserializable {
   public let nextToken: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DescribeRepositoriesResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DescribeRepositoriesResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DescribeRepositoriesResponse(
-        repositories: jsonDict["repositories"].flatMap { ($0 is NSNull) ? nil : [Repository].deserialize(response: response, json: $0) },
-      nextToken: jsonDict["nextToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        repositories: jsonDict["repositories"].flatMap { ($0 is NSNull) ? nil : [Repository].deserialize(response: response, body: .json($0)) },
+      nextToken: jsonDict["nextToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2190,7 +2230,8 @@ enum Imagefailurecode: String, RestJsonDeserializable, RestJsonSerializable {
   case `imageNotFound` = "ImageNotFound"
   case `missingDigestAndTag` = "MissingDigestAndTag"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Imagefailurecode {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Imagefailurecode {
+    guard case let .json(json) = body else { fatalError() }
     return Imagefailurecode(rawValue: json as! String)!
   }
 
@@ -2250,10 +2291,11 @@ public struct PutImageResponse: RestJsonDeserializable {
   public let image: Image?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> PutImageResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> PutImageResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return PutImageResponse(
-        image: jsonDict["image"].flatMap { ($0 is NSNull) ? nil : Image.deserialize(response: response, json: $0) }
+        image: jsonDict["image"].flatMap { ($0 is NSNull) ? nil : Image.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2306,14 +2348,15 @@ public struct Repository: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Repository {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Repository {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return Repository(
-        repositoryUri: jsonDict["repositoryUri"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      createdAt: jsonDict["createdAt"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, json: $0) },
-      repositoryArn: jsonDict["repositoryArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        repositoryUri: jsonDict["repositoryUri"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      createdAt: jsonDict["createdAt"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
+      repositoryArn: jsonDict["repositoryArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2388,10 +2431,11 @@ public struct RepositoryNotEmptyException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> RepositoryNotEmptyException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RepositoryNotEmptyException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return RepositoryNotEmptyException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2426,13 +2470,14 @@ public struct CompleteLayerUploadResponse: RestJsonDeserializable {
   public let layerDigest: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> CompleteLayerUploadResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompleteLayerUploadResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return CompleteLayerUploadResponse(
-        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      layerDigest: jsonDict["layerDigest"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2479,14 +2524,15 @@ public struct InvalidLayerPartException: Error, RestJsonDeserializable {
   public let lastValidByteReceived: Int?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidLayerPartException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidLayerPartException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidLayerPartException(
-        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      lastValidByteReceived: jsonDict["lastValidByteReceived"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) }
+        uploadId: jsonDict["uploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryName: jsonDict["repositoryName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      registryId: jsonDict["registryId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      lastValidByteReceived: jsonDict["lastValidByteReceived"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2623,7 +2669,8 @@ enum Tagstatus: String, RestJsonDeserializable, RestJsonSerializable {
   case `tAGGED` = "TAGGED"
   case `uNTAGGED` = "UNTAGGED"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Tagstatus {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Tagstatus {
+    guard case let .json(json) = body else { fatalError() }
     return Tagstatus(rawValue: json as! String)!
   }
 
@@ -2653,10 +2700,11 @@ public struct DescribeImagesFilter: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DescribeImagesFilter {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DescribeImagesFilter {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DescribeImagesFilter(
-        tagStatus: jsonDict["tagStatus"].flatMap { ($0 is NSNull) ? nil : Tagstatus.deserialize(response: response, json: $0) }
+        tagStatus: jsonDict["tagStatus"].flatMap { ($0 is NSNull) ? nil : Tagstatus.deserialize(response: response, body: .json($0)) }
     )
   }
 

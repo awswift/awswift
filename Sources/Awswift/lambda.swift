@@ -615,17 +615,18 @@ public struct EventSourceMappingConfiguration: RestJsonSerializable, RestJsonDes
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> EventSourceMappingConfiguration {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EventSourceMappingConfiguration {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return EventSourceMappingConfiguration(
-        lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, json: $0) },
-      uUID: jsonDict["UUID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      batchSize: jsonDict["BatchSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      eventSourceArn: jsonDict["EventSourceArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      functionArn: jsonDict["FunctionArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      state: jsonDict["State"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      lastProcessingResult: jsonDict["LastProcessingResult"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      stateTransitionReason: jsonDict["StateTransitionReason"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
+      uUID: jsonDict["UUID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      batchSize: jsonDict["BatchSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      eventSourceArn: jsonDict["EventSourceArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      functionArn: jsonDict["FunctionArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      state: jsonDict["State"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      lastProcessingResult: jsonDict["LastProcessingResult"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      stateTransitionReason: jsonDict["StateTransitionReason"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -658,7 +659,8 @@ enum Runtime: String, RestJsonDeserializable, RestJsonSerializable {
   case `java8` = "java8"
   case `python27` = "python2.7"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Runtime {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Runtime {
+    guard case let .json(json) = body else { fatalError() }
     return Runtime(rawValue: json as! String)!
   }
 
@@ -674,7 +676,7 @@ public struct EC2UnexpectedException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
@@ -685,23 +687,24 @@ public struct EC2UnexpectedException: Error, RestJsonDeserializable {
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> EC2UnexpectedException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EC2UnexpectedException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return EC2UnexpectedException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      eC2ErrorCode: jsonDict["EC2ErrorCode"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      eC2ErrorCode: jsonDict["EC2ErrorCode"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - eC2ErrorCode: 
       - message: 
  */
-  public init(stringType: String?, eC2ErrorCode: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, eC2ErrorCode: String?, message: String?) {
+self.lambdaType = lambdaType
 self.eC2ErrorCode = eC2ErrorCode
 self.message = message
   }
@@ -866,28 +869,29 @@ public struct EC2ThrottledException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> EC2ThrottledException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EC2ThrottledException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return EC2ThrottledException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1040,28 +1044,29 @@ public struct InvalidRequestContentException: Error, RestJsonDeserializable {
 /**
 <p/>
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 <p/>
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidRequestContentException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidRequestContentException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidRequestContentException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: <p/>
+      - lambdaType: <p/>
       - message: <p/>
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1073,28 +1078,29 @@ public struct InvalidSubnetIDException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidSubnetIDException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidSubnetIDException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidSubnetIDException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1106,28 +1112,29 @@ public struct InvalidSecurityGroupIDException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidSecurityGroupIDException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidSecurityGroupIDException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidSecurityGroupIDException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1140,28 +1147,29 @@ public struct PolicyLengthExceededException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> PolicyLengthExceededException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> PolicyLengthExceededException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return PolicyLengthExceededException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1258,11 +1266,12 @@ public struct ListAliasesResponse: RestJsonDeserializable {
   public let nextMarker: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListAliasesResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListAliasesResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListAliasesResponse(
-        aliases: jsonDict["Aliases"].flatMap { ($0 is NSNull) ? nil : [AliasConfiguration].deserialize(response: response, json: $0) },
-      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        aliases: jsonDict["Aliases"].flatMap { ($0 is NSNull) ? nil : [AliasConfiguration].deserialize(response: response, body: .json($0)) },
+      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1312,13 +1321,14 @@ public struct FunctionCode: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> FunctionCode {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FunctionCode {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return FunctionCode(
-        s3ObjectVersion: jsonDict["S3ObjectVersion"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      s3Key: jsonDict["S3Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      s3Bucket: jsonDict["S3Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      zipFile: jsonDict["ZipFile"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, json: $0) }
+        s3ObjectVersion: jsonDict["S3ObjectVersion"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      s3Key: jsonDict["S3Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      s3Bucket: jsonDict["S3Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      zipFile: jsonDict["ZipFile"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1362,11 +1372,12 @@ public struct FunctionCodeLocation: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> FunctionCodeLocation {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FunctionCodeLocation {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return FunctionCodeLocation(
-        location: jsonDict["Location"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      repositoryType: jsonDict["RepositoryType"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        location: jsonDict["Location"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      repositoryType: jsonDict["RepositoryType"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1386,7 +1397,8 @@ enum Invocationtype: String, RestJsonDeserializable, RestJsonSerializable {
   case `requestResponse` = "RequestResponse"
   case `dryRun` = "DryRun"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Invocationtype {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Invocationtype {
+    guard case let .json(json) = body else { fatalError() }
     return Invocationtype(rawValue: json as! String)!
   }
 
@@ -1495,7 +1507,8 @@ enum Throttlereason: String, RestJsonDeserializable, RestJsonSerializable {
   case `functionInvocationRateLimitExceeded` = "FunctionInvocationRateLimitExceeded"
   case `callerRateLimitExceeded` = "CallerRateLimitExceeded"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Throttlereason {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Throttlereason {
+    guard case let .json(json) = body else { fatalError() }
     return Throttlereason(rawValue: json as! String)!
   }
 
@@ -1508,7 +1521,8 @@ enum Logtype: String, RestJsonDeserializable, RestJsonSerializable {
   case `none` = "None"
   case `tail` = "Tail"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Logtype {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Logtype {
+    guard case let .json(json) = body else { fatalError() }
     return Logtype(rawValue: json as! String)!
   }
 
@@ -1729,7 +1743,7 @@ public struct InvokeAsyncResponse: RestJsonDeserializable {
   public let status: Int?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvokeAsyncResponse {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvokeAsyncResponse {
   
     return InvokeAsyncResponse(
         status: response.statusCode
@@ -1752,28 +1766,29 @@ public struct CodeStorageExceededException: Error, RestJsonDeserializable {
 /**
 <p/>
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> CodeStorageExceededException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CodeStorageExceededException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return CodeStorageExceededException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: <p/>
+      - lambdaType: <p/>
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1786,28 +1801,29 @@ public struct ResourceConflictException: Error, RestJsonDeserializable {
 /**
 <p/>
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 <p/>
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ResourceConflictException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ResourceConflictException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ResourceConflictException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: <p/>
+      - lambdaType: <p/>
       - message: <p/>
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -1868,13 +1884,14 @@ public struct InvocationResponse: RestJsonDeserializable {
   public let functionError: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvocationResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvocationResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvocationResponse(
         statusCode: response.statusCode,
-      logResult: response.allHeaderFields["X-Amz-Log-Result"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      payload: jsonDict["Payload"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, json: $0) },
-      functionError: response.allHeaderFields["X-Amz-Function-Error"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+      logResult: response.allHeaderFields["X-Amz-Log-Result"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      payload: jsonDict["Payload"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, body: .json($0)) },
+      functionError: response.allHeaderFields["X-Amz-Function-Error"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1908,20 +1925,21 @@ public struct TooManyRequestsException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 <p>The number of seconds the caller should wait before retrying.</p>
  */
   public let retryAfterSeconds: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> TooManyRequestsException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TooManyRequestsException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return TooManyRequestsException(
-        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      reason: jsonDict["Reason"].flatMap { ($0 is NSNull) ? nil : Throttlereason.deserialize(response: response, json: $0) },
-      stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      retryAfterSeconds: response.allHeaderFields["Retry-After"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      reason: jsonDict["Reason"].flatMap { ($0 is NSNull) ? nil : Throttlereason.deserialize(response: response, body: .json($0)) },
+      lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      retryAfterSeconds: response.allHeaderFields["Retry-After"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1929,13 +1947,13 @@ public struct TooManyRequestsException: Error, RestJsonDeserializable {
     - parameters:
       - message: 
       - reason: 
-      - stringType: 
+      - lambdaType: 
       - retryAfterSeconds: <p>The number of seconds the caller should wait before retrying.</p>
  */
-  public init(message: String?, reason: Throttlereason?, stringType: String?, retryAfterSeconds: String?) {
+  public init(message: String?, reason: Throttlereason?, lambdaType: String?, retryAfterSeconds: String?) {
 self.message = message
 self.reason = reason
-self.stringType = stringType
+self.lambdaType = lambdaType
 self.retryAfterSeconds = retryAfterSeconds
   }
 }
@@ -1950,10 +1968,11 @@ public struct AddPermissionResponse: RestJsonDeserializable {
   public let statement: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> AddPermissionResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AddPermissionResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return AddPermissionResponse(
-        statement: jsonDict["Statement"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        statement: jsonDict["Statement"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2052,28 +2071,29 @@ public struct InvalidZipFileException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidZipFileException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidZipFileException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidZipFileException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -2093,11 +2113,12 @@ public struct ListFunctionsResponse: RestJsonDeserializable {
   public let nextMarker: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListFunctionsResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListFunctionsResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListFunctionsResponse(
-        functions: jsonDict["Functions"].flatMap { ($0 is NSNull) ? nil : [FunctionConfiguration].deserialize(response: response, json: $0) },
-      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        functions: jsonDict["Functions"].flatMap { ($0 is NSNull) ? nil : [FunctionConfiguration].deserialize(response: response, body: .json($0)) },
+      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2119,28 +2140,29 @@ public struct InvalidParameterValueException: Error, RestJsonDeserializable {
 /**
 <p/>
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 <p/>
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidParameterValueException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidParameterValueException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return InvalidParameterValueException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: <p/>
+      - lambdaType: <p/>
       - message: <p/>
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -2242,7 +2264,8 @@ enum Eventsourceposition: String, RestJsonDeserializable, RestJsonSerializable {
   case `tRIM_HORIZON` = "TRIM_HORIZON"
   case `lATEST` = "LATEST"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Eventsourceposition {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Eventsourceposition {
+    guard case let .json(json) = body else { fatalError() }
     return Eventsourceposition(rawValue: json as! String)!
   }
 
@@ -2273,12 +2296,13 @@ public struct VpcConfigResponse: RestJsonDeserializable {
   public let securityGroupIds: [String]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> VpcConfigResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> VpcConfigResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return VpcConfigResponse(
-        vpcId: jsonDict["VpcId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      subnetIds: jsonDict["SubnetIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) },
-      securityGroupIds: jsonDict["SecurityGroupIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) }
+        vpcId: jsonDict["VpcId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      subnetIds: jsonDict["SubnetIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) },
+      securityGroupIds: jsonDict["SecurityGroupIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2339,28 +2363,29 @@ public struct RequestTooLargeException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> RequestTooLargeException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RequestTooLargeException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return RequestTooLargeException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -2445,22 +2470,23 @@ public struct FunctionConfiguration: RestJsonSerializable, RestJsonDeserializabl
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> FunctionConfiguration {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FunctionConfiguration {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return FunctionConfiguration(
-        vpcConfig: jsonDict["VpcConfig"].flatMap { ($0 is NSNull) ? nil : VpcConfigResponse.deserialize(response: response, json: $0) },
-      runtime: jsonDict["Runtime"].flatMap { ($0 is NSNull) ? nil : Runtime.deserialize(response: response, json: $0) },
-      timeout: jsonDict["Timeout"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      codeSha256: jsonDict["CodeSha256"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      description: jsonDict["Description"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      functionName: jsonDict["FunctionName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      memorySize: jsonDict["MemorySize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      functionArn: jsonDict["FunctionArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      version: jsonDict["Version"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      role: jsonDict["Role"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      codeSize: jsonDict["CodeSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      handler: jsonDict["Handler"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        vpcConfig: jsonDict["VpcConfig"].flatMap { ($0 is NSNull) ? nil : VpcConfigResponse.deserialize(response: response, body: .json($0)) },
+      runtime: jsonDict["Runtime"].flatMap { ($0 is NSNull) ? nil : Runtime.deserialize(response: response, body: .json($0)) },
+      timeout: jsonDict["Timeout"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      codeSha256: jsonDict["CodeSha256"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      description: jsonDict["Description"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      functionName: jsonDict["FunctionName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      memorySize: jsonDict["MemorySize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      functionArn: jsonDict["FunctionArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      version: jsonDict["Version"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      role: jsonDict["Role"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      codeSize: jsonDict["CodeSize"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      handler: jsonDict["Handler"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2507,10 +2533,11 @@ public struct GetPolicyResponse: RestJsonDeserializable {
   public let policy: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetPolicyResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetPolicyResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetPolicyResponse(
-        policy: jsonDict["Policy"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        policy: jsonDict["Policy"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2531,28 +2558,29 @@ public struct EC2AccessDeniedException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> EC2AccessDeniedException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EC2AccessDeniedException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return EC2AccessDeniedException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -2574,11 +2602,12 @@ public struct ListVersionsByFunctionResponse: RestJsonDeserializable {
   public let versions: [FunctionConfiguration]?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListVersionsByFunctionResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListVersionsByFunctionResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListVersionsByFunctionResponse(
-        nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      versions: jsonDict["Versions"].flatMap { ($0 is NSNull) ? nil : [FunctionConfiguration].deserialize(response: response, json: $0) }
+        nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      versions: jsonDict["Versions"].flatMap { ($0 is NSNull) ? nil : [FunctionConfiguration].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2600,28 +2629,29 @@ public struct ENILimitReachedException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ENILimitReachedException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ENILimitReachedException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ENILimitReachedException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -2633,28 +2663,29 @@ public struct UnsupportedMediaTypeException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> UnsupportedMediaTypeException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UnsupportedMediaTypeException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return UnsupportedMediaTypeException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -2695,13 +2726,14 @@ public struct AliasConfiguration: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> AliasConfiguration {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AliasConfiguration {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return AliasConfiguration(
-        functionVersion: jsonDict["FunctionVersion"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      aliasArn: jsonDict["AliasArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      description: jsonDict["Description"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        functionVersion: jsonDict["FunctionVersion"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      aliasArn: jsonDict["AliasArn"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      description: jsonDict["Description"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2830,11 +2862,12 @@ public struct VpcConfig: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> VpcConfig {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> VpcConfig {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return VpcConfig(
-        subnetIds: jsonDict["SubnetIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) },
-      securityGroupIds: jsonDict["SecurityGroupIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) }
+        subnetIds: jsonDict["SubnetIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) },
+      securityGroupIds: jsonDict["SecurityGroupIds"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -2856,28 +2889,29 @@ public struct ResourceNotFoundException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ResourceNotFoundException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ResourceNotFoundException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ResourceNotFoundException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -3000,28 +3034,29 @@ public struct SubnetIPAddressLimitReachedException: Error, RestJsonDeserializabl
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> SubnetIPAddressLimitReachedException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SubnetIPAddressLimitReachedException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return SubnetIPAddressLimitReachedException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -3035,28 +3070,29 @@ public struct ServiceException: Error, RestJsonDeserializable {
 /**
 
  */
-  public let stringType: String?
+  public let lambdaType: String?
 /**
 
  */
   public let message: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ServiceException {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ServiceException {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ServiceException(
-        stringType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        lambdaType: jsonDict["Type"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
 /**
     - parameters:
-      - stringType: 
+      - lambdaType: 
       - message: 
  */
-  public init(stringType: String?, message: String?) {
-self.stringType = stringType
+  public init(lambdaType: String?, message: String?) {
+self.lambdaType = lambdaType
 self.message = message
   }
 }
@@ -3114,11 +3150,12 @@ public struct GetFunctionResponse: RestJsonDeserializable {
   public let code: FunctionCodeLocation?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetFunctionResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetFunctionResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetFunctionResponse(
-        configuration: jsonDict["Configuration"].flatMap { ($0 is NSNull) ? nil : FunctionConfiguration.deserialize(response: response, json: $0) },
-      code: jsonDict["Code"].flatMap { ($0 is NSNull) ? nil : FunctionCodeLocation.deserialize(response: response, json: $0) }
+        configuration: jsonDict["Configuration"].flatMap { ($0 is NSNull) ? nil : FunctionConfiguration.deserialize(response: response, body: .json($0)) },
+      code: jsonDict["Code"].flatMap { ($0 is NSNull) ? nil : FunctionCodeLocation.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -3147,11 +3184,12 @@ public struct ListEventSourceMappingsResponse: RestJsonDeserializable {
   public let nextMarker: String?
 
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListEventSourceMappingsResponse {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListEventSourceMappingsResponse {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListEventSourceMappingsResponse(
-        eventSourceMappings: jsonDict["EventSourceMappings"].flatMap { ($0 is NSNull) ? nil : [EventSourceMappingConfiguration].deserialize(response: response, json: $0) },
-      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        eventSourceMappings: jsonDict["EventSourceMappings"].flatMap { ($0 is NSNull) ? nil : [EventSourceMappingConfiguration].deserialize(response: response, body: .json($0)) },
+      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 

@@ -476,13 +476,14 @@ public struct SendMessageBatchRequestEntry: RestJsonSerializable, RestJsonDeseri
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> SendMessageBatchRequestEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SendMessageBatchRequestEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return SendMessageBatchRequestEntry(
-        delaySeconds: jsonDict["DelaySeconds"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      messageBody: jsonDict["MessageBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      messageAttributes: jsonDict["MessageAttribute"].flatMap { ($0 is NSNull) ? nil : [String: MessageAttributeValue].deserialize(response: response, json: $0) }
+        delaySeconds: jsonDict["DelaySeconds"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      messageBody: jsonDict["MessageBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      messageAttributes: jsonDict["MessageAttribute"].flatMap { ($0 is NSNull) ? nil : [String: MessageAttributeValue].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -531,12 +532,13 @@ public struct SendMessageResult: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> SendMessageResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SendMessageResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return SendMessageResult(
-        mD5OfMessageAttributes: jsonDict["MD5OfMessageAttributes"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      mD5OfMessageBody: jsonDict["MD5OfMessageBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      messageId: jsonDict["MessageId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        mD5OfMessageAttributes: jsonDict["MD5OfMessageAttributes"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      mD5OfMessageBody: jsonDict["MD5OfMessageBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      messageId: jsonDict["MessageId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -594,14 +596,15 @@ public struct MessageAttributeValue: RestJsonSerializable, RestJsonDeserializabl
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> MessageAttributeValue {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> MessageAttributeValue {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return MessageAttributeValue(
-        stringValue: jsonDict["StringValue"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      binaryValue: jsonDict["BinaryValue"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, json: $0) },
-      binaryListValues: jsonDict["BinaryListValue"].flatMap { ($0 is NSNull) ? nil : [Data].deserialize(response: response, json: $0) },
-      dataType: jsonDict["DataType"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      stringListValues: jsonDict["StringListValue"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) }
+        stringValue: jsonDict["StringValue"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      binaryValue: jsonDict["BinaryValue"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, body: .json($0)) },
+      binaryListValues: jsonDict["BinaryListValue"].flatMap { ($0 is NSNull) ? nil : [Data].deserialize(response: response, body: .json($0)) },
+      dataType: jsonDict["DataType"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      stringListValues: jsonDict["StringListValue"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -637,7 +640,7 @@ public struct QueueNameExists: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> QueueNameExists {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueNameExists {
   
     return QueueNameExists(
   
@@ -666,7 +669,7 @@ public struct InvalidMessageContents: RestJsonSerializable, RestJsonDeserializab
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidMessageContents {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidMessageContents {
   
     return InvalidMessageContents(
   
@@ -710,12 +713,13 @@ public struct ChangeMessageVisibilityBatchRequestEntry: RestJsonSerializable, Re
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ChangeMessageVisibilityBatchRequestEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ChangeMessageVisibilityBatchRequestEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ChangeMessageVisibilityBatchRequestEntry(
-        visibilityTimeout: jsonDict["VisibilityTimeout"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, json: $0) },
-      receiptHandle: jsonDict["ReceiptHandle"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!
+        visibilityTimeout: jsonDict["VisibilityTimeout"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      receiptHandle: jsonDict["ReceiptHandle"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -753,10 +757,11 @@ public struct GetQueueUrlResult: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetQueueUrlResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetQueueUrlResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetQueueUrlResult(
-        queueUrl: jsonDict["QueueUrl"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        queueUrl: jsonDict["QueueUrl"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -823,7 +828,7 @@ public struct MessageNotInflight: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> MessageNotInflight {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> MessageNotInflight {
   
     return MessageNotInflight(
   
@@ -853,7 +858,7 @@ public struct InvalidBatchEntryId: RestJsonSerializable, RestJsonDeserializable 
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidBatchEntryId {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidBatchEntryId {
   
     return InvalidBatchEntryId(
   
@@ -890,7 +895,7 @@ public struct Message: RestJsonSerializable, RestJsonDeserializable {
 /**
 <p>The message's contents (not URL-encoded).</p>
  */
-  public let stringBody: String?
+  public let sqsBody: String?
 /**
 <p>An MD5 digest of the non-URL-encoded message body string.</p>
  */
@@ -910,23 +915,24 @@ public struct Message: RestJsonSerializable, RestJsonDeserializable {
     if messageId != nil { body["MessageId"] = messageId! }
     if mD5OfMessageAttributes != nil { body["MD5OfMessageAttributes"] = mD5OfMessageAttributes! }
     if attributes != nil { body["Attribute"] = attributes! }
-    if stringBody != nil { body["Body"] = stringBody! }
+    if sqsBody != nil { body["Body"] = sqsBody! }
     if mD5OfBody != nil { body["MD5OfBody"] = mD5OfBody! }
     if messageAttributes != nil { body["MessageAttribute"] = messageAttributes! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Message {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Message {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return Message(
-        receiptHandle: jsonDict["ReceiptHandle"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      messageId: jsonDict["MessageId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      mD5OfMessageAttributes: jsonDict["MD5OfMessageAttributes"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      attributes: jsonDict["Attribute"].flatMap { ($0 is NSNull) ? nil : [Queueattributename: String].deserialize(response: response, json: $0) },
-      stringBody: jsonDict["Body"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      mD5OfBody: jsonDict["MD5OfBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      messageAttributes: jsonDict["MessageAttribute"].flatMap { ($0 is NSNull) ? nil : [String: MessageAttributeValue].deserialize(response: response, json: $0) }
+        receiptHandle: jsonDict["ReceiptHandle"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      messageId: jsonDict["MessageId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      mD5OfMessageAttributes: jsonDict["MD5OfMessageAttributes"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      attributes: jsonDict["Attribute"].flatMap { ($0 is NSNull) ? nil : [Queueattributename: String].deserialize(response: response, body: .json($0)) },
+      sqsBody: jsonDict["Body"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      mD5OfBody: jsonDict["MD5OfBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      messageAttributes: jsonDict["MessageAttribute"].flatMap { ($0 is NSNull) ? nil : [String: MessageAttributeValue].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -936,16 +942,16 @@ public struct Message: RestJsonSerializable, RestJsonDeserializable {
       - messageId: <p>A unique identifier for the message. Message IDs are considered unique across all AWS accounts for an extended period of time.</p>
       - mD5OfMessageAttributes: <p>An MD5 digest of the non-URL-encoded message attribute string. This can be used to verify that Amazon SQS received the message correctly. Amazon SQS first URL decodes the message before creating the MD5 digest. For information about MD5, go to <a href="http://www.faqs.org/rfcs/rfc1321.html">http://www.faqs.org/rfcs/rfc1321.html</a>.</p>
       - attributes: <p><code>SenderId</code>, <code>SentTimestamp</code>, <code>ApproximateReceiveCount</code>, and/or <code>ApproximateFirstReceiveTimestamp</code>. <code>SentTimestamp</code> and <code>ApproximateFirstReceiveTimestamp</code> are each returned as an integer representing the <a href="http://en.wikipedia.org/wiki/Unix_time">epoch time</a> in milliseconds.</p>
-      - stringBody: <p>The message's contents (not URL-encoded).</p>
+      - sqsBody: <p>The message's contents (not URL-encoded).</p>
       - mD5OfBody: <p>An MD5 digest of the non-URL-encoded message body string.</p>
       - messageAttributes: <p>Each message attribute consists of a Name, Type, and Value. For more information, see <a href="http://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/SQSMessageAttributes.html#SQSMessageAttributesNTV">Message Attribute Items</a>.</p>
  */
-  public init(receiptHandle: String?, messageId: String?, mD5OfMessageAttributes: String?, attributes: [Queueattributename: String]?, stringBody: String?, mD5OfBody: String?, messageAttributes: [String: MessageAttributeValue]?) {
+  public init(receiptHandle: String?, messageId: String?, mD5OfMessageAttributes: String?, attributes: [Queueattributename: String]?, sqsBody: String?, mD5OfBody: String?, messageAttributes: [String: MessageAttributeValue]?) {
 self.receiptHandle = receiptHandle
 self.messageId = messageId
 self.mD5OfMessageAttributes = mD5OfMessageAttributes
 self.attributes = attributes
-self.stringBody = stringBody
+self.sqsBody = sqsBody
 self.mD5OfBody = mD5OfBody
 self.messageAttributes = messageAttributes
   }
@@ -977,11 +983,12 @@ public struct DeleteMessageBatchResult: RestJsonSerializable, RestJsonDeserializ
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DeleteMessageBatchResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteMessageBatchResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DeleteMessageBatchResult(
-        successful: jsonDict["Successful"].flatMap { ($0 is NSNull) ? nil : [DeleteMessageBatchResultEntry].deserialize(response: response, json: $0) }!,
-      failed: jsonDict["Failed"].flatMap { ($0 is NSNull) ? nil : [BatchResultErrorEntry].deserialize(response: response, json: $0) }!
+        successful: jsonDict["Successful"].flatMap { ($0 is NSNull) ? nil : [DeleteMessageBatchResultEntry].deserialize(response: response, body: .json($0)) }!,
+      failed: jsonDict["Failed"].flatMap { ($0 is NSNull) ? nil : [BatchResultErrorEntry].deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -1011,7 +1018,7 @@ public struct OverLimit: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> OverLimit {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> OverLimit {
   
     return OverLimit(
   
@@ -1045,10 +1052,11 @@ public struct ReceiveMessageResult: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ReceiveMessageResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ReceiveMessageResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ReceiveMessageResult(
-        messages: jsonDict["Messages"].flatMap { ($0 is NSNull) ? nil : [Message].deserialize(response: response, json: $0) }
+        messages: jsonDict["Messages"].flatMap { ($0 is NSNull) ? nil : [Message].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1216,7 +1224,7 @@ public struct QueueDoesNotExist: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> QueueDoesNotExist {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueDoesNotExist {
   
     return QueueDoesNotExist(
   
@@ -1250,10 +1258,11 @@ public struct ListDeadLetterSourceQueuesResult: RestJsonSerializable, RestJsonDe
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListDeadLetterSourceQueuesResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListDeadLetterSourceQueuesResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListDeadLetterSourceQueuesResult(
-        queueUrls: jsonDict["queueUrls"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) }!
+        queueUrls: jsonDict["queueUrls"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -1283,7 +1292,8 @@ enum Queueattributename: String, RestJsonDeserializable, RestJsonSerializable {
   case `receiveMessageWaitTimeSeconds` = "ReceiveMessageWaitTimeSeconds"
   case `redrivePolicy` = "RedrivePolicy"
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Queueattributename {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Queueattributename {
+    guard case let .json(json) = body else { fatalError() }
     return Queueattributename(rawValue: json as! String)!
   }
 
@@ -1374,7 +1384,7 @@ public struct InvalidIdFormat: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidIdFormat {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidIdFormat {
   
     return InvalidIdFormat(
   
@@ -1403,7 +1413,7 @@ public struct QueueDeletedRecently: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> QueueDeletedRecently {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueDeletedRecently {
   
     return QueueDeletedRecently(
   
@@ -1445,11 +1455,12 @@ public struct ChangeMessageVisibilityBatchResult: RestJsonSerializable, RestJson
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ChangeMessageVisibilityBatchResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ChangeMessageVisibilityBatchResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ChangeMessageVisibilityBatchResult(
-        successful: jsonDict["Successful"].flatMap { ($0 is NSNull) ? nil : [ChangeMessageVisibilityBatchResultEntry].deserialize(response: response, json: $0) }!,
-      failed: jsonDict["Failed"].flatMap { ($0 is NSNull) ? nil : [BatchResultErrorEntry].deserialize(response: response, json: $0) }!
+        successful: jsonDict["Successful"].flatMap { ($0 is NSNull) ? nil : [ChangeMessageVisibilityBatchResultEntry].deserialize(response: response, body: .json($0)) }!,
+      failed: jsonDict["Failed"].flatMap { ($0 is NSNull) ? nil : [BatchResultErrorEntry].deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -1480,7 +1491,7 @@ public struct PurgeQueueInProgress: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> PurgeQueueInProgress {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> PurgeQueueInProgress {
   
     return PurgeQueueInProgress(
   
@@ -1561,13 +1572,14 @@ public struct SendMessageBatchResultEntry: RestJsonSerializable, RestJsonDeseria
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> SendMessageBatchResultEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SendMessageBatchResultEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return SendMessageBatchResultEntry(
-        mD5OfMessageAttributes: jsonDict["MD5OfMessageAttributes"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      mD5OfMessageBody: jsonDict["MD5OfMessageBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      messageId: jsonDict["MessageId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!
+        mD5OfMessageAttributes: jsonDict["MD5OfMessageAttributes"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      mD5OfMessageBody: jsonDict["MD5OfMessageBody"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      messageId: jsonDict["MessageId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -1630,10 +1642,11 @@ public struct GetQueueAttributesResult: RestJsonSerializable, RestJsonDeserializ
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> GetQueueAttributesResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetQueueAttributesResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return GetQueueAttributesResult(
-        attributes: jsonDict["Attribute"].flatMap { ($0 is NSNull) ? nil : [Queueattributename: String].deserialize(response: response, json: $0) }
+        attributes: jsonDict["Attribute"].flatMap { ($0 is NSNull) ? nil : [Queueattributename: String].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1703,10 +1716,11 @@ public struct CreateQueueResult: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> CreateQueueResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateQueueResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return CreateQueueResult(
-        queueUrl: jsonDict["QueueUrl"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }
+        queueUrl: jsonDict["QueueUrl"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1739,10 +1753,11 @@ public struct ListQueuesResult: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ListQueuesResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListQueuesResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ListQueuesResult(
-        queueUrls: jsonDict["QueueUrls"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, json: $0) }
+        queueUrls: jsonDict["QueueUrls"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }
     )
   }
 
@@ -1770,7 +1785,7 @@ public struct BatchEntryIdsNotDistinct: RestJsonSerializable, RestJsonDeserializ
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> BatchEntryIdsNotDistinct {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BatchEntryIdsNotDistinct {
   
     return BatchEntryIdsNotDistinct(
   
@@ -1851,11 +1866,12 @@ public struct DeleteMessageBatchRequestEntry: RestJsonSerializable, RestJsonDese
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DeleteMessageBatchRequestEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteMessageBatchRequestEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DeleteMessageBatchRequestEntry(
-        receiptHandle: jsonDict["ReceiptHandle"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!
+        receiptHandle: jsonDict["ReceiptHandle"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -1885,7 +1901,7 @@ public struct ReceiptHandleIsInvalid: RestJsonSerializable, RestJsonDeserializab
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ReceiptHandleIsInvalid {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ReceiptHandleIsInvalid {
   
     return ReceiptHandleIsInvalid(
   
@@ -1934,13 +1950,14 @@ public struct BatchResultErrorEntry: RestJsonSerializable, RestJsonDeserializabl
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> BatchResultErrorEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BatchResultErrorEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return BatchResultErrorEntry(
-        code: jsonDict["Code"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!,
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) },
-      senderFault: jsonDict["SenderFault"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, json: $0) }!,
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!
+        code: jsonDict["Code"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
+      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      senderFault: jsonDict["SenderFault"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) }!,
+      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -1979,10 +1996,11 @@ public struct ChangeMessageVisibilityBatchResultEntry: RestJsonSerializable, Res
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> ChangeMessageVisibilityBatchResultEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ChangeMessageVisibilityBatchResultEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return ChangeMessageVisibilityBatchResultEntry(
-        id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!
+        id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -2048,7 +2066,7 @@ public struct UnsupportedOperation: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> UnsupportedOperation {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UnsupportedOperation {
   
     return UnsupportedOperation(
   
@@ -2077,7 +2095,7 @@ public struct InvalidAttributeName: RestJsonSerializable, RestJsonDeserializable
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> InvalidAttributeName {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidAttributeName {
   
     return InvalidAttributeName(
   
@@ -2309,10 +2327,11 @@ public struct DeleteMessageBatchResultEntry: RestJsonSerializable, RestJsonDeser
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> DeleteMessageBatchResultEntry {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteMessageBatchResultEntry {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return DeleteMessageBatchResultEntry(
-        id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, json: $0) }!
+        id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
     )
   }
 
@@ -2340,7 +2359,7 @@ public struct BatchRequestTooLong: RestJsonSerializable, RestJsonDeserializable 
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> BatchRequestTooLong {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BatchRequestTooLong {
   
     return BatchRequestTooLong(
   
@@ -2379,11 +2398,12 @@ public struct SendMessageBatchResult: RestJsonSerializable, RestJsonDeserializab
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
-  static func deserialize(response: HTTPURLResponse, json: Any) -> SendMessageBatchResult {
-    let jsonDict = json as! [String: Any]
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SendMessageBatchResult {
+    guard case let .json(json) = body else { fatalError() }
+  let jsonDict = json as! [String: Any]
     return SendMessageBatchResult(
-        successful: jsonDict["Successful"].flatMap { ($0 is NSNull) ? nil : [SendMessageBatchResultEntry].deserialize(response: response, json: $0) }!,
-      failed: jsonDict["Failed"].flatMap { ($0 is NSNull) ? nil : [BatchResultErrorEntry].deserialize(response: response, json: $0) }!
+        successful: jsonDict["Successful"].flatMap { ($0 is NSNull) ? nil : [SendMessageBatchResultEntry].deserialize(response: response, body: .json($0)) }!,
+      failed: jsonDict["Failed"].flatMap { ($0 is NSNull) ? nil : [BatchResultErrorEntry].deserialize(response: response, body: .json($0)) }!
     )
   }
 

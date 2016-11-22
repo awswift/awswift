@@ -64,63 +64,98 @@ struct SerializedForm {
   let header: [String: String?]
   let body: Body
 }
+
+enum DeserializableBody {
+  case json(Any)
+  case xml(XMLNode)
+}
+
 protocol RestJsonSerializable {
   func serialize() -> SerializedForm
 }
 protocol RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Self
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Self
 }
 extension Array where Element: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> [Element] {
-    let arr = json as! [Any]
-    return arr.map { Element.deserialize(response: response, json: $0) }
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> [Element] {
+    switch body {
+    case .json(let json):
+      let arr = json as! [Any]
+      return arr.map { Element.deserialize(response: response, body: .json($0)) }
+    case .xml(let node):
+      fatalError()
+    }
+    
   }
 }
 extension Dictionary where Key: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> [Key: Value] {
-    let dict = json as! [Key: Value]
-    return Dictionary(dict.map { (key: Key.deserialize(response: response, json: $0), value: $1) })
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> [Key: Value] {
+    switch body {
+    case .json(let json):
+      let dict = json as! [Key: Value]
+      return Dictionary(dict.map { (key: Key.deserialize(response: response, body: .json($0)), value: $1) })
+    case .xml(let node):
+      fatalError()
+    }
+    
   }
 }
 extension String: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> String {
-    return json as! String
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> String {
+    switch body {
+    case .json(let json): return json as! String
+    case .xml(let node): fatalError()
+    }
   }
 }
 extension Int: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Int {
-    return json as! Int
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Int {
+    switch body {
+    case .json(let json): return json as! Int
+    case .xml(let node): fatalError()
+    }
   }
 }
 
 extension Float: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Float {
-    return json as! Float
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Float {
+    switch body {
+    case .json(let json): return json as! Float
+    case .xml(let node): fatalError()
+    }
   }
 }
 extension Double: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Double {
-    return json as! Double
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Double {
+    switch body {
+    case .json(let json): return json as! Double
+    case .xml(let node): fatalError()
+    }
   }
 }
 extension Bool: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Bool {
-    return json as! Bool
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bool {
+    switch body {
+    case .json(let json): return json as! Bool
+    case .xml(let node): fatalError()
+    }
   }
 }
 extension Date: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Date {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Date {
     return Date()
   }
 }
 extension Data: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> Data {
-    let str = json as! String
-    return str.data(using: .utf8)!
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Data {
+    switch body {
+    case .json(let json): return (json as! String).data(using: .utf8)!
+    case .xml(let node): fatalError()
+    }
   }
 }
 struct AwsApiVoidOutput: RestJsonDeserializable {
-  static func deserialize(response: HTTPURLResponse, json: Any) -> AwsApiVoidOutput {
+  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AwsApiVoidOutput {
     return AwsApiVoidOutput()
   }
 }
@@ -187,7 +222,7 @@ func awsApiCallTask<I: RestJsonSerializable, O: RestJsonDeserializable>(session:
         completionHandler(nil, error)
       } else if let http = response as? HTTPURLResponse, http.statusCode == expectedStatus {
         let json = try! JSONSerialization.jsonObject(with: data!, options: [])
-        let ret = O.deserialize(response: http, json: json)
+        let ret = O.deserialize(response: http, body: .json(json))
         completionHandler(ret, nil)
       } else {
         completionHandler(nil, nil)
