@@ -1,5 +1,5 @@
 import XCTest
-@testable import AwswiftSigner
+@testable import Signer
 
 class AwsHostnameTypeTests: XCTestCase {
   

@@ -660,8 +660,11 @@ enum Runtime: String, RestJsonDeserializable, RestJsonSerializable {
   case `python27` = "python2.7"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Runtime {
-    guard case let .json(json) = body else { fatalError() }
-    return Runtime(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Runtime(rawValue: json as! String)!
+    case .xml(let node): return Runtime(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -1398,8 +1401,11 @@ enum Invocationtype: String, RestJsonDeserializable, RestJsonSerializable {
   case `dryRun` = "DryRun"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Invocationtype {
-    guard case let .json(json) = body else { fatalError() }
-    return Invocationtype(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Invocationtype(rawValue: json as! String)!
+    case .xml(let node): return Invocationtype(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -1508,8 +1514,11 @@ enum Throttlereason: String, RestJsonDeserializable, RestJsonSerializable {
   case `callerRateLimitExceeded` = "CallerRateLimitExceeded"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Throttlereason {
-    guard case let .json(json) = body else { fatalError() }
-    return Throttlereason(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Throttlereason(rawValue: json as! String)!
+    case .xml(let node): return Throttlereason(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -1522,8 +1531,11 @@ enum Logtype: String, RestJsonDeserializable, RestJsonSerializable {
   case `tail` = "Tail"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Logtype {
-    guard case let .json(json) = body else { fatalError() }
-    return Logtype(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Logtype(rawValue: json as! String)!
+    case .xml(let node): return Logtype(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -2265,8 +2277,11 @@ enum Eventsourceposition: String, RestJsonDeserializable, RestJsonSerializable {
   case `lATEST` = "LATEST"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Eventsourceposition {
-    guard case let .json(json) = body else { fatalError() }
-    return Eventsourceposition(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Eventsourceposition(rawValue: json as! String)!
+    case .xml(let node): return Eventsourceposition(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {

@@ -139,7 +139,19 @@ class Member {
     switch location {
     case .statusCode: return "      \(memberName()): response.statusCode"
     case .header: return "      \(memberName()): response.allHeaderFields[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
-    case .body: return "      \(memberName()): jsonDict[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
+    case .body:
+      switch shape.context.apiProtocol {
+      case .restJson:
+        return "      \(memberName()): jsonDict[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
+      case .restXml:
+        if let list = shape as? List {
+          return "      \(memberName()): try! node.nodes(forXPath: \"\(locationName)\").map { \(list.memberShape.memberType()).deserialize(response: response, body: .xml($0)) }"
+        } else {
+          return "      \(memberName()): try! node.nodes(forXPath: \"\(locationName)\").first.map { \(shape.memberType()).deserialize(response: response, body: .xml($0)) }\(required ? "!" : "")"
+        }
+        
+      default: fatalError()
+      }
     case .headers: return "      \(memberName()): Dictionary(response.allHeaderFields.map { (key: $0 as! String, value: $1 as! String) }.filter { $0.key.lowercased().hasPrefix(\"\(locationName)\") })"
     default: fatalError()
     }
@@ -254,8 +266,11 @@ final class AwsEnum: Shape {
     
     e("")
     e("  static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> \(memberType()) {")
-    e("    guard case let .json(json) = body else { fatalError() }")
-    e("    return \(memberType())(rawValue: json as! String)!")
+    e("    switch body { ")
+    e("    case .json(let json): return \(memberType())(rawValue: json as! String)!")
+    e("    case .xml(let node): return \(memberType())(rawValue: node.stringValue!)!")
+    e("    default: fatalError()")
+    e("    }")
     e("  }")
     e("")
     e("  func serialize() -> SerializedForm {")
@@ -381,9 +396,18 @@ final class Structure: Shape {
     
     let fieldInitLines = members.map { $0.deserialization() }
     let fieldLines = fieldInitLines.joined(separator: ",\n")
+    let dictLine: String
     
+    if members.filter({ $0.location == .body }).count == 0 {
+      dictLine = ""
+    } else {
+      switch context.apiProtocol {
+      case .restJson: dictLine = "  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]"
+      case .restXml: dictLine = "  guard case let .xml(node) = body else { fatalError() }"
+      default: fatalError()
+      }
+    }
     
-    let dictLine = members.filter({ $0.location == .body }).count > 0 ? "  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]" : ""
     
     return [
       "static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> \(memberType()) {",

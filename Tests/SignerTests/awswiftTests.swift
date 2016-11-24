@@ -1,5 +1,5 @@
 import XCTest
-@testable import AwswiftSigner
+@testable import Signer
 
 class awswiftTests: XCTestCase {
   var signer: AwsRequestSigner!
@@ -67,7 +67,7 @@ class awswiftTests: XCTestCase {
       "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
   }
   
-  func testShiz() {
+  /*func testShiz() {
     let testsDir = "/Users/aidan.steele/Downloads/aws4_testsuite/aws4_testsuite/"
     let tests = try! FileManager.default.contentsOfDirectory(atPath: testsDir)
     
@@ -79,11 +79,11 @@ class awswiftTests: XCTestCase {
       let sts =   try! String(contentsOfFile: testFilePrefix + ".sts")
       let authz = try! String(contentsOfFile: testFilePrefix + ".authz")
       
-      let request = URLRequest(url: <#T##URL#>)
+      //let request = URLRequest(url: <#T##URL#>)
       
       print(test)
     }
-  }
+  }*/
   
   static var allTests : [(String, (awswiftTests) -> () throws -> Void)] {
     return [

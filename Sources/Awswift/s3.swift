@@ -1315,12 +1315,11 @@ Indicates the lifetime, in days, of the objects that are subject to the rule. Th
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LifecycleExpiration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return LifecycleExpiration(
-        expiredObjectDeleteMarker: jsonDict["ExpiredObjectDeleteMarker"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      date: jsonDict["Date"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      days: jsonDict["Days"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        expiredObjectDeleteMarker: try! node.nodes(forXPath: "ExpiredObjectDeleteMarker").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      date: try! node.nodes(forXPath: "Date").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      days: try! node.nodes(forXPath: "Days").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -1565,17 +1564,16 @@ Prefix identifying one or more objects to which the rule applies.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Rule {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Rule(
-        iD: jsonDict["ID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Expirationstatus.deserialize(response: response, body: .json($0)) }!,
-      abortIncompleteMultipartUpload: jsonDict["AbortIncompleteMultipartUpload"].flatMap { ($0 is NSNull) ? nil : AbortIncompleteMultipartUpload.deserialize(response: response, body: .json($0)) },
-      noncurrentVersionExpiration: jsonDict["NoncurrentVersionExpiration"].flatMap { ($0 is NSNull) ? nil : NoncurrentVersionExpiration.deserialize(response: response, body: .json($0)) },
-      transition: jsonDict["Transition"].flatMap { ($0 is NSNull) ? nil : Transition.deserialize(response: response, body: .json($0)) },
-      noncurrentVersionTransition: jsonDict["NoncurrentVersionTransition"].flatMap { ($0 is NSNull) ? nil : NoncurrentVersionTransition.deserialize(response: response, body: .json($0)) },
-      expiration: jsonDict["Expiration"].flatMap { ($0 is NSNull) ? nil : LifecycleExpiration.deserialize(response: response, body: .json($0)) },
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        iD: try! node.nodes(forXPath: "ID").first.map { String.deserialize(response: response, body: .xml($0)) },
+      status: try! node.nodes(forXPath: "Status").first.map { Expirationstatus.deserialize(response: response, body: .xml($0)) }!,
+      abortIncompleteMultipartUpload: try! node.nodes(forXPath: "AbortIncompleteMultipartUpload").first.map { AbortIncompleteMultipartUpload.deserialize(response: response, body: .xml($0)) },
+      noncurrentVersionExpiration: try! node.nodes(forXPath: "NoncurrentVersionExpiration").first.map { NoncurrentVersionExpiration.deserialize(response: response, body: .xml($0)) },
+      transition: try! node.nodes(forXPath: "Transition").first.map { Transition.deserialize(response: response, body: .xml($0)) },
+      noncurrentVersionTransition: try! node.nodes(forXPath: "NoncurrentVersionTransition").first.map { NoncurrentVersionTransition.deserialize(response: response, body: .xml($0)) },
+      expiration: try! node.nodes(forXPath: "Expiration").first.map { LifecycleExpiration.deserialize(response: response, body: .xml($0)) },
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -1625,11 +1623,10 @@ A list of grants.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AccessControlPolicy {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return AccessControlPolicy(
-        owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) },
-      grants: jsonDict["AccessControlList"].flatMap { ($0 is NSNull) ? nil : [Grant].deserialize(response: response, body: .json($0)) }
+        owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) },
+      grants: try! node.nodes(forXPath: "AccessControlList").map { Grant.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -1747,11 +1744,10 @@ public struct CopyObjectResult: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CopyObjectResult {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CopyObjectResult(
-        eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) }
+        eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
+      lastModified: try! node.nodes(forXPath: "LastModified").first.map { Date.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -1771,8 +1767,11 @@ enum Payer: String, RestJsonDeserializable, RestJsonSerializable {
   case `bucketOwner` = "BucketOwner"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Payer {
-    guard case let .json(json) = body else { fatalError() }
-    return Payer(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Payer(rawValue: json as! String)!
+    case .xml(let node): return Payer(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -1853,10 +1852,9 @@ public struct GetBucketLocationOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLocationOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketLocationOutput(
-        locationConstraint: jsonDict["LocationConstraint"].flatMap { ($0 is NSNull) ? nil : Bucketlocationconstraint.deserialize(response: response, body: .json($0)) }
+        locationConstraint: try! node.nodes(forXPath: "LocationConstraint").first.map { Bucketlocationconstraint.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -1891,13 +1889,12 @@ public struct GetBucketWebsiteOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketWebsiteOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketWebsiteOutput(
-        routingRules: jsonDict["RoutingRules"].flatMap { ($0 is NSNull) ? nil : [RoutingRule].deserialize(response: response, body: .json($0)) },
-      indexDocument: jsonDict["IndexDocument"].flatMap { ($0 is NSNull) ? nil : IndexDocument.deserialize(response: response, body: .json($0)) },
-      errorDocument: jsonDict["ErrorDocument"].flatMap { ($0 is NSNull) ? nil : ErrorDocument.deserialize(response: response, body: .json($0)) },
-      redirectAllRequestsTo: jsonDict["RedirectAllRequestsTo"].flatMap { ($0 is NSNull) ? nil : RedirectAllRequestsTo.deserialize(response: response, body: .json($0)) }
+        routingRules: try! node.nodes(forXPath: "RoutingRules").map { RoutingRule.deserialize(response: response, body: .xml($0)) },
+      indexDocument: try! node.nodes(forXPath: "IndexDocument").first.map { IndexDocument.deserialize(response: response, body: .xml($0)) },
+      errorDocument: try! node.nodes(forXPath: "ErrorDocument").first.map { ErrorDocument.deserialize(response: response, body: .xml($0)) },
+      redirectAllRequestsTo: try! node.nodes(forXPath: "RedirectAllRequestsTo").first.map { RedirectAllRequestsTo.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -1941,11 +1938,10 @@ Protocol to use (http, https) when redirecting requests. The default is the prot
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RedirectAllRequestsTo {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return RedirectAllRequestsTo(
-        hostName: jsonDict["HostName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      s3Protocol: jsonDict["Protocol"].flatMap { ($0 is NSNull) ? nil : S3Protocol.deserialize(response: response, body: .json($0)) }
+        hostName: try! node.nodes(forXPath: "HostName").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      s3Protocol: try! node.nodes(forXPath: "Protocol").first.map { S3Protocol.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -1980,10 +1976,9 @@ public struct CORSConfiguration: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CORSConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CORSConfiguration(
-        cORSRules: jsonDict["CORSRule"].flatMap { ($0 is NSNull) ? nil : [CORSRule].deserialize(response: response, body: .json($0)) }!
+        cORSRules: try! node.nodes(forXPath: "CORSRule").map { CORSRule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -2019,11 +2014,10 @@ Key name of the object to delete.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ObjectIdentifier {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ObjectIdentifier(
-        versionId: jsonDict["VersionId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        versionId: try! node.nodes(forXPath: "VersionId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -2073,8 +2067,11 @@ enum Serversideencryption: String, RestJsonDeserializable, RestJsonSerializable 
   case `awskms` = "aws:kms"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Serversideencryption {
-    guard case let .json(json) = body else { fatalError() }
-    return Serversideencryption(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Serversideencryption(rawValue: json as! String)!
+    case .xml(let node): return Serversideencryption(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -2110,12 +2107,11 @@ Specifies the bucket where you want Amazon S3 to store server access logs. You c
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LoggingEnabled {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return LoggingEnabled(
-        targetGrants: jsonDict["TargetGrants"].flatMap { ($0 is NSNull) ? nil : [TargetGrant].deserialize(response: response, body: .json($0)) },
-      targetPrefix: jsonDict["TargetPrefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      targetBucket: jsonDict["TargetBucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        targetGrants: try! node.nodes(forXPath: "TargetGrants").map { TargetGrant.deserialize(response: response, body: .xml($0)) },
+      targetPrefix: try! node.nodes(forXPath: "TargetPrefix").first.map { String.deserialize(response: response, body: .xml($0)) },
+      targetBucket: try! node.nodes(forXPath: "TargetBucket").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -2164,10 +2160,9 @@ The Server-side encryption algorithm used when storing this object in S3 (e.g., 
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UploadPartCopyOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return UploadPartCopyOutput(
-        copyPartResult: jsonDict["CopyPartResult"].flatMap { ($0 is NSNull) ? nil : CopyPartResult.deserialize(response: response, body: .json($0)) },
+        copyPartResult: try! node.nodes(forXPath: "CopyPartResult").first.map { CopyPartResult.deserialize(response: response, body: .xml($0)) },
       sSECustomerKeyMD5: response.allHeaderFields["x-amz-server-side-encryption-customer-key-MD5"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       copySourceVersionId: response.allHeaderFields["x-amz-copy-source-version-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       sSEKMSKeyId: response.allHeaderFields["x-amz-server-side-encryption-aws-kms-key-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
@@ -2223,11 +2218,10 @@ Name of the tag.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Tag {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Tag(
-        value: jsonDict["Value"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        value: try! node.nodes(forXPath: "Value").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -2260,10 +2254,9 @@ public struct Tagging: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Tagging {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Tagging(
-        tagSet: jsonDict["TagSet"].flatMap { ($0 is NSNull) ? nil : [Tag].deserialize(response: response, body: .json($0)) }!
+        tagSet: try! node.nodes(forXPath: "TagSet").map { Tag.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -2300,11 +2293,10 @@ public struct Owner: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Owner {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Owner(
-        iD: jsonDict["ID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      displayName: jsonDict["DisplayName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        iD: try! node.nodes(forXPath: "ID").first.map { String.deserialize(response: response, body: .xml($0)) },
+      displayName: try! node.nodes(forXPath: "DisplayName").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -2363,15 +2355,14 @@ The Server-side encryption algorithm used when storing this object in S3 (e.g., 
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateMultipartUploadOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CreateMultipartUploadOutput(
-        bucket: jsonDict["Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+        bucket: try! node.nodes(forXPath: "Bucket").first.map { String.deserialize(response: response, body: .xml($0)) },
       abortDate: response.allHeaderFields["x-amz-abort-date"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
       abortRuleId: response.allHeaderFields["x-amz-abort-rule-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       sSECustomerKeyMD5: response.allHeaderFields["x-amz-server-side-encryption-customer-key-MD5"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      uploadId: jsonDict["UploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      uploadId: try! node.nodes(forXPath: "UploadId").first.map { String.deserialize(response: response, body: .xml($0)) },
       sSEKMSKeyId: response.allHeaderFields["x-amz-server-side-encryption-aws-kms-key-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       sSECustomerAlgorithm: response.allHeaderFields["x-amz-server-side-encryption-customer-algorithm"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       requestCharged: response.allHeaderFields["x-amz-request-charged"].flatMap { ($0 is NSNull) ? nil : Requestcharged.deserialize(response: response, body: .json($0)) },
@@ -2449,15 +2440,14 @@ The class of storage used to store the object.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Object {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Object(
-        lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Objectstorageclass.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) },
-      size: jsonDict["Size"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        lastModified: try! node.nodes(forXPath: "LastModified").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Objectstorageclass.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
+      owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) },
+      size: try! node.nodes(forXPath: "Size").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -2793,11 +2783,10 @@ Specifies the permission given to the grantee.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Grant {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Grant(
-        permission: jsonDict["Permission"].flatMap { ($0 is NSNull) ? nil : Permission.deserialize(response: response, body: .json($0)) },
-      grantee: jsonDict["Grantee"].flatMap { ($0 is NSNull) ? nil : Grantee.deserialize(response: response, body: .json($0)) }
+        permission: try! node.nodes(forXPath: "Permission").first.map { Permission.deserialize(response: response, body: .xml($0)) },
+      grantee: try! node.nodes(forXPath: "Grantee").first.map { Grantee.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -2817,8 +2806,11 @@ enum Metadatadirective: String, RestJsonDeserializable, RestJsonSerializable {
   case `rEPLACE` = "REPLACE"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Metadatadirective {
-    guard case let .json(json) = body else { fatalError() }
-    return Metadatadirective(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Metadatadirective(rawValue: json as! String)!
+    case .xml(let node): return Metadatadirective(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -2835,8 +2827,11 @@ enum Bucketcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
   case `authenticatedread` = "authenticated-read"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucketcannedacl {
-    guard case let .json(json) = body else { fatalError() }
-    return Bucketcannedacl(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Bucketcannedacl(rawValue: json as! String)!
+    case .xml(let node): return Bucketcannedacl(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -2863,10 +2858,9 @@ public struct BucketLifecycleConfiguration: RestJsonSerializable, RestJsonDeseri
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BucketLifecycleConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return BucketLifecycleConfiguration(
-        rules: jsonDict["Rule"].flatMap { ($0 is NSNull) ? nil : [LifecycleRule].deserialize(response: response, body: .json($0)) }!
+        rules: try! node.nodes(forXPath: "Rule").map { LifecycleRule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3005,17 +2999,16 @@ Prefix identifying one or more objects to which the rule applies.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LifecycleRule {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return LifecycleRule(
-        iD: jsonDict["ID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Expirationstatus.deserialize(response: response, body: .json($0)) }!,
-      noncurrentVersionExpiration: jsonDict["NoncurrentVersionExpiration"].flatMap { ($0 is NSNull) ? nil : NoncurrentVersionExpiration.deserialize(response: response, body: .json($0)) },
-      abortIncompleteMultipartUpload: jsonDict["AbortIncompleteMultipartUpload"].flatMap { ($0 is NSNull) ? nil : AbortIncompleteMultipartUpload.deserialize(response: response, body: .json($0)) },
-      expiration: jsonDict["Expiration"].flatMap { ($0 is NSNull) ? nil : LifecycleExpiration.deserialize(response: response, body: .json($0)) },
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      transitions: jsonDict["Transition"].flatMap { ($0 is NSNull) ? nil : [Transition].deserialize(response: response, body: .json($0)) },
-      noncurrentVersionTransitions: jsonDict["NoncurrentVersionTransition"].flatMap { ($0 is NSNull) ? nil : [NoncurrentVersionTransition].deserialize(response: response, body: .json($0)) }
+        iD: try! node.nodes(forXPath: "ID").first.map { String.deserialize(response: response, body: .xml($0)) },
+      status: try! node.nodes(forXPath: "Status").first.map { Expirationstatus.deserialize(response: response, body: .xml($0)) }!,
+      noncurrentVersionExpiration: try! node.nodes(forXPath: "NoncurrentVersionExpiration").first.map { NoncurrentVersionExpiration.deserialize(response: response, body: .xml($0)) },
+      abortIncompleteMultipartUpload: try! node.nodes(forXPath: "AbortIncompleteMultipartUpload").first.map { AbortIncompleteMultipartUpload.deserialize(response: response, body: .xml($0)) },
+      expiration: try! node.nodes(forXPath: "Expiration").first.map { LifecycleExpiration.deserialize(response: response, body: .xml($0)) },
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      transitions: try! node.nodes(forXPath: "Transition").map { Transition.deserialize(response: response, body: .xml($0)) },
+      noncurrentVersionTransitions: try! node.nodes(forXPath: "NoncurrentVersionTransition").map { NoncurrentVersionTransition.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3065,11 +3058,10 @@ Date the bucket was created.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucket {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Bucket(
-        name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      creationDate: jsonDict["CreationDate"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) }
+        name: try! node.nodes(forXPath: "Name").first.map { String.deserialize(response: response, body: .xml($0)) },
+      creationDate: try! node.nodes(forXPath: "CreationDate").first.map { Date.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3134,11 +3126,10 @@ The class of storage used to store the object.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Destination {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Destination(
-        bucket: jsonDict["Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Storageclass.deserialize(response: response, body: .json($0)) }
+        bucket: try! node.nodes(forXPath: "Bucket").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Storageclass.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3195,14 +3186,13 @@ public struct CloudFunctionConfiguration: RestJsonSerializable, RestJsonDeserial
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CloudFunctionConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CloudFunctionConfiguration(
-        cloudFunction: jsonDict["CloudFunction"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      events: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : [Event].deserialize(response: response, body: .json($0)) },
-      invocationRole: jsonDict["InvocationRole"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      event: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : Event.deserialize(response: response, body: .json($0)) },
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        cloudFunction: try! node.nodes(forXPath: "CloudFunction").first.map { String.deserialize(response: response, body: .xml($0)) },
+      events: try! node.nodes(forXPath: "Event").map { Event.deserialize(response: response, body: .xml($0)) },
+      invocationRole: try! node.nodes(forXPath: "InvocationRole").first.map { String.deserialize(response: response, body: .xml($0)) },
+      event: try! node.nodes(forXPath: "Event").first.map { Event.deserialize(response: response, body: .xml($0)) },
+      id: try! node.nodes(forXPath: "Id").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3343,10 +3333,9 @@ Specifies who pays for the download and request fees.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketRequestPaymentOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketRequestPaymentOutput(
-        payer: jsonDict["Payer"].flatMap { ($0 is NSNull) ? nil : Payer.deserialize(response: response, body: .json($0)) }
+        payer: try! node.nodes(forXPath: "Payer").first.map { Payer.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3498,10 +3487,9 @@ public struct CompletedMultipartUpload: RestJsonSerializable, RestJsonDeserializ
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompletedMultipartUpload {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CompletedMultipartUpload(
-        parts: jsonDict["Part"].flatMap { ($0 is NSNull) ? nil : [CompletedPart].deserialize(response: response, body: .json($0)) }
+        parts: try! node.nodes(forXPath: "Part").map { CompletedPart.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3529,8 +3517,11 @@ enum Objectcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
   case `bucketownerfullcontrol` = "bucket-owner-full-control"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Objectcannedacl {
-    guard case let .json(json) = body else { fatalError() }
-    return Objectcannedacl(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Objectcannedacl(rawValue: json as! String)!
+    case .xml(let node): return Objectcannedacl(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -3545,8 +3536,11 @@ enum Mfadeletestatus: String, RestJsonDeserializable, RestJsonSerializable {
   case `disabled` = "Disabled"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Mfadeletestatus {
-    guard case let .json(json) = body else { fatalError() }
-    return Mfadeletestatus(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Mfadeletestatus(rawValue: json as! String)!
+    case .xml(let node): return Mfadeletestatus(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -3668,8 +3662,7 @@ Specifies whether the object retrieved was (true) or was not (false) a Delete Ma
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetObjectOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetObjectOutput(
         partsCount: response.allHeaderFields["x-amz-mp-parts-count"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
       contentDisposition: response.allHeaderFields["Content-Disposition"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
@@ -3684,7 +3677,7 @@ Specifies whether the object retrieved was (true) or was not (false) a Delete Ma
       expiration: response.allHeaderFields["x-amz-expiration"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       websiteRedirectLocation: response.allHeaderFields["x-amz-website-redirect-location"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       eTag: response.allHeaderFields["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      s3Body: jsonDict["Body"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, body: .json($0)) },
+      s3Body: try! node.nodes(forXPath: "Body").first.map { Data.deserialize(response: response, body: .xml($0)) },
       missingMeta: response.allHeaderFields["x-amz-missing-meta"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
       cacheControl: response.allHeaderFields["Cache-Control"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       sSECustomerKeyMD5: response.allHeaderFields["x-amz-server-side-encryption-customer-key-MD5"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
@@ -3795,13 +3788,12 @@ Size of the uploaded part data.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Part {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Part(
-        lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      partNumber: jsonDict["PartNumber"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      size: jsonDict["Size"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        lastModified: try! node.nodes(forXPath: "LastModified").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      partNumber: try! node.nodes(forXPath: "PartNumber").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
+      size: try! node.nodes(forXPath: "Size").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3835,8 +3827,11 @@ enum Event: String, RestJsonDeserializable, RestJsonSerializable {
   case `s3ObjectRemovedDeleteMarkerCreated` = "s3:ObjectRemoved:DeleteMarkerCreated"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Event {
-    guard case let .json(json) = body else { fatalError() }
-    return Event(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Event(rawValue: json as! String)!
+    case .xml(let node): return Event(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -3859,11 +3854,10 @@ public struct ListBucketsOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListBucketsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ListBucketsOutput(
-        buckets: jsonDict["Buckets"].flatMap { ($0 is NSNull) ? nil : [Bucket].deserialize(response: response, body: .json($0)) },
-      owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) }
+        buckets: try! node.nodes(forXPath: "Buckets").map { Bucket.deserialize(response: response, body: .xml($0)) },
+      owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3886,10 +3880,9 @@ The accelerate configuration of the bucket.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketAccelerateConfigurationOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketAccelerateConfigurationOutput(
-        status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Bucketacceleratestatus.deserialize(response: response, body: .json($0)) }
+        status: try! node.nodes(forXPath: "Status").first.map { Bucketacceleratestatus.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -3961,12 +3954,11 @@ public struct NotificationConfigurationDeprecated: RestJsonSerializable, RestJso
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NotificationConfigurationDeprecated {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return NotificationConfigurationDeprecated(
-        cloudFunctionConfiguration: jsonDict["CloudFunctionConfiguration"].flatMap { ($0 is NSNull) ? nil : CloudFunctionConfiguration.deserialize(response: response, body: .json($0)) },
-      topicConfiguration: jsonDict["TopicConfiguration"].flatMap { ($0 is NSNull) ? nil : TopicConfigurationDeprecated.deserialize(response: response, body: .json($0)) },
-      queueConfiguration: jsonDict["QueueConfiguration"].flatMap { ($0 is NSNull) ? nil : QueueConfigurationDeprecated.deserialize(response: response, body: .json($0)) }
+        cloudFunctionConfiguration: try! node.nodes(forXPath: "CloudFunctionConfiguration").first.map { CloudFunctionConfiguration.deserialize(response: response, body: .xml($0)) },
+      topicConfiguration: try! node.nodes(forXPath: "TopicConfiguration").first.map { TopicConfigurationDeprecated.deserialize(response: response, body: .xml($0)) },
+      queueConfiguration: try! node.nodes(forXPath: "QueueConfiguration").first.map { QueueConfigurationDeprecated.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4006,11 +3998,10 @@ Date and time at which the object was uploaded.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CopyPartResult {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CopyPartResult(
-        eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) }
+        eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
+      lastModified: try! node.nodes(forXPath: "LastModified").first.map { Date.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4046,10 +4037,9 @@ Specifies the number of days an object is noncurrent before Amazon S3 can perfor
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoncurrentVersionExpiration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return NoncurrentVersionExpiration(
-        noncurrentDays: jsonDict["NoncurrentDays"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        noncurrentDays: try! node.nodes(forXPath: "NoncurrentDays").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4092,12 +4082,11 @@ Indicates the lifetime, in days, of the objects that are subject to the rule. Th
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Transition {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Transition(
-        storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Transitionstorageclass.deserialize(response: response, body: .json($0)) },
-      date: jsonDict["Date"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      days: jsonDict["Days"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Transitionstorageclass.deserialize(response: response, body: .xml($0)) },
+      date: try! node.nodes(forXPath: "Date").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      days: try! node.nodes(forXPath: "Days").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4142,11 +4131,10 @@ Object key name prefix or suffix identifying one or more objects to which the fi
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FilterRule {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return FilterRule(
-        value: jsonDict["Value"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : Filterrulename.deserialize(response: response, body: .json($0)) }
+        value: try! node.nodes(forXPath: "Value").first.map { String.deserialize(response: response, body: .xml($0)) },
+      name: try! node.nodes(forXPath: "Name").first.map { Filterrulename.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4184,11 +4172,10 @@ The object key name prefix when the redirect is applied. For example, to redirec
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Condition {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Condition(
-        httpErrorCodeReturnedEquals: jsonDict["HttpErrorCodeReturnedEquals"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      keyPrefixEquals: jsonDict["KeyPrefixEquals"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        httpErrorCodeReturnedEquals: try! node.nodes(forXPath: "HttpErrorCodeReturnedEquals").first.map { String.deserialize(response: response, body: .xml($0)) },
+      keyPrefixEquals: try! node.nodes(forXPath: "KeyPrefixEquals").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4221,10 +4208,9 @@ The accelerate configuration of the bucket.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AccelerateConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return AccelerateConfiguration(
-        status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Bucketacceleratestatus.deserialize(response: response, body: .json($0)) }
+        status: try! node.nodes(forXPath: "Status").first.map { Bucketacceleratestatus.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4284,8 +4270,11 @@ enum S3Type: String, RestJsonDeserializable, RestJsonSerializable {
   case `group` = "Group"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> S3Type {
-    guard case let .json(json) = body else { fatalError() }
-    return S3Type(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return S3Type(rawValue: json as! String)!
+    case .xml(let node): return S3Type(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -4301,10 +4290,9 @@ The bucket policy as a JSON document.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketPolicyOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketPolicyOutput(
-        policy: jsonDict["Policy"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        policy: try! node.nodes(forXPath: "Policy").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4341,11 +4329,10 @@ The versioning state of the bucket.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> VersioningConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return VersioningConfiguration(
-        mFADelete: jsonDict["MfaDelete"].flatMap { ($0 is NSNull) ? nil : Mfadelete.deserialize(response: response, body: .json($0)) },
-      status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Bucketversioningstatus.deserialize(response: response, body: .json($0)) }
+        mFADelete: try! node.nodes(forXPath: "MfaDelete").first.map { Mfadelete.deserialize(response: response, body: .xml($0)) },
+      status: try! node.nodes(forXPath: "Status").first.map { Bucketversioningstatus.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4429,11 +4416,10 @@ Container for information about a particular replication rule. Replication confi
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ReplicationConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ReplicationConfiguration(
-        role: jsonDict["Role"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      rules: jsonDict["Rule"].flatMap { ($0 is NSNull) ? nil : [ReplicationRule].deserialize(response: response, body: .json($0)) }!
+        role: try! node.nodes(forXPath: "Role").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      rules: try! node.nodes(forXPath: "Rule").map { ReplicationRule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4459,8 +4445,11 @@ enum Replicationstatus: String, RestJsonDeserializable, RestJsonSerializable {
   case `rEPLICA` = "REPLICA"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Replicationstatus {
-    guard case let .json(json) = body else { fatalError() }
-    return Replicationstatus(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Replicationstatus(rawValue: json as! String)!
+    case .xml(let node): return Replicationstatus(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -4630,8 +4619,11 @@ enum Replicationrulestatus: String, RestJsonDeserializable, RestJsonSerializable
   case `disabled` = "Disabled"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Replicationrulestatus {
-    guard case let .json(json) = body else { fatalError() }
-    return Replicationrulestatus(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Replicationrulestatus(rawValue: json as! String)!
+    case .xml(let node): return Replicationrulestatus(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -4692,17 +4684,16 @@ Specifies whether the object is (true) or is not (false) the latest version of a
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ObjectVersion {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ObjectVersion(
-        lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      size: jsonDict["Size"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      versionId: jsonDict["VersionId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Objectversionstorageclass.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      isLatest: jsonDict["IsLatest"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) }
+        lastModified: try! node.nodes(forXPath: "LastModified").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      size: try! node.nodes(forXPath: "Size").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      versionId: try! node.nodes(forXPath: "VersionId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Objectversionstorageclass.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      isLatest: try! node.nodes(forXPath: "IsLatest").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
+      owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4737,10 +4728,9 @@ public struct GetBucketReplicationOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketReplicationOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketReplicationOutput(
-        replicationConfiguration: jsonDict["ReplicationConfiguration"].flatMap { ($0 is NSNull) ? nil : ReplicationConfiguration.deserialize(response: response, body: .json($0)) }
+        replicationConfiguration: try! node.nodes(forXPath: "ReplicationConfiguration").first.map { ReplicationConfiguration.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4875,19 +4865,18 @@ When response is truncated (the IsTruncated element value in the response is tru
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListObjectsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ListObjectsOutput(
-        maxKeys: jsonDict["MaxKeys"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      isTruncated: jsonDict["IsTruncated"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      marker: jsonDict["Marker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      commonPrefixes: jsonDict["CommonPrefixes"].flatMap { ($0 is NSNull) ? nil : [CommonPrefix].deserialize(response: response, body: .json($0)) },
-      contents: jsonDict["Contents"].flatMap { ($0 is NSNull) ? nil : [Object].deserialize(response: response, body: .json($0)) },
-      delimiter: jsonDict["Delimiter"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      encodingType: jsonDict["EncodingType"].flatMap { ($0 is NSNull) ? nil : Encodingtype.deserialize(response: response, body: .json($0)) },
-      nextMarker: jsonDict["NextMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        maxKeys: try! node.nodes(forXPath: "MaxKeys").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      isTruncated: try! node.nodes(forXPath: "IsTruncated").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      marker: try! node.nodes(forXPath: "Marker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      name: try! node.nodes(forXPath: "Name").first.map { String.deserialize(response: response, body: .xml($0)) },
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) },
+      commonPrefixes: try! node.nodes(forXPath: "CommonPrefixes").map { CommonPrefix.deserialize(response: response, body: .xml($0)) },
+      contents: try! node.nodes(forXPath: "Contents").map { Object.deserialize(response: response, body: .xml($0)) },
+      delimiter: try! node.nodes(forXPath: "Delimiter").first.map { String.deserialize(response: response, body: .xml($0)) },
+      encodingType: try! node.nodes(forXPath: "EncodingType").first.map { Encodingtype.deserialize(response: response, body: .xml($0)) },
+      nextMarker: try! node.nodes(forXPath: "NextMarker").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -4960,16 +4949,15 @@ The Server-side encryption algorithm used when storing this object in S3 (e.g., 
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompleteMultipartUploadOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CompleteMultipartUploadOutput(
-        bucket: jsonDict["Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      location: jsonDict["Location"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+        bucket: try! node.nodes(forXPath: "Bucket").first.map { String.deserialize(response: response, body: .xml($0)) },
+      location: try! node.nodes(forXPath: "Location").first.map { String.deserialize(response: response, body: .xml($0)) },
       expiration: response.allHeaderFields["x-amz-expiration"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       versionId: response.allHeaderFields["x-amz-version-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
       sSEKMSKeyId: response.allHeaderFields["x-amz-server-side-encryption-aws-kms-key-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
+      eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
       serverSideEncryption: response.allHeaderFields["x-amz-server-side-encryption"].flatMap { ($0 is NSNull) ? nil : Serversideencryption.deserialize(response: response, body: .json($0)) },
       requestCharged: response.allHeaderFields["x-amz-request-charged"].flatMap { ($0 is NSNull) ? nil : Requestcharged.deserialize(response: response, body: .json($0)) }
     )
@@ -5042,10 +5030,9 @@ public struct GetObjectTorrentOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetObjectTorrentOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetObjectTorrentOutput(
-        s3Body: jsonDict["Body"].flatMap { ($0 is NSNull) ? nil : Data.deserialize(response: response, body: .json($0)) },
+        s3Body: try! node.nodes(forXPath: "Body").first.map { Data.deserialize(response: response, body: .xml($0)) },
       requestCharged: response.allHeaderFields["x-amz-request-charged"].flatMap { ($0 is NSNull) ? nil : Requestcharged.deserialize(response: response, body: .json($0)) }
     )
   }
@@ -5066,8 +5053,11 @@ enum Mfadelete: String, RestJsonDeserializable, RestJsonSerializable {
   case `disabled` = "Disabled"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Mfadelete {
-    guard case let .json(json) = body else { fatalError() }
-    return Mfadelete(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Mfadelete(rawValue: json as! String)!
+    case .xml(let node): return Mfadelete(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -5096,10 +5086,9 @@ public struct NotificationConfigurationFilter: RestJsonSerializable, RestJsonDes
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NotificationConfigurationFilter {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return NotificationConfigurationFilter(
-        key: jsonDict["S3Key"].flatMap { ($0 is NSNull) ? nil : S3KeyFilter.deserialize(response: response, body: .json($0)) }
+        key: try! node.nodes(forXPath: "S3Key").first.map { S3KeyFilter.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -5242,11 +5231,10 @@ The class of storage used to store the object.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoncurrentVersionTransition {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return NoncurrentVersionTransition(
-        noncurrentDays: jsonDict["NoncurrentDays"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Transitionstorageclass.deserialize(response: response, body: .json($0)) }
+        noncurrentDays: try! node.nodes(forXPath: "NoncurrentDays").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Transitionstorageclass.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -5299,14 +5287,13 @@ The specific object key to use in the redirect request. For example, redirect re
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Redirect {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Redirect(
-        replaceKeyPrefixWith: jsonDict["ReplaceKeyPrefixWith"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      httpRedirectCode: jsonDict["HttpRedirectCode"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      hostName: jsonDict["HostName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      s3Protocol: jsonDict["Protocol"].flatMap { ($0 is NSNull) ? nil : S3Protocol.deserialize(response: response, body: .json($0)) },
-      replaceKeyWith: jsonDict["ReplaceKeyWith"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        replaceKeyPrefixWith: try! node.nodes(forXPath: "ReplaceKeyPrefixWith").first.map { String.deserialize(response: response, body: .xml($0)) },
+      httpRedirectCode: try! node.nodes(forXPath: "HttpRedirectCode").first.map { String.deserialize(response: response, body: .xml($0)) },
+      hostName: try! node.nodes(forXPath: "HostName").first.map { String.deserialize(response: response, body: .xml($0)) },
+      s3Protocol: try! node.nodes(forXPath: "Protocol").first.map { S3Protocol.deserialize(response: response, body: .xml($0)) },
+      replaceKeyWith: try! node.nodes(forXPath: "ReplaceKeyWith").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -5585,13 +5572,12 @@ Amazon SNS topic ARN to which Amazon S3 will publish a message when it detects e
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TopicConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return TopicConfiguration(
-        topicArn: jsonDict["Topic"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      events: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : [Event].deserialize(response: response, body: .json($0)) }!,
-      filter: jsonDict["Filter"].flatMap { ($0 is NSNull) ? nil : NotificationConfigurationFilter.deserialize(response: response, body: .json($0)) },
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        topicArn: try! node.nodes(forXPath: "Topic").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      events: try! node.nodes(forXPath: "Event").map { Event.deserialize(response: response, body: .xml($0)) },
+      filter: try! node.nodes(forXPath: "Filter").first.map { NotificationConfigurationFilter.deserialize(response: response, body: .xml($0)) },
+      id: try! node.nodes(forXPath: "Id").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -5633,11 +5619,10 @@ A container for describing a condition that must be met for the specified redire
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RoutingRule {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return RoutingRule(
-        redirect: jsonDict["Redirect"].flatMap { ($0 is NSNull) ? nil : Redirect.deserialize(response: response, body: .json($0)) }!,
-      condition: jsonDict["Condition"].flatMap { ($0 is NSNull) ? nil : Condition.deserialize(response: response, body: .json($0)) }
+        redirect: try! node.nodes(forXPath: "Redirect").first.map { Redirect.deserialize(response: response, body: .xml($0)) }!,
+      condition: try! node.nodes(forXPath: "Condition").first.map { Condition.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -5660,8 +5645,11 @@ enum Encodingtype: String, RestJsonDeserializable, RestJsonSerializable {
   case `url` = "url"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Encodingtype {
-    guard case let .json(json) = body else { fatalError() }
-    return Encodingtype(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Encodingtype(rawValue: json as! String)!
+    case .xml(let node): return Encodingtype(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -5690,10 +5678,9 @@ A suffix that is appended to a request that is for a directory on the website en
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> IndexDocument {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return IndexDocument(
-        suffix: jsonDict["Suffix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        suffix: try! node.nodes(forXPath: "Suffix").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -5931,8 +5918,11 @@ enum Bucketversioningstatus: String, RestJsonDeserializable, RestJsonSerializabl
   case `suspended` = "Suspended"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucketversioningstatus {
-    guard case let .json(json) = body else { fatalError() }
-    return Bucketversioningstatus(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Bucketversioningstatus(rawValue: json as! String)!
+    case .xml(let node): return Bucketversioningstatus(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -5964,11 +5954,10 @@ Part number that identifies the part. This is a positive integer between 1 and 1
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompletedPart {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CompletedPart(
-        eTag: jsonDict["ETag"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      partNumber: jsonDict["PartNumber"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        eTag: try! node.nodes(forXPath: "ETag").first.map { String.deserialize(response: response, body: .xml($0)) },
+      partNumber: try! node.nodes(forXPath: "PartNumber").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6030,15 +6019,14 @@ Identifies who initiated the multipart upload.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> MultipartUpload {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return MultipartUpload(
-        storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Storageclass.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      uploadId: jsonDict["UploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) },
-      initiated: jsonDict["Initiated"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      initiator: jsonDict["Initiator"].flatMap { ($0 is NSNull) ? nil : Initiator.deserialize(response: response, body: .json($0)) }
+        storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Storageclass.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      uploadId: try! node.nodes(forXPath: "UploadId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) },
+      initiated: try! node.nodes(forXPath: "Initiated").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      initiator: try! node.nodes(forXPath: "Initiator").first.map { Initiator.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6114,21 +6102,20 @@ KeyCount is the number of keys returned with this request. KeyCount will always 
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListObjectsV2Output {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ListObjectsV2Output(
-        maxKeys: jsonDict["MaxKeys"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      startAfter: jsonDict["StartAfter"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      isTruncated: jsonDict["IsTruncated"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      continuationToken: jsonDict["ContinuationToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      nextContinuationToken: jsonDict["NextContinuationToken"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      commonPrefixes: jsonDict["CommonPrefixes"].flatMap { ($0 is NSNull) ? nil : [CommonPrefix].deserialize(response: response, body: .json($0)) },
-      contents: jsonDict["Contents"].flatMap { ($0 is NSNull) ? nil : [Object].deserialize(response: response, body: .json($0)) },
-      delimiter: jsonDict["Delimiter"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      encodingType: jsonDict["EncodingType"].flatMap { ($0 is NSNull) ? nil : Encodingtype.deserialize(response: response, body: .json($0)) },
-      keyCount: jsonDict["KeyCount"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        maxKeys: try! node.nodes(forXPath: "MaxKeys").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      startAfter: try! node.nodes(forXPath: "StartAfter").first.map { String.deserialize(response: response, body: .xml($0)) },
+      isTruncated: try! node.nodes(forXPath: "IsTruncated").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      continuationToken: try! node.nodes(forXPath: "ContinuationToken").first.map { String.deserialize(response: response, body: .xml($0)) },
+      name: try! node.nodes(forXPath: "Name").first.map { String.deserialize(response: response, body: .xml($0)) },
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) },
+      nextContinuationToken: try! node.nodes(forXPath: "NextContinuationToken").first.map { String.deserialize(response: response, body: .xml($0)) },
+      commonPrefixes: try! node.nodes(forXPath: "CommonPrefixes").map { CommonPrefix.deserialize(response: response, body: .xml($0)) },
+      contents: try! node.nodes(forXPath: "Contents").map { Object.deserialize(response: response, body: .xml($0)) },
+      delimiter: try! node.nodes(forXPath: "Delimiter").first.map { String.deserialize(response: response, body: .xml($0)) },
+      encodingType: try! node.nodes(forXPath: "EncodingType").first.map { Encodingtype.deserialize(response: response, body: .xml($0)) },
+      keyCount: try! node.nodes(forXPath: "KeyCount").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6170,8 +6157,11 @@ enum Objectstorageclass: String, RestJsonDeserializable, RestJsonSerializable {
   case `gLACIER` = "GLACIER"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Objectstorageclass {
-    guard case let .json(json) = body else { fatalError() }
-    return Objectstorageclass(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Objectstorageclass(rawValue: json as! String)!
+    case .xml(let node): return Objectstorageclass(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -6202,11 +6192,10 @@ Logging permissions assigned to the Grantee for the bucket.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TargetGrant {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return TargetGrant(
-        permission: jsonDict["Permission"].flatMap { ($0 is NSNull) ? nil : Bucketlogspermission.deserialize(response: response, body: .json($0)) },
-      grantee: jsonDict["Grantee"].flatMap { ($0 is NSNull) ? nil : Grantee.deserialize(response: response, body: .json($0)) }
+        permission: try! node.nodes(forXPath: "Permission").first.map { Bucketlogspermission.deserialize(response: response, body: .xml($0)) },
+      grantee: try! node.nodes(forXPath: "Grantee").first.map { Grantee.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6271,10 +6260,9 @@ Specifies who pays for the download and request fees.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RequestPaymentConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return RequestPaymentConfiguration(
-        payer: jsonDict["Payer"].flatMap { ($0 is NSNull) ? nil : Payer.deserialize(response: response, body: .json($0)) }!
+        payer: try! node.nodes(forXPath: "Payer").first.map { Payer.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -6336,10 +6324,9 @@ public struct GetBucketLifecycleConfigurationOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLifecycleConfigurationOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketLifecycleConfigurationOutput(
-        rules: jsonDict["Rule"].flatMap { ($0 is NSNull) ? nil : [LifecycleRule].deserialize(response: response, body: .json($0)) }
+        rules: try! node.nodes(forXPath: "Rule").map { LifecycleRule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6370,10 +6357,9 @@ public struct BucketLoggingStatus: RestJsonSerializable, RestJsonDeserializable 
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BucketLoggingStatus {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return BucketLoggingStatus(
-        loggingEnabled: jsonDict["LoggingEnabled"].flatMap { ($0 is NSNull) ? nil : LoggingEnabled.deserialize(response: response, body: .json($0)) }
+        loggingEnabled: try! node.nodes(forXPath: "LoggingEnabled").first.map { LoggingEnabled.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6419,13 +6405,12 @@ public struct WebsiteConfiguration: RestJsonSerializable, RestJsonDeserializable
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> WebsiteConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return WebsiteConfiguration(
-        routingRules: jsonDict["RoutingRules"].flatMap { ($0 is NSNull) ? nil : [RoutingRule].deserialize(response: response, body: .json($0)) },
-      indexDocument: jsonDict["IndexDocument"].flatMap { ($0 is NSNull) ? nil : IndexDocument.deserialize(response: response, body: .json($0)) },
-      errorDocument: jsonDict["ErrorDocument"].flatMap { ($0 is NSNull) ? nil : ErrorDocument.deserialize(response: response, body: .json($0)) },
-      redirectAllRequestsTo: jsonDict["RedirectAllRequestsTo"].flatMap { ($0 is NSNull) ? nil : RedirectAllRequestsTo.deserialize(response: response, body: .json($0)) }
+        routingRules: try! node.nodes(forXPath: "RoutingRules").map { RoutingRule.deserialize(response: response, body: .xml($0)) },
+      indexDocument: try! node.nodes(forXPath: "IndexDocument").first.map { IndexDocument.deserialize(response: response, body: .xml($0)) },
+      errorDocument: try! node.nodes(forXPath: "ErrorDocument").first.map { ErrorDocument.deserialize(response: response, body: .xml($0)) },
+      redirectAllRequestsTo: try! node.nodes(forXPath: "RedirectAllRequestsTo").first.map { RedirectAllRequestsTo.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6512,12 +6497,11 @@ public struct NotificationConfiguration: RestJsonSerializable, RestJsonDeseriali
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NotificationConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return NotificationConfiguration(
-        topicConfigurations: jsonDict["TopicConfiguration"].flatMap { ($0 is NSNull) ? nil : [TopicConfiguration].deserialize(response: response, body: .json($0)) },
-      queueConfigurations: jsonDict["QueueConfiguration"].flatMap { ($0 is NSNull) ? nil : [QueueConfiguration].deserialize(response: response, body: .json($0)) },
-      lambdaFunctionConfigurations: jsonDict["CloudFunctionConfiguration"].flatMap { ($0 is NSNull) ? nil : [LambdaFunctionConfiguration].deserialize(response: response, body: .json($0)) }
+        topicConfigurations: try! node.nodes(forXPath: "TopicConfiguration").map { TopicConfiguration.deserialize(response: response, body: .xml($0)) },
+      queueConfigurations: try! node.nodes(forXPath: "QueueConfiguration").map { QueueConfiguration.deserialize(response: response, body: .xml($0)) },
+      lambdaFunctionConfigurations: try! node.nodes(forXPath: "CloudFunctionConfiguration").map { LambdaFunctionConfiguration.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6604,13 +6588,12 @@ Amazon SQS queue ARN to which Amazon S3 will publish a message when it detects e
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return QueueConfiguration(
-        events: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : [Event].deserialize(response: response, body: .json($0)) }!,
-      queueArn: jsonDict["Queue"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!,
-      filter: jsonDict["Filter"].flatMap { ($0 is NSNull) ? nil : NotificationConfigurationFilter.deserialize(response: response, body: .json($0)) },
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        events: try! node.nodes(forXPath: "Event").map { Event.deserialize(response: response, body: .xml($0)) },
+      queueArn: try! node.nodes(forXPath: "Queue").first.map { String.deserialize(response: response, body: .xml($0)) }!,
+      filter: try! node.nodes(forXPath: "Filter").first.map { NotificationConfigurationFilter.deserialize(response: response, body: .xml($0)) },
+      id: try! node.nodes(forXPath: "Id").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6702,10 +6685,9 @@ public struct GetBucketTaggingOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketTaggingOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketTaggingOutput(
-        tagSet: jsonDict["TagSet"].flatMap { ($0 is NSNull) ? nil : [Tag].deserialize(response: response, body: .json($0)) }!
+        tagSet: try! node.nodes(forXPath: "TagSet").map { Tag.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6775,22 +6757,21 @@ Use this value for the key marker request parameter in a subsequent request.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListObjectVersionsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ListObjectVersionsOutput(
-        maxKeys: jsonDict["MaxKeys"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      isTruncated: jsonDict["IsTruncated"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      versions: jsonDict["Version"].flatMap { ($0 is NSNull) ? nil : [ObjectVersion].deserialize(response: response, body: .json($0)) },
-      nextVersionIdMarker: jsonDict["NextVersionIdMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      commonPrefixes: jsonDict["CommonPrefixes"].flatMap { ($0 is NSNull) ? nil : [CommonPrefix].deserialize(response: response, body: .json($0)) },
-      delimiter: jsonDict["Delimiter"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      keyMarker: jsonDict["KeyMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      encodingType: jsonDict["EncodingType"].flatMap { ($0 is NSNull) ? nil : Encodingtype.deserialize(response: response, body: .json($0)) },
-      name: jsonDict["Name"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      deleteMarkers: jsonDict["DeleteMarker"].flatMap { ($0 is NSNull) ? nil : [DeleteMarkerEntry].deserialize(response: response, body: .json($0)) },
-      nextKeyMarker: jsonDict["NextKeyMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      versionIdMarker: jsonDict["VersionIdMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        maxKeys: try! node.nodes(forXPath: "MaxKeys").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      isTruncated: try! node.nodes(forXPath: "IsTruncated").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      versions: try! node.nodes(forXPath: "Version").map { ObjectVersion.deserialize(response: response, body: .xml($0)) },
+      nextVersionIdMarker: try! node.nodes(forXPath: "NextVersionIdMarker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      commonPrefixes: try! node.nodes(forXPath: "CommonPrefixes").map { CommonPrefix.deserialize(response: response, body: .xml($0)) },
+      delimiter: try! node.nodes(forXPath: "Delimiter").first.map { String.deserialize(response: response, body: .xml($0)) },
+      keyMarker: try! node.nodes(forXPath: "KeyMarker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      encodingType: try! node.nodes(forXPath: "EncodingType").first.map { Encodingtype.deserialize(response: response, body: .xml($0)) },
+      name: try! node.nodes(forXPath: "Name").first.map { String.deserialize(response: response, body: .xml($0)) },
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) },
+      deleteMarkers: try! node.nodes(forXPath: "DeleteMarker").map { DeleteMarkerEntry.deserialize(response: response, body: .xml($0)) },
+      nextKeyMarker: try! node.nodes(forXPath: "NextKeyMarker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      versionIdMarker: try! node.nodes(forXPath: "VersionIdMarker").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6839,11 +6820,10 @@ The versioning state of the bucket.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketVersioningOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketVersioningOutput(
-        mFADelete: jsonDict["MfaDelete"].flatMap { ($0 is NSNull) ? nil : Mfadeletestatus.deserialize(response: response, body: .json($0)) },
-      status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Bucketversioningstatus.deserialize(response: response, body: .json($0)) }
+        mFADelete: try! node.nodes(forXPath: "MfaDelete").first.map { Mfadeletestatus.deserialize(response: response, body: .xml($0)) },
+      status: try! node.nodes(forXPath: "Status").first.map { Bucketversioningstatus.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -6876,10 +6856,9 @@ The object key name to use when a 4XX class error occurs.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ErrorDocument {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ErrorDocument(
-        key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -7045,11 +7024,10 @@ A list of grants.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetObjectAclOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetObjectAclOutput(
-        owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) },
-      grants: jsonDict["AccessControlList"].flatMap { ($0 is NSNull) ? nil : [Grant].deserialize(response: response, body: .json($0)) },
+        owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) },
+      grants: try! node.nodes(forXPath: "AccessControlList").map { Grant.deserialize(response: response, body: .xml($0)) },
       requestCharged: response.allHeaderFields["x-amz-request-charged"].flatMap { ($0 is NSNull) ? nil : Requestcharged.deserialize(response: response, body: .json($0)) }
     )
   }
@@ -7159,11 +7137,10 @@ Element to enable quiet mode for the request. When you add this element, you mus
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Delete {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Delete(
-        objects: jsonDict["Object"].flatMap { ($0 is NSNull) ? nil : [ObjectIdentifier].deserialize(response: response, body: .json($0)) }!,
-      quiet: jsonDict["Quiet"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) }
+        objects: try! node.nodes(forXPath: "Object").map { ObjectIdentifier.deserialize(response: response, body: .xml($0)) },
+      quiet: try! node.nodes(forXPath: "Quiet").first.map { Bool.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -7189,10 +7166,9 @@ public struct GetBucketLifecycleOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLifecycleOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketLifecycleOutput(
-        rules: jsonDict["Rule"].flatMap { ($0 is NSNull) ? nil : [Rule].deserialize(response: response, body: .json($0)) }
+        rules: try! node.nodes(forXPath: "Rule").map { Rule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -7212,8 +7188,11 @@ enum Bucketlogspermission: String, RestJsonDeserializable, RestJsonSerializable 
   case `wRITE` = "WRITE"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucketlogspermission {
-    guard case let .json(json) = body else { fatalError() }
-    return Bucketlogspermission(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Bucketlogspermission(rawValue: json as! String)!
+    case .xml(let node): return Bucketlogspermission(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -7257,8 +7236,11 @@ enum Requestcharged: String, RestJsonDeserializable, RestJsonSerializable {
   case `requester` = "requester"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Requestcharged {
-    guard case let .json(json) = body else { fatalError() }
-    return Requestcharged(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Requestcharged(rawValue: json as! String)!
+    case .xml(let node): return Requestcharged(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -7305,14 +7287,13 @@ Version ID of an object.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteMarkerEntry {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return DeleteMarkerEntry(
-        isLatest: jsonDict["IsLatest"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      lastModified: jsonDict["LastModified"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      versionId: jsonDict["VersionId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) }
+        isLatest: try! node.nodes(forXPath: "IsLatest").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      lastModified: try! node.nodes(forXPath: "LastModified").first.map { Date.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      versionId: try! node.nodes(forXPath: "VersionId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -7421,11 +7402,10 @@ public struct DeleteObjectsOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteObjectsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return DeleteObjectsOutput(
-        errors: jsonDict["Error"].flatMap { ($0 is NSNull) ? nil : [S3Error].deserialize(response: response, body: .json($0)) },
-      deleted: jsonDict["Deleted"].flatMap { ($0 is NSNull) ? nil : [DeletedObject].deserialize(response: response, body: .json($0)) },
+        errors: try! node.nodes(forXPath: "Error").map { S3Error.deserialize(response: response, body: .xml($0)) },
+      deleted: try! node.nodes(forXPath: "Deleted").map { DeletedObject.deserialize(response: response, body: .xml($0)) },
       requestCharged: response.allHeaderFields["x-amz-request-charged"].flatMap { ($0 is NSNull) ? nil : Requestcharged.deserialize(response: response, body: .json($0)) }
     )
   }
@@ -7514,13 +7494,12 @@ Object keyname prefix identifying one or more objects to which the rule applies.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ReplicationRule {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ReplicationRule(
-        iD: jsonDict["ID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      status: jsonDict["Status"].flatMap { ($0 is NSNull) ? nil : Replicationrulestatus.deserialize(response: response, body: .json($0)) }!,
-      destination: jsonDict["Destination"].flatMap { ($0 is NSNull) ? nil : Destination.deserialize(response: response, body: .json($0)) }!,
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        iD: try! node.nodes(forXPath: "ID").first.map { String.deserialize(response: response, body: .xml($0)) },
+      status: try! node.nodes(forXPath: "Status").first.map { Replicationrulestatus.deserialize(response: response, body: .xml($0)) }!,
+      destination: try! node.nodes(forXPath: "Destination").first.map { Destination.deserialize(response: response, body: .xml($0)) }!,
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -7603,13 +7582,12 @@ Lambda cloud function ARN that Amazon S3 can invoke when it detects events of th
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LambdaFunctionConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return LambdaFunctionConfiguration(
-        id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      events: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : [Event].deserialize(response: response, body: .json($0)) }!,
-      filter: jsonDict["Filter"].flatMap { ($0 is NSNull) ? nil : NotificationConfigurationFilter.deserialize(response: response, body: .json($0)) },
-      lambdaFunctionArn: jsonDict["CloudFunction"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }!
+        id: try! node.nodes(forXPath: "Id").first.map { String.deserialize(response: response, body: .xml($0)) },
+      events: try! node.nodes(forXPath: "Event").map { Event.deserialize(response: response, body: .xml($0)) },
+      filter: try! node.nodes(forXPath: "Filter").first.map { NotificationConfigurationFilter.deserialize(response: response, body: .xml($0)) },
+      lambdaFunctionArn: try! node.nodes(forXPath: "CloudFunction").first.map { String.deserialize(response: response, body: .xml($0)) }!
     )
   }
 
@@ -7636,10 +7614,9 @@ public struct GetBucketLoggingOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLoggingOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketLoggingOutput(
-        loggingEnabled: jsonDict["LoggingEnabled"].flatMap { ($0 is NSNull) ? nil : LoggingEnabled.deserialize(response: response, body: .json($0)) }
+        loggingEnabled: try! node.nodes(forXPath: "LoggingEnabled").first.map { LoggingEnabled.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -7717,8 +7694,11 @@ enum Storageclass: String, RestJsonDeserializable, RestJsonSerializable {
   case `sTANDARD_IA` = "STANDARD_IA"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Storageclass {
-    guard case let .json(json) = body else { fatalError() }
-    return Storageclass(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Storageclass(rawValue: json as! String)!
+    case .xml(let node): return Storageclass(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -7734,10 +7714,9 @@ public struct GetBucketCorsOutput: RestJsonDeserializable {
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketCorsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketCorsOutput(
-        cORSRules: jsonDict["CORSRule"].flatMap { ($0 is NSNull) ? nil : [CORSRule].deserialize(response: response, body: .json($0)) }
+        cORSRules: try! node.nodes(forXPath: "CORSRule").map { CORSRule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -7783,13 +7762,12 @@ public struct S3Error: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> S3Error {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return S3Error(
-        versionId: jsonDict["VersionId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      code: jsonDict["Code"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      message: jsonDict["Message"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        versionId: try! node.nodes(forXPath: "VersionId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      code: try! node.nodes(forXPath: "Code").first.map { String.deserialize(response: response, body: .xml($0)) },
+      message: try! node.nodes(forXPath: "Message").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -7829,10 +7807,9 @@ Specifies the region where the bucket will be created. If you don't specify a re
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateBucketConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CreateBucketConfiguration(
-        locationConstraint: jsonDict["LocationConstraint"].flatMap { ($0 is NSNull) ? nil : Bucketlocationconstraint.deserialize(response: response, body: .json($0)) }
+        locationConstraint: try! node.nodes(forXPath: "LocationConstraint").first.map { Bucketlocationconstraint.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8197,13 +8174,12 @@ public struct DeletedObject: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeletedObject {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return DeletedObject(
-        deleteMarkerVersionId: jsonDict["DeleteMarkerVersionId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      versionId: jsonDict["VersionId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      deleteMarker: jsonDict["DeleteMarker"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) }
+        deleteMarkerVersionId: try! node.nodes(forXPath: "DeleteMarkerVersionId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      versionId: try! node.nodes(forXPath: "VersionId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      deleteMarker: try! node.nodes(forXPath: "DeleteMarker").first.map { Bool.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8276,21 +8252,20 @@ The key at or after which the listing began.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListMultipartUploadsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ListMultipartUploadsOutput(
-        bucket: jsonDict["Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      isTruncated: jsonDict["IsTruncated"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
-      nextKeyMarker: jsonDict["NextKeyMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      uploadIdMarker: jsonDict["UploadIdMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      commonPrefixes: jsonDict["CommonPrefixes"].flatMap { ($0 is NSNull) ? nil : [CommonPrefix].deserialize(response: response, body: .json($0)) },
-      maxUploads: jsonDict["MaxUploads"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      uploads: jsonDict["Upload"].flatMap { ($0 is NSNull) ? nil : [MultipartUpload].deserialize(response: response, body: .json($0)) },
-      delimiter: jsonDict["Delimiter"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      encodingType: jsonDict["EncodingType"].flatMap { ($0 is NSNull) ? nil : Encodingtype.deserialize(response: response, body: .json($0)) },
-      nextUploadIdMarker: jsonDict["NextUploadIdMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      keyMarker: jsonDict["KeyMarker"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        bucket: try! node.nodes(forXPath: "Bucket").first.map { String.deserialize(response: response, body: .xml($0)) },
+      isTruncated: try! node.nodes(forXPath: "IsTruncated").first.map { Bool.deserialize(response: response, body: .xml($0)) },
+      nextKeyMarker: try! node.nodes(forXPath: "NextKeyMarker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      uploadIdMarker: try! node.nodes(forXPath: "UploadIdMarker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) },
+      commonPrefixes: try! node.nodes(forXPath: "CommonPrefixes").map { CommonPrefix.deserialize(response: response, body: .xml($0)) },
+      maxUploads: try! node.nodes(forXPath: "MaxUploads").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      uploads: try! node.nodes(forXPath: "Upload").map { MultipartUpload.deserialize(response: response, body: .xml($0)) },
+      delimiter: try! node.nodes(forXPath: "Delimiter").first.map { String.deserialize(response: response, body: .xml($0)) },
+      encodingType: try! node.nodes(forXPath: "EncodingType").first.map { Encodingtype.deserialize(response: response, body: .xml($0)) },
+      nextUploadIdMarker: try! node.nodes(forXPath: "NextUploadIdMarker").first.map { String.deserialize(response: response, body: .xml($0)) },
+      keyMarker: try! node.nodes(forXPath: "KeyMarker").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8337,11 +8312,10 @@ A list of grants.
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketAclOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return GetBucketAclOutput(
-        owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) },
-      grants: jsonDict["AccessControlList"].flatMap { ($0 is NSNull) ? nil : [Grant].deserialize(response: response, body: .json($0)) }
+        owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) },
+      grants: try! node.nodes(forXPath: "AccessControlList").map { Grant.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8462,10 +8436,9 @@ public struct S3KeyFilter: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> S3KeyFilter {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return S3KeyFilter(
-        filterRules: jsonDict["FilterRule"].flatMap { ($0 is NSNull) ? nil : [FilterRule].deserialize(response: response, body: .json($0)) }
+        filterRules: try! node.nodes(forXPath: "FilterRule").map { FilterRule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8566,8 +8539,11 @@ enum Transitionstorageclass: String, RestJsonDeserializable, RestJsonSerializabl
   case `sTANDARD_IA` = "STANDARD_IA"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Transitionstorageclass {
-    guard case let .json(json) = body else { fatalError() }
-    return Transitionstorageclass(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Transitionstorageclass(rawValue: json as! String)!
+    case .xml(let node): return Transitionstorageclass(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -8751,10 +8727,9 @@ Indicates the number of days that must pass since initiation for Lifecycle to ab
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AbortIncompleteMultipartUpload {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return AbortIncompleteMultipartUpload(
-        daysAfterInitiation: jsonDict["DaysAfterInitiation"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) }
+        daysAfterInitiation: try! node.nodes(forXPath: "DaysAfterInitiation").first.map { Int.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8781,8 +8756,11 @@ enum Bucketlocationconstraint: String, RestJsonDeserializable, RestJsonSerializa
   case `eucentral1` = "eu-central-1"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucketlocationconstraint {
-    guard case let .json(json) = body else { fatalError() }
-    return Bucketlocationconstraint(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Bucketlocationconstraint(rawValue: json as! String)!
+    case .xml(let node): return Bucketlocationconstraint(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -8813,11 +8791,10 @@ Name of the Principal.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Initiator {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Initiator(
-        iD: jsonDict["ID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      displayName: jsonDict["DisplayName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        iD: try! node.nodes(forXPath: "ID").first.map { String.deserialize(response: response, body: .xml($0)) },
+      displayName: try! node.nodes(forXPath: "DisplayName").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8919,10 +8896,9 @@ public struct LifecycleConfiguration: RestJsonSerializable, RestJsonDeserializab
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LifecycleConfiguration {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return LifecycleConfiguration(
-        rules: jsonDict["Rule"].flatMap { ($0 is NSNull) ? nil : [Rule].deserialize(response: response, body: .json($0)) }!
+        rules: try! node.nodes(forXPath: "Rule").map { Rule.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -8975,14 +8951,13 @@ Specifies which headers are allowed in a pre-flight OPTIONS request.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CORSRule {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CORSRule(
-        exposeHeaders: jsonDict["ExposeHeader"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) },
-      allowedMethods: jsonDict["AllowedMethod"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }!,
-      allowedOrigins: jsonDict["AllowedOrigin"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }!,
-      maxAgeSeconds: jsonDict["MaxAgeSeconds"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      allowedHeaders: jsonDict["AllowedHeader"].flatMap { ($0 is NSNull) ? nil : [String].deserialize(response: response, body: .json($0)) }
+        exposeHeaders: try! node.nodes(forXPath: "ExposeHeader").map { String.deserialize(response: response, body: .xml($0)) },
+      allowedMethods: try! node.nodes(forXPath: "AllowedMethod").map { String.deserialize(response: response, body: .xml($0)) },
+      allowedOrigins: try! node.nodes(forXPath: "AllowedOrigin").map { String.deserialize(response: response, body: .xml($0)) },
+      maxAgeSeconds: try! node.nodes(forXPath: "MaxAgeSeconds").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      allowedHeaders: try! node.nodes(forXPath: "AllowedHeader").map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -9411,22 +9386,21 @@ When a list is truncated, this element specifies the last part in the list, as w
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListPartsOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return ListPartsOutput(
-        partNumberMarker: jsonDict["PartNumberMarker"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      bucket: jsonDict["Bucket"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      isTruncated: jsonDict["IsTruncated"].flatMap { ($0 is NSNull) ? nil : Bool.deserialize(response: response, body: .json($0)) },
+        partNumberMarker: try! node.nodes(forXPath: "PartNumberMarker").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      bucket: try! node.nodes(forXPath: "Bucket").first.map { String.deserialize(response: response, body: .xml($0)) },
+      isTruncated: try! node.nodes(forXPath: "IsTruncated").first.map { Bool.deserialize(response: response, body: .xml($0)) },
       abortDate: response.allHeaderFields["x-amz-abort-date"].flatMap { ($0 is NSNull) ? nil : Date.deserialize(response: response, body: .json($0)) },
-      uploadId: jsonDict["UploadId"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      owner: jsonDict["Owner"].flatMap { ($0 is NSNull) ? nil : Owner.deserialize(response: response, body: .json($0)) },
-      parts: jsonDict["Part"].flatMap { ($0 is NSNull) ? nil : [Part].deserialize(response: response, body: .json($0)) },
-      initiator: jsonDict["Initiator"].flatMap { ($0 is NSNull) ? nil : Initiator.deserialize(response: response, body: .json($0)) },
+      uploadId: try! node.nodes(forXPath: "UploadId").first.map { String.deserialize(response: response, body: .xml($0)) },
+      owner: try! node.nodes(forXPath: "Owner").first.map { Owner.deserialize(response: response, body: .xml($0)) },
+      parts: try! node.nodes(forXPath: "Part").map { Part.deserialize(response: response, body: .xml($0)) },
+      initiator: try! node.nodes(forXPath: "Initiator").first.map { Initiator.deserialize(response: response, body: .xml($0)) },
       abortRuleId: response.allHeaderFields["x-amz-abort-rule-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      storageClass: jsonDict["StorageClass"].flatMap { ($0 is NSNull) ? nil : Storageclass.deserialize(response: response, body: .json($0)) },
-      key: jsonDict["Key"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      maxParts: jsonDict["MaxParts"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
-      nextPartNumberMarker: jsonDict["NextPartNumberMarker"].flatMap { ($0 is NSNull) ? nil : Int.deserialize(response: response, body: .json($0)) },
+      storageClass: try! node.nodes(forXPath: "StorageClass").first.map { Storageclass.deserialize(response: response, body: .xml($0)) },
+      key: try! node.nodes(forXPath: "Key").first.map { String.deserialize(response: response, body: .xml($0)) },
+      maxParts: try! node.nodes(forXPath: "MaxParts").first.map { Int.deserialize(response: response, body: .xml($0)) },
+      nextPartNumberMarker: try! node.nodes(forXPath: "NextPartNumberMarker").first.map { Int.deserialize(response: response, body: .xml($0)) },
       requestCharged: response.allHeaderFields["x-amz-request-charged"].flatMap { ($0 is NSNull) ? nil : Requestcharged.deserialize(response: response, body: .json($0)) }
     )
   }
@@ -9471,8 +9445,11 @@ enum Bucketacceleratestatus: String, RestJsonDeserializable, RestJsonSerializabl
   case `suspended` = "Suspended"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucketacceleratestatus {
-    guard case let .json(json) = body else { fatalError() }
-    return Bucketacceleratestatus(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Bucketacceleratestatus(rawValue: json as! String)!
+    case .xml(let node): return Bucketacceleratestatus(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -9513,8 +9490,11 @@ enum Objectversionstorageclass: String, RestJsonDeserializable, RestJsonSerializ
   case `sTANDARD` = "STANDARD"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Objectversionstorageclass {
-    guard case let .json(json) = body else { fatalError() }
-    return Objectversionstorageclass(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Objectversionstorageclass(rawValue: json as! String)!
+    case .xml(let node): return Objectversionstorageclass(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -9582,8 +9562,11 @@ enum Filterrulename: String, RestJsonDeserializable, RestJsonSerializable {
   case `suffix` = "suffix"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Filterrulename {
-    guard case let .json(json) = body else { fatalError() }
-    return Filterrulename(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Filterrulename(rawValue: json as! String)!
+    case .xml(let node): return Filterrulename(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -9624,13 +9607,12 @@ Bucket event for which to send notifications.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TopicConfigurationDeprecated {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return TopicConfigurationDeprecated(
-        topic: jsonDict["Topic"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      events: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : [Event].deserialize(response: response, body: .json($0)) },
-      event: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : Event.deserialize(response: response, body: .json($0)) },
-      id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        topic: try! node.nodes(forXPath: "Topic").first.map { String.deserialize(response: response, body: .xml($0)) },
+      events: try! node.nodes(forXPath: "Event").map { Event.deserialize(response: response, body: .xml($0)) },
+      event: try! node.nodes(forXPath: "Event").first.map { Event.deserialize(response: response, body: .xml($0)) },
+      id: try! node.nodes(forXPath: "Id").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -9688,14 +9670,13 @@ URI of the grantee group.
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Grantee {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return Grantee(
-        iD: jsonDict["ID"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      emailAddress: jsonDict["EmailAddress"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      s3Type: jsonDict["xsi:type"].flatMap { ($0 is NSNull) ? nil : S3Type.deserialize(response: response, body: .json($0)) }!,
-      displayName: jsonDict["DisplayName"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      uRI: jsonDict["URI"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        iD: try! node.nodes(forXPath: "ID").first.map { String.deserialize(response: response, body: .xml($0)) },
+      emailAddress: try! node.nodes(forXPath: "EmailAddress").first.map { String.deserialize(response: response, body: .xml($0)) },
+      s3Type: try! node.nodes(forXPath: "xsi:type").first.map { S3Type.deserialize(response: response, body: .xml($0)) }!,
+      displayName: try! node.nodes(forXPath: "DisplayName").first.map { String.deserialize(response: response, body: .xml($0)) },
+      uRI: try! node.nodes(forXPath: "URI").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -9749,13 +9730,12 @@ public struct QueueConfigurationDeprecated: RestJsonSerializable, RestJsonDeseri
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueConfigurationDeprecated {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return QueueConfigurationDeprecated(
-        id: jsonDict["Id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
-      events: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : [Event].deserialize(response: response, body: .json($0)) },
-      event: jsonDict["Event"].flatMap { ($0 is NSNull) ? nil : Event.deserialize(response: response, body: .json($0)) },
-      queue: jsonDict["Queue"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        id: try! node.nodes(forXPath: "Id").first.map { String.deserialize(response: response, body: .xml($0)) },
+      events: try! node.nodes(forXPath: "Event").map { Event.deserialize(response: response, body: .xml($0)) },
+      event: try! node.nodes(forXPath: "Event").first.map { Event.deserialize(response: response, body: .xml($0)) },
+      queue: try! node.nodes(forXPath: "Queue").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -9781,8 +9761,11 @@ enum Requestpayer: String, RestJsonDeserializable, RestJsonSerializable {
   case `requester` = "requester"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Requestpayer {
-    guard case let .json(json) = body else { fatalError() }
-    return Requestpayer(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Requestpayer(rawValue: json as! String)!
+    case .xml(let node): return Requestpayer(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -9838,10 +9821,9 @@ public struct CommonPrefix: RestJsonSerializable, RestJsonDeserializable {
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CommonPrefix {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CommonPrefix(
-        prefix: jsonDict["Prefix"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) }
+        prefix: try! node.nodes(forXPath: "Prefix").first.map { String.deserialize(response: response, body: .xml($0)) }
     )
   }
 
@@ -9889,8 +9871,11 @@ enum Permission: String, RestJsonDeserializable, RestJsonSerializable {
   case `rEAD_ACP` = "READ_ACP"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Permission {
-    guard case let .json(json) = body else { fatalError() }
-    return Permission(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Permission(rawValue: json as! String)!
+    case .xml(let node): return Permission(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -9903,8 +9888,11 @@ enum Expirationstatus: String, RestJsonDeserializable, RestJsonSerializable {
   case `disabled` = "Disabled"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Expirationstatus {
-    guard case let .json(json) = body else { fatalError() }
-    return Expirationstatus(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return Expirationstatus(rawValue: json as! String)!
+    case .xml(let node): return Expirationstatus(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -9944,8 +9932,11 @@ enum S3Protocol: String, RestJsonDeserializable, RestJsonSerializable {
   case `https` = "https"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> S3Protocol {
-    guard case let .json(json) = body else { fatalError() }
-    return S3Protocol(rawValue: json as! String)!
+    switch body { 
+    case .json(let json): return S3Protocol(rawValue: json as! String)!
+    case .xml(let node): return S3Protocol(rawValue: node.stringValue!)!
+    default: fatalError()
+    }
   }
 
   func serialize() -> SerializedForm {
@@ -10149,10 +10140,9 @@ The Server-side encryption algorithm used when storing this object in S3 (e.g., 
 
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CopyObjectOutput {
-    guard case let .json(json) = body else { fatalError() }
-  let jsonDict = json as! [String: Any]
+    guard case let .xml(node) = body else { fatalError() }
     return CopyObjectOutput(
-        copyObjectResult: jsonDict["CopyObjectResult"].flatMap { ($0 is NSNull) ? nil : CopyObjectResult.deserialize(response: response, body: .json($0)) },
+        copyObjectResult: try! node.nodes(forXPath: "CopyObjectResult").first.map { CopyObjectResult.deserialize(response: response, body: .xml($0)) },
       expiration: response.allHeaderFields["x-amz-expiration"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       versionId: response.allHeaderFields["x-amz-version-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },
       copySourceVersionId: response.allHeaderFields["x-amz-copy-source-version-id"].flatMap { ($0 is NSNull) ? nil : String.deserialize(response: response, body: .json($0)) },

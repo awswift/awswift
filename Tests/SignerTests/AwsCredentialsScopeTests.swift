@@ -1,5 +1,5 @@
 import XCTest
-@testable import AwswiftSigner
+@testable import Awswift
 
 class AwsCredentialsScopeTests: XCTestCase {
   static var allTests : [(String, (AwsCredentialsScopeTests) -> () throws -> Void)] {
