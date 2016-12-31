@@ -1277,7 +1277,6 @@ enum Eventsourceposition: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Eventsourceposition(rawValue: json as! String)!
     case .xml(let node): return Eventsourceposition(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -2060,7 +2059,6 @@ enum Invocationtype: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Invocationtype(rawValue: json as! String)!
     case .xml(let node): return Invocationtype(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -2453,7 +2451,6 @@ enum Logtype: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Logtype(rawValue: json as! String)!
     case .xml(let node): return Logtype(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -2702,7 +2699,6 @@ enum Runtime: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Runtime(rawValue: json as! String)!
     case .xml(let node): return Runtime(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -2798,7 +2794,6 @@ enum Throttlereason: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Throttlereason(rawValue: json as! String)!
     case .xml(let node): return Throttlereason(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 

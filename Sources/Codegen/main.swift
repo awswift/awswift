@@ -1,13 +1,13 @@
 import Foundation
-import SwiftyJSON
+import Jay
 import Commander
 
 func generateSwift(apiUrl: URL, docsUrl: URL, swiftUrl: URL) {
   let apiData = try! Data(contentsOf: apiUrl)
-  let apiJson = JSON(data: apiData)
+  let apiJson = try! Jay().jsonFromData([UInt8](apiData))
   
   let docsData = try! Data(contentsOf: docsUrl)
-  let docsJson = JSON(data: docsData)
+  let docsJson = try! Jay().jsonFromData([UInt8](docsData))
   let docs = Docs.fromJSON(docs: docsJson)
 
   let api = API.fromJSON(json: apiJson, docs: docs)

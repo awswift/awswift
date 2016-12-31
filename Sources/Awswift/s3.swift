@@ -1498,7 +1498,6 @@ enum Bucketacceleratestatus: String, RestJsonDeserializable, RestJsonSerializabl
     switch body { 
     case .json(let json): return Bucketacceleratestatus(rawValue: json as! String)!
     case .xml(let node): return Bucketacceleratestatus(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -1572,7 +1571,6 @@ enum Bucketcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Bucketcannedacl(rawValue: json as! String)!
     case .xml(let node): return Bucketcannedacl(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -1631,7 +1629,6 @@ enum Bucketlocationconstraint: String, RestJsonDeserializable, RestJsonSerializa
     switch body { 
     case .json(let json): return Bucketlocationconstraint(rawValue: json as! String)!
     case .xml(let node): return Bucketlocationconstraint(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -1682,7 +1679,6 @@ enum Bucketlogspermission: String, RestJsonDeserializable, RestJsonSerializable 
     switch body { 
     case .json(let json): return Bucketlogspermission(rawValue: json as! String)!
     case .xml(let node): return Bucketlogspermission(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -1700,7 +1696,6 @@ enum Bucketversioningstatus: String, RestJsonDeserializable, RestJsonSerializabl
     switch body { 
     case .json(let json): return Bucketversioningstatus(rawValue: json as! String)!
     case .xml(let node): return Bucketversioningstatus(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -3559,7 +3554,6 @@ enum Encodingtype: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Encodingtype(rawValue: json as! String)!
     case .xml(let node): return Encodingtype(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -3677,7 +3671,6 @@ enum Event: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Event(rawValue: json as! String)!
     case .xml(let node): return Event(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -3696,7 +3689,6 @@ enum Expirationstatus: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Expirationstatus(rawValue: json as! String)!
     case .xml(let node): return Expirationstatus(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -3766,7 +3758,6 @@ enum Filterrulename: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Filterrulename(rawValue: json as! String)!
     case .xml(let node): return Filterrulename(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -6714,7 +6705,6 @@ enum Mfadelete: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Mfadelete(rawValue: json as! String)!
     case .xml(let node): return Mfadelete(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -6731,7 +6721,6 @@ enum Mfadeletestatus: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Mfadeletestatus(rawValue: json as! String)!
     case .xml(let node): return Mfadeletestatus(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -6755,7 +6744,6 @@ enum Metadatadirective: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Metadatadirective(rawValue: json as! String)!
     case .xml(let node): return Metadatadirective(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -7272,7 +7260,6 @@ enum Objectcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Objectcannedacl(rawValue: json as! String)!
     case .xml(let node): return Objectcannedacl(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -7363,7 +7350,6 @@ enum Objectstorageclass: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Objectstorageclass(rawValue: json as! String)!
     case .xml(let node): return Objectstorageclass(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -7470,7 +7456,6 @@ enum Objectversionstorageclass: String, RestJsonDeserializable, RestJsonSerializ
     switch body { 
     case .json(let json): return Objectversionstorageclass(rawValue: json as! String)!
     case .xml(let node): return Objectversionstorageclass(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -7589,7 +7574,6 @@ enum Payer: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Payer(rawValue: json as! String)!
     case .xml(let node): return Payer(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -7609,7 +7593,6 @@ enum Permission: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Permission(rawValue: json as! String)!
     case .xml(let node): return Permission(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -7628,7 +7611,6 @@ enum S3Protocol: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return S3Protocol(rawValue: json as! String)!
     case .xml(let node): return S3Protocol(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -8970,7 +8952,6 @@ enum Replicationrulestatus: String, RestJsonDeserializable, RestJsonSerializable
     switch body { 
     case .json(let json): return Replicationrulestatus(rawValue: json as! String)!
     case .xml(let node): return Replicationrulestatus(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -8990,7 +8971,6 @@ enum Replicationstatus: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Replicationstatus(rawValue: json as! String)!
     case .xml(let node): return Replicationstatus(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -9009,7 +8989,6 @@ enum Requestcharged: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Requestcharged(rawValue: json as! String)!
     case .xml(let node): return Requestcharged(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -9028,7 +9007,6 @@ enum Requestpayer: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Requestpayer(rawValue: json as! String)!
     case .xml(let node): return Requestpayer(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -9363,7 +9341,6 @@ enum Serversideencryption: String, RestJsonDeserializable, RestJsonSerializable 
     switch body { 
     case .json(let json): return Serversideencryption(rawValue: json as! String)!
     case .xml(let node): return Serversideencryption(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -9383,7 +9360,6 @@ enum Storageclass: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return Storageclass(rawValue: json as! String)!
     case .xml(let node): return Storageclass(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -9690,7 +9666,6 @@ enum Transitionstorageclass: String, RestJsonDeserializable, RestJsonSerializabl
     switch body { 
     case .json(let json): return Transitionstorageclass(rawValue: json as! String)!
     case .xml(let node): return Transitionstorageclass(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
@@ -9708,7 +9683,6 @@ enum S3Type: String, RestJsonDeserializable, RestJsonSerializable {
     switch body { 
     case .json(let json): return S3Type(rawValue: json as! String)!
     case .xml(let node): return S3Type(rawValue: node.stringValue!)!
-    default: fatalError()
     }
   }
 
