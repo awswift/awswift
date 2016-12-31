@@ -1,6 +1,8 @@
 import Foundation
 import URITemplate
+#if !os(Linux)
 import PromiseKit
+#endif
 import Signer
 
 extension Dictionary {
@@ -23,9 +25,11 @@ struct ApiCallTask<T> {
     handler(completionHandler)
   }
   
+#if !os(Linux)
   func promise() -> Promise<T> {
     return wrap { async($0) }
   }
+#endif
   
   func sync() throws -> T {
     let sema = DispatchSemaphore(value: 0)

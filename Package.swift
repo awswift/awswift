@@ -1,5 +1,11 @@
 import PackageDescription
 
+#if os(Linux)
+let platformPackages: [Package.Dependency] = []
+#else
+let platformPackages = [Package.Dependency.Package(url: "https://github.com/mxcl/PromiseKit.git", majorVersion: 4)]
+#endif
+
 let package = Package(
   name: "Awswift",
   targets: [
@@ -12,6 +18,5 @@ let package = Package(
     .Package(url: "https://github.com/kylef/Commander.git", majorVersion: 0, minor: 5),
     .Package(url: "https://github.com/czechboy0/Jay.git", majorVersion: 1),
     .Package(url: "https://github.com/kylef/URITemplate.swift", majorVersion: 2),
-    .Package(url: "https://github.com/mxcl/PromiseKit.git", majorVersion: 4),
-  ]
+  ] + platformPackages
 )
