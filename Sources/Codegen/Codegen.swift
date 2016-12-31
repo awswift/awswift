@@ -317,7 +317,9 @@ final class Structure: Shape {
   
   static func fromJSON(name: String, json: JSON, context: ApiContext) -> Structure {
     let required = json["required"].flatMap { $1.string }
-    let members = json["members"].map { Member.fromJSON(name: $0, required: required.contains($0), json: $1, context: context) }
+    let members = json["members"].map { name, memberJson in
+        Member.fromJSON(name: name, required: required.contains(name), json: memberJson, context: context)
+    }.sorted { $0.name < $1.name }
     
     return Structure(
       name: name,
@@ -520,7 +522,7 @@ class Operation {
     
     let input = inputName.map { LUT[$0]! }
     let output = outputName.map { LUT[$0]! }
-    let errors = errorNames.map { LUT[$0]! }
+    let errors = errorNames.map { LUT[$0]! }.sorted { $0.name < $1.name }
     
     return Operation(
       name: name,
@@ -661,7 +663,7 @@ struct API {
     
     let operations: [Operation] = json["operations"].map { (key, json) in
       return Operation.fromJSON(json: json, docs: docs, LUT: context.LUT)
-    }
+    }.sorted { $0.name < $1.name }
     
     return API(name: name, shapes: context.LUT, operations: operations, version: version, endpoint: endpoint, apiProtocol: apiProtocol, signatureVersion: signatureVersion, docs: docs)
   }
@@ -740,7 +742,9 @@ struct API {
     operations.forEach { e($0.emit(api: self)) }
     e("  }")
     
-    shapes.forEach { (name, shape) in
+    let shapeNames = shapes.keys.sorted()
+    shapeNames.forEach { name in
+      let shape = shapes[name]!
       if let doc = docs.shapes[name] {
         e("/**")
         e(doc)
@@ -748,7 +752,7 @@ struct API {
       }
       e(shape.emit())
     }
-    
+
     e("}")
     
     return str
