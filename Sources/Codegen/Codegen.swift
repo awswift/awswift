@@ -634,12 +634,16 @@ struct Ec2: ApiProtocol {
 }
 
 struct Query: ApiProtocol {
-    func memberDeserialization(member: Member) -> String {
-        fatalError()
+    func memberDeserialization(member m: Member) -> String {
+        if let list = m.shape as? List {
+            return "      \(m.memberName()): try! node.nodes(forXPath: \"\(m.locationName)\").map { \(list.memberShape.memberType()).deserialize(response: response, body: .xml($0)) }"
+        } else {
+            return "      \(m.memberName()): try! node.nodes(forXPath: \"\(m.locationName)\").first.map { \(m.shape.memberType()).deserialize(response: response, body: .xml($0)) }\(m.required ? "!" : "")"
+        }
     }
     
     func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String) {
-        fatalError()
+        return ("  guard case let .xml(node) = body else { fatalError() }", "  let node = try! XMLDocument(data: data, options: 0).child(at: 0)!\n  return .xml(node)")
     }
 }
 
