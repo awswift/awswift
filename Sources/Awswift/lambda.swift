@@ -527,7 +527,7 @@ func updateFunctionConfiguration(input: UpdateFunctionConfigurationRequest) -> A
 /**
 <p/>
  */
-public struct AddPermissionRequest: RestJsonSerializable {
+public struct AddPermissionRequest: AwswiftSerializable {
 /**
 <p>The AWS Lambda action you want to allow in this statement. Each Lambda action is a string starting with <code>lambda:</code> followed by the API name . For example, <code>lambda:CreateFunction</code>. You can use wildcard (<code>lambda:*</code>) to grant permission for all AWS Lambda actions. </p>
  */
@@ -606,12 +606,17 @@ self.statementId = statementId
 /**
 <p/>
  */
-public struct AddPermissionResponse: RestJsonDeserializable {
+public struct AddPermissionResponse: AwswiftDeserializable {
 /**
 <p>The permission statement you specified in the request. The response returns the same as a string using a backslash ("\") as an escape character in the JSON.</p>
  */
   public let statement: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AddPermissionResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -634,7 +639,7 @@ self.statement = statement
 /**
 <p>Provides configuration information about a Lambda function version alias.</p>
  */
-public struct AliasConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct AliasConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 <p>Lambda function ARN that is qualified using the alias name as the suffix. For example, if you create an alias called <code>BETA</code> that points to a helloworld function version, the ARN is <code>arn:aws:lambda:aws-regions:acct-id:function:helloworld:BETA</code>.</p>
  */
@@ -664,6 +669,11 @@ public struct AliasConfiguration: RestJsonSerializable, RestJsonDeserializable {
     if name != nil { body["Name"] = name! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AliasConfiguration {
@@ -701,7 +711,7 @@ self.name = name
 /**
 <p>You have exceeded your maximum total code size per account. <a href="http://docs.aws.amazon.com/lambda/latest/dg/limits.html">Limits</a> </p>
  */
-public struct CodeStorageExceededException: Error, RestJsonDeserializable {
+public struct CodeStorageExceededException: Error, AwswiftDeserializable {
 /**
 <p/>
  */
@@ -711,6 +721,11 @@ public struct CodeStorageExceededException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CodeStorageExceededException {
     guard case let .json(json) = body else { fatalError() }
@@ -732,7 +747,7 @@ self.message = message
   }
 }
 
-public struct CreateAliasRequest: RestJsonSerializable {
+public struct CreateAliasRequest: AwswiftSerializable {
 /**
 <p>Description of the alias.</p>
  */
@@ -783,7 +798,7 @@ self.name = name
 /**
 <p/>
  */
-public struct CreateEventSourceMappingRequest: RestJsonSerializable {
+public struct CreateEventSourceMappingRequest: AwswiftSerializable {
 /**
 <p>The largest number of records that AWS Lambda will retrieve from your event source at the time of invoking your function. Your function receives an event with all the retrieved records. The default is 100 records.</p>
  */
@@ -841,7 +856,7 @@ self.startingPosition = startingPosition
 /**
 <p/>
  */
-public struct CreateFunctionRequest: RestJsonSerializable {
+public struct CreateFunctionRequest: AwswiftSerializable {
 /**
 <p>The code for the Lambda function.</p>
  */
@@ -932,7 +947,7 @@ self.vpcConfig = vpcConfig
 }
 
 
-public struct DeleteAliasRequest: RestJsonSerializable {
+public struct DeleteAliasRequest: AwswiftSerializable {
 /**
 <p>The Lambda function name for which the alias is created. Deleting an alias does not delete the function version to which it is pointing.</p>
  */
@@ -969,7 +984,7 @@ self.name = name
 /**
 <p/>
  */
-public struct DeleteEventSourceMappingRequest: RestJsonSerializable {
+public struct DeleteEventSourceMappingRequest: AwswiftSerializable {
 /**
 <p>The event source mapping ID.</p>
  */
@@ -996,7 +1011,7 @@ self.uUID = uUID
   }
 }
 
-public struct DeleteFunctionRequest: RestJsonSerializable {
+public struct DeleteFunctionRequest: AwswiftSerializable {
 /**
 <p>The Lambda function to delete.</p> <p> You can specify the function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). If you are using versioning, you can also provide a qualified function ARN (ARN that is qualified with function version or alias name as suffix). AWS Lambda also allows you to specify only the function name with the account ID qualifier (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -1034,7 +1049,7 @@ self.qualifier = qualifier
 /**
 <p/>
  */
-public struct EC2AccessDeniedException: Error, RestJsonDeserializable {
+public struct EC2AccessDeniedException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1044,6 +1059,11 @@ public struct EC2AccessDeniedException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EC2AccessDeniedException {
     guard case let .json(json) = body else { fatalError() }
@@ -1068,7 +1088,7 @@ self.lambdaType = lambdaType
 /**
 <p>AWS Lambda was throttled by Amazon EC2 during Lambda function initialization using the execution role provided for the Lambda function.</p>
  */
-public struct EC2ThrottledException: Error, RestJsonDeserializable {
+public struct EC2ThrottledException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1078,6 +1098,11 @@ public struct EC2ThrottledException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EC2ThrottledException {
     guard case let .json(json) = body else { fatalError() }
@@ -1102,7 +1127,7 @@ self.lambdaType = lambdaType
 /**
 <p>AWS Lambda received an unexpected EC2 client exception while setting up for the Lambda function.</p>
  */
-public struct EC2UnexpectedException: Error, RestJsonDeserializable {
+public struct EC2UnexpectedException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1116,6 +1141,11 @@ public struct EC2UnexpectedException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EC2UnexpectedException {
     guard case let .json(json) = body else { fatalError() }
@@ -1143,7 +1173,7 @@ self.lambdaType = lambdaType
 /**
 <p>AWS Lambda was not able to create an Elastic Network Interface (ENI) in the VPC, specified as part of Lambda function configuration, because the limit for network interfaces has been reached.</p>
  */
-public struct ENILimitReachedException: Error, RestJsonDeserializable {
+public struct ENILimitReachedException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1153,6 +1183,11 @@ public struct ENILimitReachedException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ENILimitReachedException {
     guard case let .json(json) = body else { fatalError() }
@@ -1178,7 +1213,7 @@ self.lambdaType = lambdaType
 /**
 <p>Describes mapping between an Amazon Kinesis stream and a Lambda function.</p>
  */
-public struct EventSourceMappingConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct EventSourceMappingConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 <p>The largest number of records that AWS Lambda will retrieve from your event source at the time of invoking your function. Your function receives an event with all the retrieved records.</p>
  */
@@ -1230,6 +1265,11 @@ public struct EventSourceMappingConfiguration: RestJsonSerializable, RestJsonDes
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> EventSourceMappingConfiguration {
     guard case let .json(json) = body else { fatalError() }
   let jsonDict = json as! [String: Any]
@@ -1269,7 +1309,7 @@ self.uUID = uUID
 }
 
 
-enum Eventsourceposition: String, RestJsonDeserializable, RestJsonSerializable {
+enum Eventsourceposition: String, AwswiftDeserializable, AwswiftSerializable {
   case `tRIM_HORIZON` = "TRIM_HORIZON"
   case `lATEST` = "LATEST"
 
@@ -1290,7 +1330,7 @@ enum Eventsourceposition: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 <p>The code for the Lambda function.</p>
  */
-public struct FunctionCode: RestJsonSerializable, RestJsonDeserializable {
+public struct FunctionCode: AwswiftSerializable, AwswiftDeserializable {
 /**
 <p>Amazon S3 bucket name where the .zip file containing your deployment package is stored. This bucket must reside in the same AWS region where you are creating the Lambda function.</p>
  */
@@ -1322,6 +1362,11 @@ public struct FunctionCode: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FunctionCode {
     guard case let .json(json) = body else { fatalError() }
   let jsonDict = json as! [String: Any]
@@ -1351,7 +1396,7 @@ self.zipFile = zipFile
 /**
 <p>The object for the Lambda function location.</p>
  */
-public struct FunctionCodeLocation: RestJsonSerializable, RestJsonDeserializable {
+public struct FunctionCodeLocation: AwswiftSerializable, AwswiftDeserializable {
 /**
 <p>The presigned URL you can use to download the function's .zip file that you previously uploaded. The URL is valid for up to 10 minutes.</p>
  */
@@ -1371,6 +1416,11 @@ public struct FunctionCodeLocation: RestJsonSerializable, RestJsonDeserializable
     if repositoryType != nil { body["RepositoryType"] = repositoryType! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FunctionCodeLocation {
@@ -1396,7 +1446,7 @@ self.repositoryType = repositoryType
 /**
 <p>A complex type that describes function metadata.</p>
  */
-public struct FunctionConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct FunctionConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 <p>It is the SHA256 hash of your function deployment package.</p>
  */
@@ -1473,6 +1523,11 @@ public struct FunctionConfiguration: RestJsonSerializable, RestJsonDeserializabl
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FunctionConfiguration {
     guard case let .json(json) = body else { fatalError() }
   let jsonDict = json as! [String: Any]
@@ -1528,7 +1583,7 @@ self.vpcConfig = vpcConfig
 
 
 
-public struct GetAliasRequest: RestJsonSerializable {
+public struct GetAliasRequest: AwswiftSerializable {
 /**
 <p>Function name for which the alias is created. An alias is a subresource that exists only in the context of an existing Lambda function so you must specify the function name.</p>
  */
@@ -1565,7 +1620,7 @@ self.name = name
 /**
 <p/>
  */
-public struct GetEventSourceMappingRequest: RestJsonSerializable {
+public struct GetEventSourceMappingRequest: AwswiftSerializable {
 /**
 <p>The AWS Lambda assigned ID of the event source mapping.</p>
  */
@@ -1595,7 +1650,7 @@ self.uUID = uUID
 /**
 <p/>
  */
-public struct GetFunctionConfigurationRequest: RestJsonSerializable {
+public struct GetFunctionConfigurationRequest: AwswiftSerializable {
 /**
 <p>The name of the Lambda function for which you want to retrieve the configuration information.</p> <p> You can specify a function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). AWS Lambda also allows you to specify a partial ARN (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -1632,7 +1687,7 @@ self.qualifier = qualifier
 /**
 <p/>
  */
-public struct GetFunctionRequest: RestJsonSerializable {
+public struct GetFunctionRequest: AwswiftSerializable {
 /**
 <p>The Lambda function name.</p> <p> You can specify a function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). AWS Lambda also allows you to specify a partial ARN (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -1669,7 +1724,7 @@ self.qualifier = qualifier
 /**
 <p>This response contains the object for the Lambda function location (see .</p>
  */
-public struct GetFunctionResponse: RestJsonDeserializable {
+public struct GetFunctionResponse: AwswiftDeserializable {
 /**
 
  */
@@ -1679,6 +1734,11 @@ public struct GetFunctionResponse: RestJsonDeserializable {
  */
   public let configuration: FunctionConfiguration?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetFunctionResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -1703,7 +1763,7 @@ self.configuration = configuration
 /**
 <p/>
  */
-public struct GetPolicyRequest: RestJsonSerializable {
+public struct GetPolicyRequest: AwswiftSerializable {
 /**
 <p>Function name whose resource policy you want to retrieve.</p> <p> You can specify the function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). If you are using versioning, you can also provide a qualified function ARN (ARN that is qualified with function version or alias name as suffix). AWS Lambda also allows you to specify only the function name with the account ID qualifier (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -1740,12 +1800,17 @@ self.qualifier = qualifier
 /**
 <p/>
  */
-public struct GetPolicyResponse: RestJsonDeserializable {
+public struct GetPolicyResponse: AwswiftDeserializable {
 /**
 <p>The resource policy associated with the specified function. The response returns the same as a string using a backslash ("\") as an escape character in the JSON.</p>
  */
   public let policy: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetPolicyResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -1770,7 +1835,7 @@ self.policy = policy
 /**
 <p>One of the parameters in the request is invalid. For example, if you provided an IAM role for AWS Lambda to assume in the <code>CreateFunction</code> or the <code>UpdateFunctionConfiguration</code> API, that AWS Lambda is unable to assume you will get this exception. </p>
  */
-public struct InvalidParameterValueException: Error, RestJsonDeserializable {
+public struct InvalidParameterValueException: Error, AwswiftDeserializable {
 /**
 <p/>
  */
@@ -1780,6 +1845,11 @@ public struct InvalidParameterValueException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidParameterValueException {
     guard case let .json(json) = body else { fatalError() }
@@ -1804,7 +1874,7 @@ self.message = message
 /**
 <p>The request body could not be parsed as JSON.</p>
  */
-public struct InvalidRequestContentException: Error, RestJsonDeserializable {
+public struct InvalidRequestContentException: Error, AwswiftDeserializable {
 /**
 <p/>
  */
@@ -1814,6 +1884,11 @@ public struct InvalidRequestContentException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidRequestContentException {
     guard case let .json(json) = body else { fatalError() }
@@ -1838,7 +1913,7 @@ self.message = message
 /**
 <p>The Security Group ID provided in the Lambda function VPC configuration is invalid.</p>
  */
-public struct InvalidSecurityGroupIDException: Error, RestJsonDeserializable {
+public struct InvalidSecurityGroupIDException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1848,6 +1923,11 @@ public struct InvalidSecurityGroupIDException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidSecurityGroupIDException {
     guard case let .json(json) = body else { fatalError() }
@@ -1872,7 +1952,7 @@ self.lambdaType = lambdaType
 /**
 <p>The Subnet ID provided in the Lambda function VPC configuration is invalid.</p>
  */
-public struct InvalidSubnetIDException: Error, RestJsonDeserializable {
+public struct InvalidSubnetIDException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1882,6 +1962,11 @@ public struct InvalidSubnetIDException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidSubnetIDException {
     guard case let .json(json) = body else { fatalError() }
@@ -1906,7 +1991,7 @@ self.lambdaType = lambdaType
 /**
 <p>AWS Lambda could not unzip the function zip file.</p>
  */
-public struct InvalidZipFileException: Error, RestJsonDeserializable {
+public struct InvalidZipFileException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -1916,6 +2001,11 @@ public struct InvalidZipFileException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvalidZipFileException {
     guard case let .json(json) = body else { fatalError() }
@@ -1940,7 +2030,7 @@ self.lambdaType = lambdaType
 /**
 <p/>
  */
-public struct InvocationRequest: RestJsonSerializable {
+public struct InvocationRequest: AwswiftSerializable {
 /**
 <p>Using the <code>ClientContext</code> you can pass client-specific information to the Lambda function you are invoking. You can then process the client information in your Lambda function as you choose through the context variable. For an example of a <code>ClientContext</code> JSON, see <a href="http://docs.aws.amazon.com/mobileanalytics/latest/ug/PutEvents.html">PutEvents</a> in the <i>Amazon Mobile Analytics API Reference and User Guide</i>.</p> <p>The ClientContext JSON must be base64-encoded.</p>
  */
@@ -2005,7 +2095,7 @@ self.qualifier = qualifier
 /**
 <p>Upon success, returns an empty response. Otherwise, throws an exception.</p>
  */
-public struct InvocationResponse: RestJsonDeserializable {
+public struct InvocationResponse: AwswiftDeserializable {
 /**
 <p>Indicates whether an error occurred while executing the Lambda function. If an error occurred this field will have one of two values; <code>Handled</code> or <code>Unhandled</code>. <code>Handled</code> errors are errors that are reported by the function while the <code>Unhandled</code> errors are those detected and reported by AWS Lambda. Unhandled errors include out of memory errors and function timeouts. For information about how to report an <code>Handled</code> error, see <a href="http://docs.aws.amazon.com/lambda/latest/dg/programming-model.html">Programming Model</a>. </p>
  */
@@ -2023,6 +2113,11 @@ public struct InvocationResponse: RestJsonDeserializable {
  */
   public let statusCode: Int?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvocationResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -2050,7 +2145,7 @@ self.statusCode = statusCode
   }
 }
 
-enum Invocationtype: String, RestJsonDeserializable, RestJsonSerializable {
+enum Invocationtype: String, AwswiftDeserializable, AwswiftSerializable {
   case `event` = "Event"
   case `requestResponse` = "RequestResponse"
   case `dryRun` = "DryRun"
@@ -2070,7 +2165,7 @@ enum Invocationtype: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 <p/>
  */
-public struct InvokeAsyncRequest: RestJsonSerializable {
+public struct InvokeAsyncRequest: AwswiftSerializable {
 /**
 <p>The Lambda function name.</p>
  */
@@ -2107,12 +2202,16 @@ self.invokeArgs = invokeArgs
 /**
 <p>Upon success, it returns empty response. Otherwise, throws an exception.</p>
  */
-public struct InvokeAsyncResponse: RestJsonDeserializable {
+public struct InvokeAsyncResponse: AwswiftDeserializable {
 /**
 <p>It will be 202 upon success.</p>
  */
   public let status: Int?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> InvokeAsyncResponse {
   
@@ -2130,7 +2229,7 @@ self.status = status
   }
 }
 
-public struct ListAliasesRequest: RestJsonSerializable {
+public struct ListAliasesRequest: AwswiftSerializable {
 /**
 <p>Lambda function name for which the alias is created.</p>
  */
@@ -2178,7 +2277,7 @@ self.maxItems = maxItems
   }
 }
 
-public struct ListAliasesResponse: RestJsonDeserializable {
+public struct ListAliasesResponse: AwswiftDeserializable {
 /**
 <p>A list of aliases.</p>
  */
@@ -2188,6 +2287,11 @@ public struct ListAliasesResponse: RestJsonDeserializable {
  */
   public let nextMarker: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListAliasesResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -2212,7 +2316,7 @@ self.nextMarker = nextMarker
 /**
 <p/>
  */
-public struct ListEventSourceMappingsRequest: RestJsonSerializable {
+public struct ListEventSourceMappingsRequest: AwswiftSerializable {
 /**
 <p>The Amazon Resource Name (ARN) of the Amazon Kinesis stream. (This parameter is optional.)</p>
  */
@@ -2263,7 +2367,7 @@ self.maxItems = maxItems
 /**
 <p>Contains a list of event sources (see )</p>
  */
-public struct ListEventSourceMappingsResponse: RestJsonDeserializable {
+public struct ListEventSourceMappingsResponse: AwswiftDeserializable {
 /**
 <p>An array of <code>EventSourceMappingConfiguration</code> objects.</p>
  */
@@ -2273,6 +2377,11 @@ public struct ListEventSourceMappingsResponse: RestJsonDeserializable {
  */
   public let nextMarker: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListEventSourceMappingsResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -2297,7 +2406,7 @@ self.nextMarker = nextMarker
 /**
 <p/>
  */
-public struct ListFunctionsRequest: RestJsonSerializable {
+public struct ListFunctionsRequest: AwswiftSerializable {
 /**
 <p>Optional string. An opaque pagination token returned from a previous <code>ListFunctions</code> operation. If present, indicates where to continue the listing. </p>
  */
@@ -2334,7 +2443,7 @@ self.maxItems = maxItems
 /**
 <p>Contains a list of AWS Lambda function configurations (see <a>FunctionConfiguration</a>.</p>
  */
-public struct ListFunctionsResponse: RestJsonDeserializable {
+public struct ListFunctionsResponse: AwswiftDeserializable {
 /**
 <p>A list of Lambda functions.</p>
  */
@@ -2344,6 +2453,11 @@ public struct ListFunctionsResponse: RestJsonDeserializable {
  */
   public let nextMarker: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListFunctionsResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -2368,7 +2482,7 @@ self.nextMarker = nextMarker
 /**
 <p/>
  */
-public struct ListVersionsByFunctionRequest: RestJsonSerializable {
+public struct ListVersionsByFunctionRequest: AwswiftSerializable {
 /**
 <p>Function name whose versions to list. You can specify a function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). AWS Lambda also allows you to specify a partial ARN (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -2412,7 +2526,7 @@ self.maxItems = maxItems
 /**
 <p/>
  */
-public struct ListVersionsByFunctionResponse: RestJsonDeserializable {
+public struct ListVersionsByFunctionResponse: AwswiftDeserializable {
 /**
 <p>A string, present if there are more function versions.</p>
  */
@@ -2422,6 +2536,11 @@ public struct ListVersionsByFunctionResponse: RestJsonDeserializable {
  */
   public let versions: [FunctionConfiguration]?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListVersionsByFunctionResponse {
     guard case let .json(json) = body else { fatalError() }
@@ -2443,7 +2562,7 @@ self.versions = versions
   }
 }
 
-enum Logtype: String, RestJsonDeserializable, RestJsonSerializable {
+enum Logtype: String, AwswiftDeserializable, AwswiftSerializable {
   case `none` = "None"
   case `tail` = "Tail"
 
@@ -2465,7 +2584,7 @@ enum Logtype: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 <p>Lambda function access policy is limited to 20 KB.</p>
  */
-public struct PolicyLengthExceededException: Error, RestJsonDeserializable {
+public struct PolicyLengthExceededException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2475,6 +2594,11 @@ public struct PolicyLengthExceededException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> PolicyLengthExceededException {
     guard case let .json(json) = body else { fatalError() }
@@ -2500,7 +2624,7 @@ self.message = message
 /**
 <p/>
  */
-public struct PublishVersionRequest: RestJsonSerializable {
+public struct PublishVersionRequest: AwswiftSerializable {
 /**
 <p>The SHA256 hash of the deployment package you want to publish. This provides validation on the code you are publishing. If you provide this parameter value must match the SHA256 of the $LATEST version for the publication to succeed.</p>
  */
@@ -2545,7 +2669,7 @@ self.functionName = functionName
 /**
 <p/>
  */
-public struct RemovePermissionRequest: RestJsonSerializable {
+public struct RemovePermissionRequest: AwswiftSerializable {
 /**
 <p>Lambda function whose resource policy you want to remove a permission from.</p> <p> You can specify a function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). AWS Lambda also allows you to specify a partial ARN (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -2589,7 +2713,7 @@ self.statementId = statementId
 /**
 <p>The request payload exceeded the <code>Invoke</code> request body JSON input limit. For more information, see <a href="http://docs.aws.amazon.com/lambda/latest/dg/limits.html">Limits</a>. </p>
  */
-public struct RequestTooLargeException: Error, RestJsonDeserializable {
+public struct RequestTooLargeException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2599,6 +2723,11 @@ public struct RequestTooLargeException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RequestTooLargeException {
     guard case let .json(json) = body else { fatalError() }
@@ -2623,7 +2752,7 @@ self.message = message
 /**
 <p>The resource already exists.</p>
  */
-public struct ResourceConflictException: Error, RestJsonDeserializable {
+public struct ResourceConflictException: Error, AwswiftDeserializable {
 /**
 <p/>
  */
@@ -2633,6 +2762,11 @@ public struct ResourceConflictException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ResourceConflictException {
     guard case let .json(json) = body else { fatalError() }
@@ -2657,7 +2791,7 @@ self.message = message
 /**
 <p>The resource (for example, a Lambda function or access policy statement) specified in the request does not exist.</p>
  */
-public struct ResourceNotFoundException: Error, RestJsonDeserializable {
+public struct ResourceNotFoundException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2667,6 +2801,11 @@ public struct ResourceNotFoundException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ResourceNotFoundException {
     guard case let .json(json) = body else { fatalError() }
@@ -2689,7 +2828,7 @@ self.lambdaType = lambdaType
 }
 
 
-enum Runtime: String, RestJsonDeserializable, RestJsonSerializable {
+enum Runtime: String, AwswiftDeserializable, AwswiftSerializable {
   case `nodejs` = "nodejs"
   case `nodejs43` = "nodejs4.3"
   case `java8` = "java8"
@@ -2715,7 +2854,7 @@ enum Runtime: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 <p>The AWS Lambda service encountered an internal error.</p>
  */
-public struct ServiceException: Error, RestJsonDeserializable {
+public struct ServiceException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2725,6 +2864,11 @@ public struct ServiceException: Error, RestJsonDeserializable {
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ServiceException {
     guard case let .json(json) = body else { fatalError() }
@@ -2752,7 +2896,7 @@ self.lambdaType = lambdaType
 /**
 <p>AWS Lambda was not able to set up VPC access for the Lambda function because one or more configured subnets has no available IP addresses.</p>
  */
-public struct SubnetIPAddressLimitReachedException: Error, RestJsonDeserializable {
+public struct SubnetIPAddressLimitReachedException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2762,6 +2906,11 @@ public struct SubnetIPAddressLimitReachedException: Error, RestJsonDeserializabl
  */
   public let lambdaType: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> SubnetIPAddressLimitReachedException {
     guard case let .json(json) = body else { fatalError() }
@@ -2785,7 +2934,7 @@ self.lambdaType = lambdaType
 
 
 
-enum Throttlereason: String, RestJsonDeserializable, RestJsonSerializable {
+enum Throttlereason: String, AwswiftDeserializable, AwswiftSerializable {
   case `concurrentInvocationLimitExceeded` = "ConcurrentInvocationLimitExceeded"
   case `functionInvocationRateLimitExceeded` = "FunctionInvocationRateLimitExceeded"
   case `callerRateLimitExceeded` = "CallerRateLimitExceeded"
@@ -2807,7 +2956,7 @@ enum Throttlereason: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 <p/>
  */
-public struct TooManyRequestsException: Error, RestJsonDeserializable {
+public struct TooManyRequestsException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2825,6 +2974,11 @@ public struct TooManyRequestsException: Error, RestJsonDeserializable {
  */
   public let retryAfterSeconds: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TooManyRequestsException {
     guard case let .json(json) = body else { fatalError() }
@@ -2855,7 +3009,7 @@ self.retryAfterSeconds = retryAfterSeconds
 /**
 <p>The content type of the <code>Invoke</code> request body is not JSON.</p>
  */
-public struct UnsupportedMediaTypeException: Error, RestJsonDeserializable {
+public struct UnsupportedMediaTypeException: Error, AwswiftDeserializable {
 /**
 
  */
@@ -2865,6 +3019,11 @@ public struct UnsupportedMediaTypeException: Error, RestJsonDeserializable {
  */
   public let message: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UnsupportedMediaTypeException {
     guard case let .json(json) = body else { fatalError() }
@@ -2886,7 +3045,7 @@ self.message = message
   }
 }
 
-public struct UpdateAliasRequest: RestJsonSerializable {
+public struct UpdateAliasRequest: AwswiftSerializable {
 /**
 <p>You can change the description of the alias using this parameter.</p>
  */
@@ -2937,7 +3096,7 @@ self.name = name
 /**
 <p/>
  */
-public struct UpdateEventSourceMappingRequest: RestJsonSerializable {
+public struct UpdateEventSourceMappingRequest: AwswiftSerializable {
 /**
 <p>The maximum number of stream records that can be sent to your Lambda function for a single invocation.</p>
  */
@@ -2988,7 +3147,7 @@ self.uUID = uUID
 /**
 <p/>
  */
-public struct UpdateFunctionCodeRequest: RestJsonSerializable {
+public struct UpdateFunctionCodeRequest: AwswiftSerializable {
 /**
 <p>The existing Lambda function name whose code you want to replace.</p> <p> You can specify a function name (for example, <code>Thumbnail</code>) or you can specify Amazon Resource Name (ARN) of the function (for example, <code>arn:aws:lambda:us-west-2:account-id:function:ThumbNail</code>). AWS Lambda also allows you to specify a partial ARN (for example, <code>account-id:Thumbnail</code>). Note that the length constraint applies only to the ARN. If you specify only the function name, it is limited to 64 character in length. </p>
  */
@@ -3053,7 +3212,7 @@ self.zipFile = zipFile
 /**
 <p/>
  */
-public struct UpdateFunctionConfigurationRequest: RestJsonSerializable {
+public struct UpdateFunctionConfigurationRequest: AwswiftSerializable {
 /**
 <p>A short user-defined function description. AWS Lambda does not use this value. Assign a meaningful description as you see fit.</p>
  */
@@ -3133,7 +3292,7 @@ self.vpcConfig = vpcConfig
 /**
 <p>If your Lambda function accesses resources in a VPC, you provide this parameter identifying the list of security group IDs and subnet IDs. These must belong to the same VPC. You must provide at least one security group and one subnet ID.</p>
  */
-public struct VpcConfig: RestJsonSerializable, RestJsonDeserializable {
+public struct VpcConfig: AwswiftSerializable, AwswiftDeserializable {
 /**
 <p>A list of one or more security groups IDs in your VPC.</p>
  */
@@ -3153,6 +3312,11 @@ public struct VpcConfig: RestJsonSerializable, RestJsonDeserializable {
     if subnetIds != nil { body["SubnetIds"] = subnetIds! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> VpcConfig {
@@ -3178,7 +3342,7 @@ self.subnetIds = subnetIds
 /**
 <p>VPC configuration associated with your Lambda function.</p>
  */
-public struct VpcConfigResponse: RestJsonDeserializable {
+public struct VpcConfigResponse: AwswiftDeserializable {
 /**
 <p>A list of security group IDs associated with the Lambda function.</p>
  */
@@ -3192,6 +3356,11 @@ public struct VpcConfigResponse: RestJsonDeserializable {
  */
   public let vpcId: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let json = try! JSONSerialization.jsonObject(with: data, options: [])
+  return .json(json)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> VpcConfigResponse {
     guard case let .json(json) = body else { fatalError() }

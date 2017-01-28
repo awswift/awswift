@@ -28,7 +28,7 @@ func abortMultipartUpload(input: AbortMultipartUploadRequest) -> ApiCallTask<Abo
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -49,7 +49,7 @@ func completeMultipartUpload(input: CompleteMultipartUploadRequest) -> ApiCallTa
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "POST", 
       expectedStatus: nil, 
       input: input, 
@@ -70,7 +70,7 @@ func copyObject(input: CopyObjectRequest) -> ApiCallTask<CopyObjectOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -91,7 +91,7 @@ func createBucket(input: CreateBucketRequest) -> ApiCallTask<CreateBucketOutput>
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -112,7 +112,7 @@ func createMultipartUpload(input: CreateMultipartUploadRequest) -> ApiCallTask<C
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}?uploads", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}?uploads", 
       httpMethod: "POST", 
       expectedStatus: nil, 
       input: input, 
@@ -133,7 +133,7 @@ func deleteBucket(input: DeleteBucketRequest) -> ApiCallTask<AwsApiVoidOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -154,7 +154,7 @@ func deleteBucketCors(input: DeleteBucketCorsRequest) -> ApiCallTask<AwsApiVoidO
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?cors", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?cors", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -175,7 +175,7 @@ func deleteBucketLifecycle(input: DeleteBucketLifecycleRequest) -> ApiCallTask<A
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?lifecycle", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?lifecycle", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -196,7 +196,7 @@ func deleteBucketPolicy(input: DeleteBucketPolicyRequest) -> ApiCallTask<AwsApiV
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?policy", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?policy", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -217,7 +217,7 @@ func deleteBucketReplication(input: DeleteBucketReplicationRequest) -> ApiCallTa
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?replication", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?replication", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -238,7 +238,7 @@ func deleteBucketTagging(input: DeleteBucketTaggingRequest) -> ApiCallTask<AwsAp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?tagging", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?tagging", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -259,7 +259,7 @@ func deleteBucketWebsite(input: DeleteBucketWebsiteRequest) -> ApiCallTask<AwsAp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?website", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?website", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -280,7 +280,7 @@ func deleteObject(input: DeleteObjectRequest) -> ApiCallTask<DeleteObjectOutput>
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "DELETE", 
       expectedStatus: nil, 
       input: input, 
@@ -301,7 +301,7 @@ func deleteObjects(input: DeleteObjectsRequest) -> ApiCallTask<DeleteObjectsOutp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?delete", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?delete", 
       httpMethod: "POST", 
       expectedStatus: nil, 
       input: input, 
@@ -322,7 +322,7 @@ func getBucketAccelerateConfiguration(input: GetBucketAccelerateConfigurationReq
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?accelerate", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?accelerate", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -343,7 +343,7 @@ func getBucketAcl(input: GetBucketAclRequest) -> ApiCallTask<GetBucketAclOutput>
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?acl", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?acl", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -364,7 +364,7 @@ func getBucketCors(input: GetBucketCorsRequest) -> ApiCallTask<GetBucketCorsOutp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?cors", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?cors", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -385,7 +385,7 @@ func getBucketLifecycle(input: GetBucketLifecycleRequest) -> ApiCallTask<GetBuck
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?lifecycle", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?lifecycle", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -406,7 +406,7 @@ func getBucketLifecycleConfiguration(input: GetBucketLifecycleConfigurationReque
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?lifecycle", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?lifecycle", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -427,7 +427,7 @@ func getBucketLocation(input: GetBucketLocationRequest) -> ApiCallTask<GetBucket
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?location", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?location", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -448,7 +448,7 @@ func getBucketLogging(input: GetBucketLoggingRequest) -> ApiCallTask<GetBucketLo
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?logging", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?logging", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -469,7 +469,7 @@ func getBucketNotification(input: GetBucketNotificationConfigurationRequest) -> 
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?notification", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?notification", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -490,7 +490,7 @@ func getBucketNotificationConfiguration(input: GetBucketNotificationConfiguratio
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?notification", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?notification", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -511,7 +511,7 @@ func getBucketPolicy(input: GetBucketPolicyRequest) -> ApiCallTask<GetBucketPoli
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?policy", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?policy", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -532,7 +532,7 @@ func getBucketReplication(input: GetBucketReplicationRequest) -> ApiCallTask<Get
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?replication", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?replication", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -553,7 +553,7 @@ func getBucketRequestPayment(input: GetBucketRequestPaymentRequest) -> ApiCallTa
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?requestPayment", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?requestPayment", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -574,7 +574,7 @@ func getBucketTagging(input: GetBucketTaggingRequest) -> ApiCallTask<GetBucketTa
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?tagging", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?tagging", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -595,7 +595,7 @@ func getBucketVersioning(input: GetBucketVersioningRequest) -> ApiCallTask<GetBu
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?versioning", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?versioning", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -616,7 +616,7 @@ func getBucketWebsite(input: GetBucketWebsiteRequest) -> ApiCallTask<GetBucketWe
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?website", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?website", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -637,7 +637,7 @@ func getObject(input: GetObjectRequest) -> ApiCallTask<GetObjectOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -658,7 +658,7 @@ func getObjectAcl(input: GetObjectAclRequest) -> ApiCallTask<GetObjectAclOutput>
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}?acl", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}?acl", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -679,7 +679,7 @@ func getObjectTorrent(input: GetObjectTorrentRequest) -> ApiCallTask<GetObjectTo
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}?torrent", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}?torrent", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -700,7 +700,7 @@ func headBucket(input: HeadBucketRequest) -> ApiCallTask<AwsApiVoidOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}", 
       httpMethod: "HEAD", 
       expectedStatus: nil, 
       input: input, 
@@ -721,7 +721,7 @@ func headObject(input: HeadObjectRequest) -> ApiCallTask<HeadObjectOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "HEAD", 
       expectedStatus: nil, 
       input: input, 
@@ -742,7 +742,7 @@ func listBuckets(input: AwsApiVoidInput) -> ApiCallTask<ListBucketsOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -763,7 +763,7 @@ func listMultipartUploads(input: ListMultipartUploadsRequest) -> ApiCallTask<Lis
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?uploads", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?uploads", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -784,7 +784,7 @@ func listObjectVersions(input: ListObjectVersionsRequest) -> ApiCallTask<ListObj
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?versions", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?versions", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -805,7 +805,7 @@ func listObjects(input: ListObjectsRequest) -> ApiCallTask<ListObjectsOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -826,7 +826,7 @@ func listObjectsV2(input: ListObjectsV2Request) -> ApiCallTask<ListObjectsV2Outp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?list-type=2", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?list-type=2", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -847,7 +847,7 @@ func listParts(input: ListPartsRequest) -> ApiCallTask<ListPartsOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "GET", 
       expectedStatus: nil, 
       input: input, 
@@ -868,7 +868,7 @@ func putBucketAccelerateConfiguration(input: PutBucketAccelerateConfigurationReq
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?accelerate", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?accelerate", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -889,7 +889,7 @@ func putBucketAcl(input: PutBucketAclRequest) -> ApiCallTask<AwsApiVoidOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?acl", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?acl", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -910,7 +910,7 @@ func putBucketCors(input: PutBucketCorsRequest) -> ApiCallTask<AwsApiVoidOutput>
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?cors", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?cors", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -931,7 +931,7 @@ func putBucketLifecycle(input: PutBucketLifecycleRequest) -> ApiCallTask<AwsApiV
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?lifecycle", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?lifecycle", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -952,7 +952,7 @@ func putBucketLifecycleConfiguration(input: PutBucketLifecycleConfigurationReque
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?lifecycle", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?lifecycle", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -973,7 +973,7 @@ func putBucketLogging(input: PutBucketLoggingRequest) -> ApiCallTask<AwsApiVoidO
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?logging", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?logging", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -994,7 +994,7 @@ func putBucketNotification(input: PutBucketNotificationRequest) -> ApiCallTask<A
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?notification", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?notification", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1015,7 +1015,7 @@ func putBucketNotificationConfiguration(input: PutBucketNotificationConfiguratio
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?notification", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?notification", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1036,7 +1036,7 @@ func putBucketPolicy(input: PutBucketPolicyRequest) -> ApiCallTask<AwsApiVoidOut
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?policy", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?policy", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1057,7 +1057,7 @@ func putBucketReplication(input: PutBucketReplicationRequest) -> ApiCallTask<Aws
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?replication", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?replication", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1078,7 +1078,7 @@ func putBucketRequestPayment(input: PutBucketRequestPaymentRequest) -> ApiCallTa
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?requestPayment", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?requestPayment", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1099,7 +1099,7 @@ func putBucketTagging(input: PutBucketTaggingRequest) -> ApiCallTask<AwsApiVoidO
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?tagging", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?tagging", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1120,7 +1120,7 @@ func putBucketVersioning(input: PutBucketVersioningRequest) -> ApiCallTask<AwsAp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?versioning", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?versioning", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1141,7 +1141,7 @@ func putBucketWebsite(input: PutBucketWebsiteRequest) -> ApiCallTask<AwsApiVoidO
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}?website", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}?website", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1162,7 +1162,7 @@ func putObject(input: PutObjectRequest) -> ApiCallTask<PutObjectOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1183,7 +1183,7 @@ func putObjectAcl(input: PutObjectAclRequest) -> ApiCallTask<PutObjectAclOutput>
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}?acl", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}?acl", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1204,7 +1204,7 @@ func restoreObject(input: RestoreObjectRequest) -> ApiCallTask<RestoreObjectOutp
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}?restore", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}?restore", 
       httpMethod: "POST", 
       expectedStatus: nil, 
       input: input, 
@@ -1225,7 +1225,7 @@ func uploadPart(input: UploadPartRequest) -> ApiCallTask<UploadPartOutput> {
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1246,7 +1246,7 @@ func uploadPartCopy(input: UploadPartCopyRequest) -> ApiCallTask<UploadPartCopyO
       credentials: self.credentialsProvider.provideAwsCredentials()!,
       scope: self.scope(),
       queue: self.queue,
-      urlString: "https://s3-\(self.region).amazonaws.com/{Bucket}/{Key+}", 
+      urlString: "https://s3.dualstack.\(self.region).amazonaws.com/{Bucket}/{Key+}", 
       httpMethod: "PUT", 
       expectedStatus: nil, 
       input: input, 
@@ -1262,7 +1262,7 @@ func uploadPartCopy(input: UploadPartCopyRequest) -> ApiCallTask<UploadPartCopyO
 /**
 Specifies the days since the initiation of an Incomplete Multipart Upload that Lifecycle will wait before permanently removing all parts of the upload.
  */
-public struct AbortIncompleteMultipartUpload: RestJsonSerializable, RestJsonDeserializable {
+public struct AbortIncompleteMultipartUpload: AwswiftSerializable, AwswiftDeserializable {
 /**
 Indicates the number of days that must pass since initiation for Lifecycle to abort an Incomplete Multipart Upload.
  */
@@ -1277,6 +1277,11 @@ Indicates the number of days that must pass since initiation for Lifecycle to ab
     if daysAfterInitiation != nil { body["DaysAfterInitiation"] = daysAfterInitiation! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AbortIncompleteMultipartUpload {
@@ -1295,12 +1300,16 @@ self.daysAfterInitiation = daysAfterInitiation
   }
 }
 
-public struct AbortMultipartUploadOutput: RestJsonDeserializable {
+public struct AbortMultipartUploadOutput: AwswiftDeserializable {
 /**
 
  */
   public let requestCharged: Requestcharged?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AbortMultipartUploadOutput {
   
@@ -1318,7 +1327,7 @@ self.requestCharged = requestCharged
   }
 }
 
-public struct AbortMultipartUploadRequest: RestJsonSerializable {
+public struct AbortMultipartUploadRequest: AwswiftSerializable {
 /**
 
  */
@@ -1367,7 +1376,7 @@ self.uploadId = uploadId
 }
 
 
-public struct AccelerateConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct AccelerateConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 The accelerate configuration of the bucket.
  */
@@ -1382,6 +1391,11 @@ The accelerate configuration of the bucket.
     if status != nil { body["Status"] = status! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AccelerateConfiguration {
@@ -1401,7 +1415,7 @@ self.status = status
 }
 
 
-public struct AccessControlPolicy: RestJsonSerializable, RestJsonDeserializable {
+public struct AccessControlPolicy: AwswiftSerializable, AwswiftDeserializable {
 /**
 A list of grants.
  */
@@ -1421,6 +1435,11 @@ A list of grants.
     if owner != nil { body["Owner"] = owner! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> AccessControlPolicy {
@@ -1449,7 +1468,7 @@ self.owner = owner
 
 
 
-public struct Bucket: RestJsonSerializable, RestJsonDeserializable {
+public struct Bucket: AwswiftSerializable, AwswiftDeserializable {
 /**
 Date the bucket was created.
  */
@@ -1471,6 +1490,11 @@ The name of the bucket.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Bucket {
     guard case let .xml(node) = body else { fatalError() }
     return Bucket(
@@ -1490,7 +1514,7 @@ self.name = name
   }
 }
 
-enum Bucketacceleratestatus: String, RestJsonDeserializable, RestJsonSerializable {
+enum Bucketacceleratestatus: String, AwswiftDeserializable, AwswiftSerializable {
   case `enabled` = "Enabled"
   case `suspended` = "Suspended"
 
@@ -1509,7 +1533,7 @@ enum Bucketacceleratestatus: String, RestJsonDeserializable, RestJsonSerializabl
 /**
 The requested bucket name is not available. The bucket namespace is shared by all users of the system. Please select a different name and try again.
  */
-public struct BucketAlreadyExists: RestJsonSerializable, RestJsonDeserializable {
+public struct BucketAlreadyExists: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -1519,6 +1543,10 @@ public struct BucketAlreadyExists: RestJsonSerializable, RestJsonDeserializable 
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BucketAlreadyExists {
@@ -1535,7 +1563,7 @@ public struct BucketAlreadyExists: RestJsonSerializable, RestJsonDeserializable 
   }
 }
 
-public struct BucketAlreadyOwnedByYou: RestJsonSerializable, RestJsonDeserializable {
+public struct BucketAlreadyOwnedByYou: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -1545,6 +1573,10 @@ public struct BucketAlreadyOwnedByYou: RestJsonSerializable, RestJsonDeserializa
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BucketAlreadyOwnedByYou {
@@ -1561,7 +1593,7 @@ public struct BucketAlreadyOwnedByYou: RestJsonSerializable, RestJsonDeserializa
   }
 }
 
-enum Bucketcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
+enum Bucketcannedacl: String, AwswiftDeserializable, AwswiftSerializable {
   case `private` = "private"
   case `publicread` = "public-read"
   case `publicreadwrite` = "public-read-write"
@@ -1579,7 +1611,7 @@ enum Bucketcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-public struct BucketLifecycleConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct BucketLifecycleConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -1594,6 +1626,11 @@ public struct BucketLifecycleConfiguration: RestJsonSerializable, RestJsonDeseri
     body["Rule"] = rules
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BucketLifecycleConfiguration {
@@ -1612,7 +1649,7 @@ self.rules = rules
   }
 }
 
-enum Bucketlocationconstraint: String, RestJsonDeserializable, RestJsonSerializable {
+enum Bucketlocationconstraint: String, AwswiftDeserializable, AwswiftSerializable {
   case `eU` = "EU"
   case `euwest1` = "eu-west-1"
   case `uswest1` = "us-west-1"
@@ -1637,7 +1674,7 @@ enum Bucketlocationconstraint: String, RestJsonDeserializable, RestJsonSerializa
   }
 }
 
-public struct BucketLoggingStatus: RestJsonSerializable, RestJsonDeserializable {
+public struct BucketLoggingStatus: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -1652,6 +1689,11 @@ public struct BucketLoggingStatus: RestJsonSerializable, RestJsonDeserializable 
     if loggingEnabled != nil { body["LoggingEnabled"] = loggingEnabled! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> BucketLoggingStatus {
@@ -1670,7 +1712,7 @@ self.loggingEnabled = loggingEnabled
   }
 }
 
-enum Bucketlogspermission: String, RestJsonDeserializable, RestJsonSerializable {
+enum Bucketlogspermission: String, AwswiftDeserializable, AwswiftSerializable {
   case `fULL_CONTROL` = "FULL_CONTROL"
   case `rEAD` = "READ"
   case `wRITE` = "WRITE"
@@ -1688,7 +1730,7 @@ enum Bucketlogspermission: String, RestJsonDeserializable, RestJsonSerializable 
 }
 
 
-enum Bucketversioningstatus: String, RestJsonDeserializable, RestJsonSerializable {
+enum Bucketversioningstatus: String, AwswiftDeserializable, AwswiftSerializable {
   case `enabled` = "Enabled"
   case `suspended` = "Suspended"
 
@@ -1705,7 +1747,7 @@ enum Bucketversioningstatus: String, RestJsonDeserializable, RestJsonSerializabl
 }
 
 
-public struct CORSConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct CORSConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -1720,6 +1762,11 @@ public struct CORSConfiguration: RestJsonSerializable, RestJsonDeserializable {
     body["CORSRule"] = cORSRules
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CORSConfiguration {
@@ -1738,7 +1785,7 @@ self.cORSRules = cORSRules
   }
 }
 
-public struct CORSRule: RestJsonSerializable, RestJsonDeserializable {
+public struct CORSRule: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies which headers are allowed in a pre-flight OPTIONS request.
  */
@@ -1775,6 +1822,11 @@ The time in seconds that your browser is to cache the preflight response for the
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CORSRule {
     guard case let .xml(node) = body else { fatalError() }
     return CORSRule(
@@ -1806,7 +1858,7 @@ self.maxAgeSeconds = maxAgeSeconds
 
 
 
-public struct CloudFunctionConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct CloudFunctionConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -1843,6 +1895,11 @@ public struct CloudFunctionConfiguration: RestJsonSerializable, RestJsonDeserial
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CloudFunctionConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return CloudFunctionConfiguration(
@@ -1873,7 +1930,7 @@ self.invocationRole = invocationRole
 
 
 
-public struct CommonPrefix: RestJsonSerializable, RestJsonDeserializable {
+public struct CommonPrefix: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -1888,6 +1945,11 @@ public struct CommonPrefix: RestJsonSerializable, RestJsonDeserializable {
     if prefix != nil { body["Prefix"] = prefix! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CommonPrefix {
@@ -1907,7 +1969,7 @@ self.prefix = prefix
 }
 
 
-public struct CompleteMultipartUploadOutput: RestJsonDeserializable {
+public struct CompleteMultipartUploadOutput: AwswiftDeserializable {
 /**
 
  */
@@ -1945,6 +2007,11 @@ Version of the object.
  */
   public let versionId: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompleteMultipartUploadOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -1986,7 +2053,7 @@ self.versionId = versionId
   }
 }
 
-public struct CompleteMultipartUploadRequest: RestJsonSerializable {
+public struct CompleteMultipartUploadRequest: AwswiftSerializable {
 /**
 
  */
@@ -2041,7 +2108,7 @@ self.uploadId = uploadId
   }
 }
 
-public struct CompletedMultipartUpload: RestJsonSerializable, RestJsonDeserializable {
+public struct CompletedMultipartUpload: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -2056,6 +2123,11 @@ public struct CompletedMultipartUpload: RestJsonSerializable, RestJsonDeserializ
     if parts != nil { body["Part"] = parts! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompletedMultipartUpload {
@@ -2074,7 +2146,7 @@ self.parts = parts
   }
 }
 
-public struct CompletedPart: RestJsonSerializable, RestJsonDeserializable {
+public struct CompletedPart: AwswiftSerializable, AwswiftDeserializable {
 /**
 Entity tag returned when the part was uploaded.
  */
@@ -2094,6 +2166,11 @@ Part number that identifies the part. This is a positive integer between 1 and 1
     if partNumber != nil { body["PartNumber"] = partNumber! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CompletedPart {
@@ -2116,7 +2193,7 @@ self.partNumber = partNumber
 }
 
 
-public struct Condition: RestJsonSerializable, RestJsonDeserializable {
+public struct Condition: AwswiftSerializable, AwswiftDeserializable {
 /**
 The HTTP error code when the redirect is applied. In the event of an error, if the error code equals this value, then the specified redirect is applied. Required when parent element Condition is specified and sibling KeyPrefixEquals is not specified. If both are specified, then both must be true for the redirect to be applied.
  */
@@ -2136,6 +2213,11 @@ The object key name prefix when the redirect is applied. For example, to redirec
     if keyPrefixEquals != nil { body["KeyPrefixEquals"] = keyPrefixEquals! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Condition {
@@ -2164,7 +2246,7 @@ self.keyPrefixEquals = keyPrefixEquals
 
 
 
-public struct CopyObjectOutput: RestJsonDeserializable {
+public struct CopyObjectOutput: AwswiftDeserializable {
 /**
 
  */
@@ -2202,6 +2284,11 @@ Version ID of the newly created copy.
  */
   public let versionId: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CopyObjectOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -2243,7 +2330,7 @@ self.versionId = versionId
   }
 }
 
-public struct CopyObjectRequest: RestJsonSerializable {
+public struct CopyObjectRequest: AwswiftSerializable {
 /**
 The canned ACL to apply to the object.
  */
@@ -2479,7 +2566,7 @@ self.websiteRedirectLocation = websiteRedirectLocation
   }
 }
 
-public struct CopyObjectResult: RestJsonSerializable, RestJsonDeserializable {
+public struct CopyObjectResult: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -2499,6 +2586,11 @@ public struct CopyObjectResult: RestJsonSerializable, RestJsonDeserializable {
     if lastModified != nil { body["LastModified"] = lastModified! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CopyObjectResult {
@@ -2520,7 +2612,7 @@ self.lastModified = lastModified
   }
 }
 
-public struct CopyPartResult: RestJsonSerializable, RestJsonDeserializable {
+public struct CopyPartResult: AwswiftSerializable, AwswiftDeserializable {
 /**
 Entity tag of the object.
  */
@@ -2540,6 +2632,11 @@ Date and time at which the object was uploaded.
     if lastModified != nil { body["LastModified"] = lastModified! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CopyPartResult {
@@ -2571,7 +2668,7 @@ self.lastModified = lastModified
 
 
 
-public struct CreateBucketConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct CreateBucketConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies the region where the bucket will be created. If you don't specify a region, the bucket will be created in US Standard.
  */
@@ -2586,6 +2683,11 @@ Specifies the region where the bucket will be created. If you don't specify a re
     if locationConstraint != nil { body["LocationConstraint"] = locationConstraint! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateBucketConfiguration {
@@ -2604,12 +2706,16 @@ self.locationConstraint = locationConstraint
   }
 }
 
-public struct CreateBucketOutput: RestJsonDeserializable {
+public struct CreateBucketOutput: AwswiftDeserializable {
 /**
 
  */
   public let location: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateBucketOutput {
   
@@ -2627,7 +2733,7 @@ self.location = location
   }
 }
 
-public struct CreateBucketRequest: RestJsonSerializable {
+public struct CreateBucketRequest: AwswiftSerializable {
 /**
 The canned ACL to apply to the bucket.
  */
@@ -2703,7 +2809,7 @@ self.grantWriteACP = grantWriteACP
   }
 }
 
-public struct CreateMultipartUploadOutput: RestJsonDeserializable {
+public struct CreateMultipartUploadOutput: AwswiftDeserializable {
 /**
 Date when multipart upload will become eligible for abort operation by lifecycle.
  */
@@ -2745,6 +2851,11 @@ ID for the initiated multipart upload.
  */
   public let uploadId: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> CreateMultipartUploadOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -2789,7 +2900,7 @@ self.uploadId = uploadId
   }
 }
 
-public struct CreateMultipartUploadRequest: RestJsonSerializable {
+public struct CreateMultipartUploadRequest: AwswiftSerializable {
 /**
 The canned ACL to apply to the object.
  */
@@ -2966,7 +3077,7 @@ self.websiteRedirectLocation = websiteRedirectLocation
 
 
 
-public struct Delete: RestJsonSerializable, RestJsonDeserializable {
+public struct Delete: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -2988,6 +3099,11 @@ Element to enable quiet mode for the request. When you add this element, you mus
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Delete {
     guard case let .xml(node) = body else { fatalError() }
     return Delete(
@@ -3007,7 +3123,7 @@ self.quiet = quiet
   }
 }
 
-public struct DeleteBucketCorsRequest: RestJsonSerializable {
+public struct DeleteBucketCorsRequest: AwswiftSerializable {
 /**
 
  */
@@ -3034,7 +3150,7 @@ self.bucket = bucket
   }
 }
 
-public struct DeleteBucketLifecycleRequest: RestJsonSerializable {
+public struct DeleteBucketLifecycleRequest: AwswiftSerializable {
 /**
 
  */
@@ -3061,7 +3177,7 @@ self.bucket = bucket
   }
 }
 
-public struct DeleteBucketPolicyRequest: RestJsonSerializable {
+public struct DeleteBucketPolicyRequest: AwswiftSerializable {
 /**
 
  */
@@ -3088,7 +3204,7 @@ self.bucket = bucket
   }
 }
 
-public struct DeleteBucketReplicationRequest: RestJsonSerializable {
+public struct DeleteBucketReplicationRequest: AwswiftSerializable {
 /**
 
  */
@@ -3115,7 +3231,7 @@ self.bucket = bucket
   }
 }
 
-public struct DeleteBucketRequest: RestJsonSerializable {
+public struct DeleteBucketRequest: AwswiftSerializable {
 /**
 
  */
@@ -3142,7 +3258,7 @@ self.bucket = bucket
   }
 }
 
-public struct DeleteBucketTaggingRequest: RestJsonSerializable {
+public struct DeleteBucketTaggingRequest: AwswiftSerializable {
 /**
 
  */
@@ -3169,7 +3285,7 @@ self.bucket = bucket
   }
 }
 
-public struct DeleteBucketWebsiteRequest: RestJsonSerializable {
+public struct DeleteBucketWebsiteRequest: AwswiftSerializable {
 /**
 
  */
@@ -3197,7 +3313,7 @@ self.bucket = bucket
 }
 
 
-public struct DeleteMarkerEntry: RestJsonSerializable, RestJsonDeserializable {
+public struct DeleteMarkerEntry: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies whether the object is (true) or is not (false) the latest version of an object.
  */
@@ -3234,6 +3350,11 @@ Version ID of an object.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteMarkerEntry {
     guard case let .xml(node) = body else { fatalError() }
     return DeleteMarkerEntry(
@@ -3264,7 +3385,7 @@ self.versionId = versionId
 
 
 
-public struct DeleteObjectOutput: RestJsonDeserializable {
+public struct DeleteObjectOutput: AwswiftDeserializable {
 /**
 Specifies whether the versioned object that was permanently deleted was (true) or was not (false) a delete marker.
  */
@@ -3278,6 +3399,10 @@ Returns the version ID of the delete marker created as a result of the DELETE op
  */
   public let versionId: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteObjectOutput {
   
@@ -3301,7 +3426,7 @@ self.versionId = versionId
   }
 }
 
-public struct DeleteObjectRequest: RestJsonSerializable {
+public struct DeleteObjectRequest: AwswiftSerializable {
 /**
 
  */
@@ -3356,7 +3481,7 @@ self.versionId = versionId
   }
 }
 
-public struct DeleteObjectsOutput: RestJsonDeserializable {
+public struct DeleteObjectsOutput: AwswiftDeserializable {
 /**
 
  */
@@ -3370,6 +3495,11 @@ public struct DeleteObjectsOutput: RestJsonDeserializable {
  */
   public let requestCharged: Requestcharged?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeleteObjectsOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -3393,7 +3523,7 @@ self.requestCharged = requestCharged
   }
 }
 
-public struct DeleteObjectsRequest: RestJsonSerializable {
+public struct DeleteObjectsRequest: AwswiftSerializable {
 /**
 
  */
@@ -3441,7 +3571,7 @@ self.requestPayer = requestPayer
   }
 }
 
-public struct DeletedObject: RestJsonSerializable, RestJsonDeserializable {
+public struct DeletedObject: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -3473,6 +3603,11 @@ public struct DeletedObject: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> DeletedObject {
     guard case let .xml(node) = body else { fatalError() }
     return DeletedObject(
@@ -3500,7 +3635,7 @@ self.versionId = versionId
 
 
 
-public struct Destination: RestJsonSerializable, RestJsonDeserializable {
+public struct Destination: AwswiftSerializable, AwswiftDeserializable {
 /**
 Amazon resource name (ARN) of the bucket where you want Amazon S3 to store replicas of the object identified by the rule.
  */
@@ -3520,6 +3655,11 @@ The class of storage used to store the object.
     if storageClass != nil { body["StorageClass"] = storageClass! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Destination {
@@ -3547,7 +3687,7 @@ self.storageClass = storageClass
 /**
 Requests Amazon S3 to encode the object keys in the response and specifies the encoding method to use. An object key may contain any Unicode character; however, XML 1.0 parser cannot parse some characters, such as characters with an ASCII value from 0 to 10. For characters that are not supported in XML 1.0, you can add this parameter to request that Amazon S3 encode the keys in the response.
  */
-enum Encodingtype: String, RestJsonDeserializable, RestJsonSerializable {
+enum Encodingtype: String, AwswiftDeserializable, AwswiftSerializable {
   case `url` = "url"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Encodingtype {
@@ -3562,7 +3702,7 @@ enum Encodingtype: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-public struct S3Error: RestJsonSerializable, RestJsonDeserializable {
+public struct S3Error: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -3594,6 +3734,11 @@ public struct S3Error: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> S3Error {
     guard case let .xml(node) = body else { fatalError() }
     return S3Error(
@@ -3619,7 +3764,7 @@ self.versionId = versionId
   }
 }
 
-public struct ErrorDocument: RestJsonSerializable, RestJsonDeserializable {
+public struct ErrorDocument: AwswiftSerializable, AwswiftDeserializable {
 /**
 The object key name to use when a 4XX class error occurs.
  */
@@ -3634,6 +3779,11 @@ The object key name to use when a 4XX class error occurs.
     body["Key"] = key
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ErrorDocument {
@@ -3656,7 +3806,7 @@ self.key = key
 /**
 Bucket event for which to send notifications.
  */
-enum Event: String, RestJsonDeserializable, RestJsonSerializable {
+enum Event: String, AwswiftDeserializable, AwswiftSerializable {
   case `s3ReducedRedundancyLostObject` = "s3:ReducedRedundancyLostObject"
   case `s3ObjectCreated` = "s3:ObjectCreated:*"
   case `s3ObjectCreatedPut` = "s3:ObjectCreated:Put"
@@ -3681,7 +3831,7 @@ enum Event: String, RestJsonDeserializable, RestJsonSerializable {
 
 
 
-enum Expirationstatus: String, RestJsonDeserializable, RestJsonSerializable {
+enum Expirationstatus: String, AwswiftDeserializable, AwswiftSerializable {
   case `enabled` = "Enabled"
   case `disabled` = "Disabled"
 
@@ -3705,7 +3855,7 @@ enum Expirationstatus: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 Container for key value pair that defines the criteria for the filter rule.
  */
-public struct FilterRule: RestJsonSerializable, RestJsonDeserializable {
+public struct FilterRule: AwswiftSerializable, AwswiftDeserializable {
 /**
 Object key name prefix or suffix identifying one or more objects to which the filtering rule applies. Maximum prefix length can be up to 1,024 characters. Overlapping prefixes and suffixes are not supported. For more information, go to <a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html">Configuring Event Notifications</a> in the Amazon Simple Storage Service Developer Guide.
  */
@@ -3725,6 +3875,11 @@ Object key name prefix or suffix identifying one or more objects to which the fi
     if value != nil { body["Value"] = value! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> FilterRule {
@@ -3750,7 +3905,7 @@ self.value = value
 A list of containers for key value pair that defines the criteria for the filter rule.
  */
 
-enum Filterrulename: String, RestJsonDeserializable, RestJsonSerializable {
+enum Filterrulename: String, AwswiftDeserializable, AwswiftSerializable {
   case `prefix` = "prefix"
   case `suffix` = "suffix"
 
@@ -3767,12 +3922,17 @@ enum Filterrulename: String, RestJsonDeserializable, RestJsonSerializable {
 }
 
 
-public struct GetBucketAccelerateConfigurationOutput: RestJsonDeserializable {
+public struct GetBucketAccelerateConfigurationOutput: AwswiftDeserializable {
 /**
 The accelerate configuration of the bucket.
  */
   public let status: Bucketacceleratestatus?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketAccelerateConfigurationOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -3790,7 +3950,7 @@ self.status = status
   }
 }
 
-public struct GetBucketAccelerateConfigurationRequest: RestJsonSerializable {
+public struct GetBucketAccelerateConfigurationRequest: AwswiftSerializable {
 /**
 Name of the bucket for which the accelerate configuration is retrieved.
  */
@@ -3817,7 +3977,7 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketAclOutput: RestJsonDeserializable {
+public struct GetBucketAclOutput: AwswiftDeserializable {
 /**
 A list of grants.
  */
@@ -3827,6 +3987,11 @@ A list of grants.
  */
   public let owner: Owner?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketAclOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -3847,7 +4012,7 @@ self.owner = owner
   }
 }
 
-public struct GetBucketAclRequest: RestJsonSerializable {
+public struct GetBucketAclRequest: AwswiftSerializable {
 /**
 
  */
@@ -3874,12 +4039,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketCorsOutput: RestJsonDeserializable {
+public struct GetBucketCorsOutput: AwswiftDeserializable {
 /**
 
  */
   public let cORSRules: [CORSRule]?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketCorsOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -3897,7 +4067,7 @@ self.cORSRules = cORSRules
   }
 }
 
-public struct GetBucketCorsRequest: RestJsonSerializable {
+public struct GetBucketCorsRequest: AwswiftSerializable {
 /**
 
  */
@@ -3924,12 +4094,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketLifecycleConfigurationOutput: RestJsonDeserializable {
+public struct GetBucketLifecycleConfigurationOutput: AwswiftDeserializable {
 /**
 
  */
   public let rules: [LifecycleRule]?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLifecycleConfigurationOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -3947,7 +4122,7 @@ self.rules = rules
   }
 }
 
-public struct GetBucketLifecycleConfigurationRequest: RestJsonSerializable {
+public struct GetBucketLifecycleConfigurationRequest: AwswiftSerializable {
 /**
 
  */
@@ -3974,12 +4149,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketLifecycleOutput: RestJsonDeserializable {
+public struct GetBucketLifecycleOutput: AwswiftDeserializable {
 /**
 
  */
   public let rules: [Rule]?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLifecycleOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -3997,7 +4177,7 @@ self.rules = rules
   }
 }
 
-public struct GetBucketLifecycleRequest: RestJsonSerializable {
+public struct GetBucketLifecycleRequest: AwswiftSerializable {
 /**
 
  */
@@ -4024,12 +4204,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketLocationOutput: RestJsonDeserializable {
+public struct GetBucketLocationOutput: AwswiftDeserializable {
 /**
 
  */
   public let locationConstraint: Bucketlocationconstraint?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLocationOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4047,7 +4232,7 @@ self.locationConstraint = locationConstraint
   }
 }
 
-public struct GetBucketLocationRequest: RestJsonSerializable {
+public struct GetBucketLocationRequest: AwswiftSerializable {
 /**
 
  */
@@ -4074,12 +4259,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketLoggingOutput: RestJsonDeserializable {
+public struct GetBucketLoggingOutput: AwswiftDeserializable {
 /**
 
  */
   public let loggingEnabled: LoggingEnabled?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketLoggingOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4097,7 +4287,7 @@ self.loggingEnabled = loggingEnabled
   }
 }
 
-public struct GetBucketLoggingRequest: RestJsonSerializable {
+public struct GetBucketLoggingRequest: AwswiftSerializable {
 /**
 
  */
@@ -4124,7 +4314,7 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketNotificationConfigurationRequest: RestJsonSerializable {
+public struct GetBucketNotificationConfigurationRequest: AwswiftSerializable {
 /**
 Name of the bucket to get the notification configuration for.
  */
@@ -4151,12 +4341,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketPolicyOutput: RestJsonDeserializable {
+public struct GetBucketPolicyOutput: AwswiftDeserializable {
 /**
 The bucket policy as a JSON document.
  */
   public let policy: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketPolicyOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4174,7 +4369,7 @@ self.policy = policy
   }
 }
 
-public struct GetBucketPolicyRequest: RestJsonSerializable {
+public struct GetBucketPolicyRequest: AwswiftSerializable {
 /**
 
  */
@@ -4201,12 +4396,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketReplicationOutput: RestJsonDeserializable {
+public struct GetBucketReplicationOutput: AwswiftDeserializable {
 /**
 
  */
   public let replicationConfiguration: ReplicationConfiguration?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketReplicationOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4224,7 +4424,7 @@ self.replicationConfiguration = replicationConfiguration
   }
 }
 
-public struct GetBucketReplicationRequest: RestJsonSerializable {
+public struct GetBucketReplicationRequest: AwswiftSerializable {
 /**
 
  */
@@ -4251,12 +4451,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketRequestPaymentOutput: RestJsonDeserializable {
+public struct GetBucketRequestPaymentOutput: AwswiftDeserializable {
 /**
 Specifies who pays for the download and request fees.
  */
   public let payer: Payer?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketRequestPaymentOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4274,7 +4479,7 @@ self.payer = payer
   }
 }
 
-public struct GetBucketRequestPaymentRequest: RestJsonSerializable {
+public struct GetBucketRequestPaymentRequest: AwswiftSerializable {
 /**
 
  */
@@ -4301,12 +4506,17 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketTaggingOutput: RestJsonDeserializable {
+public struct GetBucketTaggingOutput: AwswiftDeserializable {
 /**
 
  */
   public let tagSet: [Tag]
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketTaggingOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4324,7 +4534,7 @@ self.tagSet = tagSet
   }
 }
 
-public struct GetBucketTaggingRequest: RestJsonSerializable {
+public struct GetBucketTaggingRequest: AwswiftSerializable {
 /**
 
  */
@@ -4351,7 +4561,7 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketVersioningOutput: RestJsonDeserializable {
+public struct GetBucketVersioningOutput: AwswiftDeserializable {
 /**
 Specifies whether MFA delete is enabled in the bucket versioning configuration. This element is only returned if the bucket has been configured with MFA delete. If the bucket has never been so configured, this element is not returned.
  */
@@ -4361,6 +4571,11 @@ The versioning state of the bucket.
  */
   public let status: Bucketversioningstatus?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketVersioningOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4381,7 +4596,7 @@ self.status = status
   }
 }
 
-public struct GetBucketVersioningRequest: RestJsonSerializable {
+public struct GetBucketVersioningRequest: AwswiftSerializable {
 /**
 
  */
@@ -4408,7 +4623,7 @@ self.bucket = bucket
   }
 }
 
-public struct GetBucketWebsiteOutput: RestJsonDeserializable {
+public struct GetBucketWebsiteOutput: AwswiftDeserializable {
 /**
 
  */
@@ -4426,6 +4641,11 @@ public struct GetBucketWebsiteOutput: RestJsonDeserializable {
  */
   public let routingRules: [RoutingRule]?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetBucketWebsiteOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4452,7 +4672,7 @@ self.routingRules = routingRules
   }
 }
 
-public struct GetBucketWebsiteRequest: RestJsonSerializable {
+public struct GetBucketWebsiteRequest: AwswiftSerializable {
 /**
 
  */
@@ -4479,7 +4699,7 @@ self.bucket = bucket
   }
 }
 
-public struct GetObjectAclOutput: RestJsonDeserializable {
+public struct GetObjectAclOutput: AwswiftDeserializable {
 /**
 A list of grants.
  */
@@ -4493,6 +4713,11 @@ A list of grants.
  */
   public let requestCharged: Requestcharged?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetObjectAclOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4516,7 +4741,7 @@ self.requestCharged = requestCharged
   }
 }
 
-public struct GetObjectAclRequest: RestJsonSerializable {
+public struct GetObjectAclRequest: AwswiftSerializable {
 /**
 
  */
@@ -4564,7 +4789,7 @@ self.versionId = versionId
   }
 }
 
-public struct GetObjectOutput: RestJsonDeserializable {
+public struct GetObjectOutput: AwswiftDeserializable {
 /**
 
  */
@@ -4675,6 +4900,11 @@ If the bucket is configured as a website, redirects requests for this object to 
   public let websiteRedirectLocation: String?
 
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetObjectOutput {
     guard case let .xml(node) = body else { fatalError() }
     return GetObjectOutput(
@@ -4769,7 +4999,7 @@ self.websiteRedirectLocation = websiteRedirectLocation
   }
 }
 
-public struct GetObjectRequest: RestJsonSerializable {
+public struct GetObjectRequest: AwswiftSerializable {
 /**
 
  */
@@ -4922,7 +5152,7 @@ self.versionId = versionId
   }
 }
 
-public struct GetObjectTorrentOutput: RestJsonDeserializable {
+public struct GetObjectTorrentOutput: AwswiftDeserializable {
 /**
 
  */
@@ -4932,6 +5162,11 @@ public struct GetObjectTorrentOutput: RestJsonDeserializable {
  */
   public let requestCharged: Requestcharged?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> GetObjectTorrentOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -4952,7 +5187,7 @@ self.requestCharged = requestCharged
   }
 }
 
-public struct GetObjectTorrentRequest: RestJsonSerializable {
+public struct GetObjectTorrentRequest: AwswiftSerializable {
 /**
 
  */
@@ -4993,7 +5228,7 @@ self.requestPayer = requestPayer
   }
 }
 
-public struct Grant: RestJsonSerializable, RestJsonDeserializable {
+public struct Grant: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -5013,6 +5248,11 @@ Specifies the permission given to the grantee.
     if permission != nil { body["Permission"] = permission! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Grant {
@@ -5039,7 +5279,7 @@ self.permission = permission
 
 
 
-public struct Grantee: RestJsonSerializable, RestJsonDeserializable {
+public struct Grantee: AwswiftSerializable, AwswiftDeserializable {
 /**
 Screen name of the grantee.
  */
@@ -5076,6 +5316,11 @@ URI of the grantee group.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Grantee {
     guard case let .xml(node) = body else { fatalError() }
     return Grantee(
@@ -5105,7 +5350,7 @@ self.uRI = uRI
 }
 
 
-public struct HeadBucketRequest: RestJsonSerializable {
+public struct HeadBucketRequest: AwswiftSerializable {
 /**
 
  */
@@ -5132,7 +5377,7 @@ self.bucket = bucket
   }
 }
 
-public struct HeadObjectOutput: RestJsonDeserializable {
+public struct HeadObjectOutput: AwswiftDeserializable {
 /**
 
  */
@@ -5235,6 +5480,10 @@ If the bucket is configured as a website, redirects requests for this object to 
   public let websiteRedirectLocation: String?
 
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> HeadObjectOutput {
   
     return HeadObjectOutput(
@@ -5323,7 +5572,7 @@ self.websiteRedirectLocation = websiteRedirectLocation
   }
 }
 
-public struct HeadObjectRequest: RestJsonSerializable {
+public struct HeadObjectRequest: AwswiftSerializable {
 /**
 
  */
@@ -5442,7 +5691,7 @@ self.versionId = versionId
 
 
 
-public struct IndexDocument: RestJsonSerializable, RestJsonDeserializable {
+public struct IndexDocument: AwswiftSerializable, AwswiftDeserializable {
 /**
 A suffix that is appended to a request that is for a directory on the website endpoint (e.g. if the suffix is index.html and you make a request to samplebucket/images/ the data that is returned will be for the object with the key name images/index.html) The suffix must not be empty and must not include a slash character.
  */
@@ -5457,6 +5706,11 @@ A suffix that is appended to a request that is for a directory on the website en
     body["Suffix"] = suffix
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> IndexDocument {
@@ -5476,7 +5730,7 @@ self.suffix = suffix
 }
 
 
-public struct Initiator: RestJsonSerializable, RestJsonDeserializable {
+public struct Initiator: AwswiftSerializable, AwswiftDeserializable {
 /**
 Name of the Principal.
  */
@@ -5496,6 +5750,11 @@ If the principal is an AWS account, it provides the Canonical User ID. If the pr
     if iD != nil { body["ID"] = iD! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Initiator {
@@ -5526,7 +5785,7 @@ self.iD = iD
 /**
 Container for specifying the AWS Lambda notification configuration.
  */
-public struct LambdaFunctionConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct LambdaFunctionConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -5558,6 +5817,11 @@ Lambda cloud function ARN that Amazon S3 can invoke when it detects events of th
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LambdaFunctionConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return LambdaFunctionConfiguration(
@@ -5585,7 +5849,7 @@ self.lambdaFunctionArn = lambdaFunctionArn
 
 
 
-public struct LifecycleConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct LifecycleConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -5600,6 +5864,11 @@ public struct LifecycleConfiguration: RestJsonSerializable, RestJsonDeserializab
     body["Rule"] = rules
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LifecycleConfiguration {
@@ -5618,7 +5887,7 @@ self.rules = rules
   }
 }
 
-public struct LifecycleExpiration: RestJsonSerializable, RestJsonDeserializable {
+public struct LifecycleExpiration: AwswiftSerializable, AwswiftDeserializable {
 /**
 Indicates at what date the object is to be moved or deleted. Should be in GMT ISO 8601 Format.
  */
@@ -5645,6 +5914,11 @@ Indicates whether Amazon S3 will remove a delete marker with no noncurrent versi
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LifecycleExpiration {
     guard case let .xml(node) = body else { fatalError() }
     return LifecycleExpiration(
@@ -5667,7 +5941,7 @@ self.expiredObjectDeleteMarker = expiredObjectDeleteMarker
   }
 }
 
-public struct LifecycleRule: RestJsonSerializable, RestJsonDeserializable {
+public struct LifecycleRule: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -5719,6 +5993,11 @@ If 'Enabled', the rule is currently being applied. If 'Disabled', the rule is no
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LifecycleRule {
     guard case let .xml(node) = body else { fatalError() }
     return LifecycleRule(
@@ -5757,7 +6036,7 @@ self.transitions = transitions
 }
 
 
-public struct ListBucketsOutput: RestJsonDeserializable {
+public struct ListBucketsOutput: AwswiftDeserializable {
 /**
 
  */
@@ -5767,6 +6046,11 @@ public struct ListBucketsOutput: RestJsonDeserializable {
  */
   public let owner: Owner?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListBucketsOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -5787,7 +6071,7 @@ self.owner = owner
   }
 }
 
-public struct ListMultipartUploadsOutput: RestJsonDeserializable {
+public struct ListMultipartUploadsOutput: AwswiftDeserializable {
 /**
 Name of the bucket to which the multipart upload was initiated.
  */
@@ -5838,6 +6122,11 @@ Upload ID after which listing began.
   public let uploads: [MultipartUpload]?
 
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListMultipartUploadsOutput {
     guard case let .xml(node) = body else { fatalError() }
     return ListMultipartUploadsOutput(
@@ -5887,7 +6176,7 @@ self.uploads = uploads
   }
 }
 
-public struct ListMultipartUploadsRequest: RestJsonSerializable {
+public struct ListMultipartUploadsRequest: AwswiftSerializable {
 /**
 
  */
@@ -5956,7 +6245,7 @@ self.uploadIdMarker = uploadIdMarker
   }
 }
 
-public struct ListObjectVersionsOutput: RestJsonDeserializable {
+public struct ListObjectVersionsOutput: AwswiftDeserializable {
 /**
 
  */
@@ -6011,6 +6300,11 @@ Use this value for the next version id marker parameter in a subsequent request.
   public let versions: [ObjectVersion]?
 
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListObjectVersionsOutput {
     guard case let .xml(node) = body else { fatalError() }
     return ListObjectVersionsOutput(
@@ -6063,7 +6357,7 @@ self.versions = versions
   }
 }
 
-public struct ListObjectVersionsRequest: RestJsonSerializable {
+public struct ListObjectVersionsRequest: AwswiftSerializable {
 /**
 
  */
@@ -6132,7 +6426,7 @@ self.versionIdMarker = versionIdMarker
   }
 }
 
-public struct ListObjectsOutput: RestJsonDeserializable {
+public struct ListObjectsOutput: AwswiftDeserializable {
 /**
 
  */
@@ -6174,6 +6468,11 @@ When response is truncated (the IsTruncated element value in the response is tru
  */
   public let prefix: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListObjectsOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -6218,7 +6517,7 @@ self.prefix = prefix
   }
 }
 
-public struct ListObjectsRequest: RestJsonSerializable {
+public struct ListObjectsRequest: AwswiftSerializable {
 /**
 
  */
@@ -6287,7 +6586,7 @@ self.requestPayer = requestPayer
   }
 }
 
-public struct ListObjectsV2Output: RestJsonDeserializable {
+public struct ListObjectsV2Output: AwswiftDeserializable {
 /**
 CommonPrefixes contains all (if there are any) keys between Prefix and the next occurrence of the string specified by delimiter
  */
@@ -6338,6 +6637,11 @@ StartAfter is where you want Amazon S3 to start listing from. Amazon S3 starts l
   public let startAfter: String?
 
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListObjectsV2Output {
     guard case let .xml(node) = body else { fatalError() }
     return ListObjectsV2Output(
@@ -6387,7 +6691,7 @@ self.startAfter = startAfter
   }
 }
 
-public struct ListObjectsV2Request: RestJsonSerializable {
+public struct ListObjectsV2Request: AwswiftSerializable {
 /**
 Name of the bucket to list.
  */
@@ -6470,7 +6774,7 @@ self.startAfter = startAfter
   }
 }
 
-public struct ListPartsOutput: RestJsonDeserializable {
+public struct ListPartsOutput: AwswiftDeserializable {
 /**
 Date when multipart upload will become eligible for abort operation by lifecycle.
  */
@@ -6529,6 +6833,11 @@ Upload ID identifying the multipart upload whose parts are being listed.
   public let uploadId: String?
 
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ListPartsOutput {
     guard case let .xml(node) = body else { fatalError() }
     return ListPartsOutput(
@@ -6584,7 +6893,7 @@ self.uploadId = uploadId
   }
 }
 
-public struct ListPartsRequest: RestJsonSerializable {
+public struct ListPartsRequest: AwswiftSerializable {
 /**
 
  */
@@ -6647,7 +6956,7 @@ self.uploadId = uploadId
 }
 
 
-public struct LoggingEnabled: RestJsonSerializable, RestJsonDeserializable {
+public struct LoggingEnabled: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies the bucket where you want Amazon S3 to store server access logs. You can have your logs delivered to any bucket that you own, including the same bucket that is being logged. You can also configure multiple buckets to deliver their logs to the same target bucket. In this case you should choose a different TargetPrefix for each source bucket so that the delivered log files can be distinguished by key.
  */
@@ -6674,6 +6983,11 @@ This element lets you specify a prefix for the keys that the log files will be s
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> LoggingEnabled {
     guard case let .xml(node) = body else { fatalError() }
     return LoggingEnabled(
@@ -6697,7 +7011,7 @@ self.targetPrefix = targetPrefix
 }
 
 
-enum Mfadelete: String, RestJsonDeserializable, RestJsonSerializable {
+enum Mfadelete: String, AwswiftDeserializable, AwswiftSerializable {
   case `enabled` = "Enabled"
   case `disabled` = "Disabled"
 
@@ -6713,7 +7027,7 @@ enum Mfadelete: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-enum Mfadeletestatus: String, RestJsonDeserializable, RestJsonSerializable {
+enum Mfadeletestatus: String, AwswiftDeserializable, AwswiftSerializable {
   case `enabled` = "Enabled"
   case `disabled` = "Disabled"
 
@@ -6736,7 +7050,7 @@ enum Mfadeletestatus: String, RestJsonDeserializable, RestJsonSerializable {
 
 
 
-enum Metadatadirective: String, RestJsonDeserializable, RestJsonSerializable {
+enum Metadatadirective: String, AwswiftDeserializable, AwswiftSerializable {
   case `cOPY` = "COPY"
   case `rEPLACE` = "REPLACE"
 
@@ -6755,7 +7069,7 @@ enum Metadatadirective: String, RestJsonDeserializable, RestJsonSerializable {
 
 
 
-public struct MultipartUpload: RestJsonSerializable, RestJsonDeserializable {
+public struct MultipartUpload: AwswiftSerializable, AwswiftDeserializable {
 /**
 Date and time at which the multipart upload was initiated.
  */
@@ -6795,6 +7109,11 @@ Upload ID that identifies the multipart upload.
     if uploadId != nil { body["UploadId"] = uploadId! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> MultipartUpload {
@@ -6839,7 +7158,7 @@ self.uploadId = uploadId
 /**
 The specified bucket does not exist.
  */
-public struct NoSuchBucket: RestJsonSerializable, RestJsonDeserializable {
+public struct NoSuchBucket: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -6849,6 +7168,10 @@ public struct NoSuchBucket: RestJsonSerializable, RestJsonDeserializable {
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoSuchBucket {
@@ -6868,7 +7191,7 @@ public struct NoSuchBucket: RestJsonSerializable, RestJsonDeserializable {
 /**
 The specified key does not exist.
  */
-public struct NoSuchKey: RestJsonSerializable, RestJsonDeserializable {
+public struct NoSuchKey: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -6878,6 +7201,10 @@ public struct NoSuchKey: RestJsonSerializable, RestJsonDeserializable {
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoSuchKey {
@@ -6897,7 +7224,7 @@ public struct NoSuchKey: RestJsonSerializable, RestJsonDeserializable {
 /**
 The specified multipart upload does not exist.
  */
-public struct NoSuchUpload: RestJsonSerializable, RestJsonDeserializable {
+public struct NoSuchUpload: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -6907,6 +7234,10 @@ public struct NoSuchUpload: RestJsonSerializable, RestJsonDeserializable {
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoSuchUpload {
@@ -6926,7 +7257,7 @@ public struct NoSuchUpload: RestJsonSerializable, RestJsonDeserializable {
 /**
 Specifies when noncurrent object versions expire. Upon expiration, Amazon S3 permanently deletes the noncurrent object versions. You set this lifecycle configuration action on a bucket that has versioning enabled (or suspended) to request that Amazon S3 delete noncurrent object versions at a specific period in the object's lifetime.
  */
-public struct NoncurrentVersionExpiration: RestJsonSerializable, RestJsonDeserializable {
+public struct NoncurrentVersionExpiration: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies the number of days an object is noncurrent before Amazon S3 can perform the associated action. For information about the noncurrent days calculations, see <a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/s3-access-control.html">How Amazon S3 Calculates When an Object Became Noncurrent</a> in the Amazon Simple Storage Service Developer Guide.
  */
@@ -6941,6 +7272,11 @@ Specifies the number of days an object is noncurrent before Amazon S3 can perfor
     if noncurrentDays != nil { body["NoncurrentDays"] = noncurrentDays! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoncurrentVersionExpiration {
@@ -6962,7 +7298,7 @@ self.noncurrentDays = noncurrentDays
 /**
 Container for the transition rule that describes when noncurrent objects transition to the STANDARD_IA or GLACIER storage class. If your bucket is versioning-enabled (or versioning is suspended), you can set this action to request that Amazon S3 transition noncurrent object versions to the STANDARD_IA or GLACIER storage class at a specific period in the object's lifetime.
  */
-public struct NoncurrentVersionTransition: RestJsonSerializable, RestJsonDeserializable {
+public struct NoncurrentVersionTransition: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies the number of days an object is noncurrent before Amazon S3 can perform the associated action. For information about the noncurrent days calculations, see <a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/s3-access-control.html">How Amazon S3 Calculates When an Object Became Noncurrent</a> in the Amazon Simple Storage Service Developer Guide.
  */
@@ -6982,6 +7318,11 @@ The class of storage used to store the object.
     if storageClass != nil { body["StorageClass"] = storageClass! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NoncurrentVersionTransition {
@@ -7007,7 +7348,7 @@ self.storageClass = storageClass
 /**
 Container for specifying the notification configuration of the bucket. If this element is empty, notifications are turned off on the bucket.
  */
-public struct NotificationConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct NotificationConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -7034,6 +7375,11 @@ public struct NotificationConfiguration: RestJsonSerializable, RestJsonDeseriali
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NotificationConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return NotificationConfiguration(
@@ -7056,7 +7402,7 @@ self.topicConfigurations = topicConfigurations
   }
 }
 
-public struct NotificationConfigurationDeprecated: RestJsonSerializable, RestJsonDeserializable {
+public struct NotificationConfigurationDeprecated: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -7081,6 +7427,11 @@ public struct NotificationConfigurationDeprecated: RestJsonSerializable, RestJso
     if topicConfiguration != nil { body["TopicConfiguration"] = topicConfiguration! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NotificationConfigurationDeprecated {
@@ -7108,7 +7459,7 @@ self.topicConfiguration = topicConfiguration
 /**
 Container for object key name filtering rules. For information about key name filtering, go to <a href="http://docs.aws.amazon.com/AmazonS3/latest/dev/NotificationHowTo.html">Configuring Event Notifications</a> in the Amazon Simple Storage Service Developer Guide.
  */
-public struct NotificationConfigurationFilter: RestJsonSerializable, RestJsonDeserializable {
+public struct NotificationConfigurationFilter: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -7123,6 +7474,11 @@ public struct NotificationConfigurationFilter: RestJsonSerializable, RestJsonDes
     if key != nil { body["S3Key"] = key! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> NotificationConfigurationFilter {
@@ -7145,7 +7501,7 @@ self.key = key
 Optional unique identifier for configurations in a notification configuration. If you don't provide one, Amazon S3 will assign an ID.
  */
 
-public struct Object: RestJsonSerializable, RestJsonDeserializable {
+public struct Object: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -7187,6 +7543,11 @@ The class of storage used to store the object.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Object {
     guard case let .xml(node) = body else { fatalError() }
     return Object(
@@ -7221,7 +7582,7 @@ self.storageClass = storageClass
 /**
 This operation is not allowed against this storage tier
  */
-public struct ObjectAlreadyInActiveTierError: RestJsonSerializable, RestJsonDeserializable {
+public struct ObjectAlreadyInActiveTierError: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -7231,6 +7592,10 @@ public struct ObjectAlreadyInActiveTierError: RestJsonSerializable, RestJsonDese
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ObjectAlreadyInActiveTierError {
@@ -7247,7 +7612,7 @@ public struct ObjectAlreadyInActiveTierError: RestJsonSerializable, RestJsonDese
   }
 }
 
-enum Objectcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
+enum Objectcannedacl: String, AwswiftDeserializable, AwswiftSerializable {
   case `private` = "private"
   case `publicread` = "public-read"
   case `publicreadwrite` = "public-read-write"
@@ -7268,7 +7633,7 @@ enum Objectcannedacl: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-public struct ObjectIdentifier: RestJsonSerializable, RestJsonDeserializable {
+public struct ObjectIdentifier: AwswiftSerializable, AwswiftDeserializable {
 /**
 Key name of the object to delete.
  */
@@ -7288,6 +7653,11 @@ VersionId for the specific version of the object to delete.
     if versionId != nil { body["VersionId"] = versionId! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ObjectIdentifier {
@@ -7315,7 +7685,7 @@ self.versionId = versionId
 /**
 The source object of the COPY operation is not in the active tier and is only stored in Amazon Glacier.
  */
-public struct ObjectNotInActiveTierError: RestJsonSerializable, RestJsonDeserializable {
+public struct ObjectNotInActiveTierError: AwswiftSerializable, AwswiftDeserializable {
 
   func serialize() -> SerializedForm {
     let uri: [String: String] = [:]
@@ -7325,6 +7695,10 @@ public struct ObjectNotInActiveTierError: RestJsonSerializable, RestJsonDeserial
   
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .empty)
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ObjectNotInActiveTierError {
@@ -7341,7 +7715,7 @@ public struct ObjectNotInActiveTierError: RestJsonSerializable, RestJsonDeserial
   }
 }
 
-enum Objectstorageclass: String, RestJsonDeserializable, RestJsonSerializable {
+enum Objectstorageclass: String, AwswiftDeserializable, AwswiftSerializable {
   case `sTANDARD` = "STANDARD"
   case `rEDUCED_REDUNDANCY` = "REDUCED_REDUNDANCY"
   case `gLACIER` = "GLACIER"
@@ -7358,7 +7732,7 @@ enum Objectstorageclass: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-public struct ObjectVersion: RestJsonSerializable, RestJsonDeserializable {
+public struct ObjectVersion: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -7410,6 +7784,11 @@ Version ID of an object.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ObjectVersion {
     guard case let .xml(node) = body else { fatalError() }
     return ObjectVersion(
@@ -7449,7 +7828,7 @@ self.versionId = versionId
 
 
 
-enum Objectversionstorageclass: String, RestJsonDeserializable, RestJsonSerializable {
+enum Objectversionstorageclass: String, AwswiftDeserializable, AwswiftSerializable {
   case `sTANDARD` = "STANDARD"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Objectversionstorageclass {
@@ -7464,7 +7843,7 @@ enum Objectversionstorageclass: String, RestJsonDeserializable, RestJsonSerializ
   }
 }
 
-public struct Owner: RestJsonSerializable, RestJsonDeserializable {
+public struct Owner: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -7486,6 +7865,11 @@ public struct Owner: RestJsonSerializable, RestJsonDeserializable {
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Owner {
     guard case let .xml(node) = body else { fatalError() }
     return Owner(
@@ -7505,7 +7889,7 @@ self.iD = iD
   }
 }
 
-public struct Part: RestJsonSerializable, RestJsonDeserializable {
+public struct Part: AwswiftSerializable, AwswiftDeserializable {
 /**
 Entity tag returned when the part was uploaded.
  */
@@ -7537,6 +7921,11 @@ Size of the uploaded part data.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Part {
     guard case let .xml(node) = body else { fatalError() }
     return Part(
@@ -7566,7 +7955,7 @@ self.size = size
 
 
 
-enum Payer: String, RestJsonDeserializable, RestJsonSerializable {
+enum Payer: String, AwswiftDeserializable, AwswiftSerializable {
   case `requester` = "Requester"
   case `bucketOwner` = "BucketOwner"
 
@@ -7582,7 +7971,7 @@ enum Payer: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-enum Permission: String, RestJsonDeserializable, RestJsonSerializable {
+enum Permission: String, AwswiftDeserializable, AwswiftSerializable {
   case `fULL_CONTROL` = "FULL_CONTROL"
   case `wRITE` = "WRITE"
   case `wRITE_ACP` = "WRITE_ACP"
@@ -7603,7 +7992,7 @@ enum Permission: String, RestJsonDeserializable, RestJsonSerializable {
 
 
 
-enum S3Protocol: String, RestJsonDeserializable, RestJsonSerializable {
+enum S3Protocol: String, AwswiftDeserializable, AwswiftSerializable {
   case `http` = "http"
   case `https` = "https"
 
@@ -7619,7 +8008,7 @@ enum S3Protocol: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-public struct PutBucketAccelerateConfigurationRequest: RestJsonSerializable {
+public struct PutBucketAccelerateConfigurationRequest: AwswiftSerializable {
 /**
 Specifies the Accelerate Configuration you want to set for the bucket.
  */
@@ -7653,7 +8042,7 @@ self.bucket = bucket
   }
 }
 
-public struct PutBucketAclRequest: RestJsonSerializable {
+public struct PutBucketAclRequest: AwswiftSerializable {
 /**
 The canned ACL to apply to the bucket.
  */
@@ -7736,7 +8125,7 @@ self.grantWriteACP = grantWriteACP
   }
 }
 
-public struct PutBucketCorsRequest: RestJsonSerializable {
+public struct PutBucketCorsRequest: AwswiftSerializable {
 /**
 
  */
@@ -7777,7 +8166,7 @@ self.contentMD5 = contentMD5
   }
 }
 
-public struct PutBucketLifecycleConfigurationRequest: RestJsonSerializable {
+public struct PutBucketLifecycleConfigurationRequest: AwswiftSerializable {
 /**
 
  */
@@ -7811,7 +8200,7 @@ self.lifecycleConfiguration = lifecycleConfiguration
   }
 }
 
-public struct PutBucketLifecycleRequest: RestJsonSerializable {
+public struct PutBucketLifecycleRequest: AwswiftSerializable {
 /**
 
  */
@@ -7852,7 +8241,7 @@ self.lifecycleConfiguration = lifecycleConfiguration
   }
 }
 
-public struct PutBucketLoggingRequest: RestJsonSerializable {
+public struct PutBucketLoggingRequest: AwswiftSerializable {
 /**
 
  */
@@ -7893,7 +8282,7 @@ self.contentMD5 = contentMD5
   }
 }
 
-public struct PutBucketNotificationConfigurationRequest: RestJsonSerializable {
+public struct PutBucketNotificationConfigurationRequest: AwswiftSerializable {
 /**
 
  */
@@ -7927,7 +8316,7 @@ self.notificationConfiguration = notificationConfiguration
   }
 }
 
-public struct PutBucketNotificationRequest: RestJsonSerializable {
+public struct PutBucketNotificationRequest: AwswiftSerializable {
 /**
 
  */
@@ -7968,7 +8357,7 @@ self.notificationConfiguration = notificationConfiguration
   }
 }
 
-public struct PutBucketPolicyRequest: RestJsonSerializable {
+public struct PutBucketPolicyRequest: AwswiftSerializable {
 /**
 
  */
@@ -8009,7 +8398,7 @@ self.policy = policy
   }
 }
 
-public struct PutBucketReplicationRequest: RestJsonSerializable {
+public struct PutBucketReplicationRequest: AwswiftSerializable {
 /**
 
  */
@@ -8050,7 +8439,7 @@ self.replicationConfiguration = replicationConfiguration
   }
 }
 
-public struct PutBucketRequestPaymentRequest: RestJsonSerializable {
+public struct PutBucketRequestPaymentRequest: AwswiftSerializable {
 /**
 
  */
@@ -8091,7 +8480,7 @@ self.requestPaymentConfiguration = requestPaymentConfiguration
   }
 }
 
-public struct PutBucketTaggingRequest: RestJsonSerializable {
+public struct PutBucketTaggingRequest: AwswiftSerializable {
 /**
 
  */
@@ -8132,7 +8521,7 @@ self.tagging = tagging
   }
 }
 
-public struct PutBucketVersioningRequest: RestJsonSerializable {
+public struct PutBucketVersioningRequest: AwswiftSerializable {
 /**
 
  */
@@ -8180,7 +8569,7 @@ self.versioningConfiguration = versioningConfiguration
   }
 }
 
-public struct PutBucketWebsiteRequest: RestJsonSerializable {
+public struct PutBucketWebsiteRequest: AwswiftSerializable {
 /**
 
  */
@@ -8221,12 +8610,16 @@ self.websiteConfiguration = websiteConfiguration
   }
 }
 
-public struct PutObjectAclOutput: RestJsonDeserializable {
+public struct PutObjectAclOutput: AwswiftDeserializable {
 /**
 
  */
   public let requestCharged: Requestcharged?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> PutObjectAclOutput {
   
@@ -8244,7 +8637,7 @@ self.requestCharged = requestCharged
   }
 }
 
-public struct PutObjectAclRequest: RestJsonSerializable {
+public struct PutObjectAclRequest: AwswiftSerializable {
 /**
 The canned ACL to apply to the object.
  */
@@ -8348,7 +8741,7 @@ self.versionId = versionId
   }
 }
 
-public struct PutObjectOutput: RestJsonDeserializable {
+public struct PutObjectOutput: AwswiftDeserializable {
 /**
 Entity tag for the uploaded object.
  */
@@ -8382,6 +8775,10 @@ Version of the object.
  */
   public let versionId: String?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> PutObjectOutput {
   
@@ -8420,7 +8817,7 @@ self.versionId = versionId
   }
 }
 
-public struct PutObjectRequest: RestJsonSerializable {
+public struct PutObjectRequest: AwswiftSerializable {
 /**
 The canned ACL to apply to the object.
  */
@@ -8618,7 +9015,7 @@ self.websiteRedirectLocation = websiteRedirectLocation
 /**
 Container for specifying an configuration when you want Amazon S3 to publish events to an Amazon Simple Queue Service (Amazon SQS) queue.
  */
-public struct QueueConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct QueueConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -8650,6 +9047,11 @@ Amazon SQS queue ARN to which Amazon S3 will publish a message when it detects e
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return QueueConfiguration(
@@ -8675,7 +9077,7 @@ self.queueArn = queueArn
   }
 }
 
-public struct QueueConfigurationDeprecated: RestJsonSerializable, RestJsonDeserializable {
+public struct QueueConfigurationDeprecated: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -8707,6 +9109,11 @@ public struct QueueConfigurationDeprecated: RestJsonSerializable, RestJsonDeseri
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> QueueConfigurationDeprecated {
     guard case let .xml(node) = body else { fatalError() }
     return QueueConfigurationDeprecated(
@@ -8735,7 +9142,7 @@ self.queue = queue
 
 
 
-public struct Redirect: RestJsonSerializable, RestJsonDeserializable {
+public struct Redirect: AwswiftSerializable, AwswiftDeserializable {
 /**
 The host name to use in the redirect request.
  */
@@ -8772,6 +9179,11 @@ The specific object key to use in the redirect request. For example, redirect re
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Redirect {
     guard case let .xml(node) = body else { fatalError() }
     return Redirect(
@@ -8800,7 +9212,7 @@ self.replaceKeyWith = replaceKeyWith
   }
 }
 
-public struct RedirectAllRequestsTo: RestJsonSerializable, RestJsonDeserializable {
+public struct RedirectAllRequestsTo: AwswiftSerializable, AwswiftDeserializable {
 /**
 Name of the host where requests will be redirected.
  */
@@ -8820,6 +9232,11 @@ Protocol to use (http, https) when redirecting requests. The default is the prot
     if s3Protocol != nil { body["Protocol"] = s3Protocol! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RedirectAllRequestsTo {
@@ -8846,7 +9263,7 @@ self.s3Protocol = s3Protocol
 /**
 Container for replication rules. You can add as many as 1,000 rules. Total replication configuration size can be up to 2 MB.
  */
-public struct ReplicationConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct ReplicationConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 Amazon Resource Name (ARN) of an IAM role for Amazon S3 to assume when replicating the objects.
  */
@@ -8868,6 +9285,11 @@ Container for information about a particular replication rule. Replication confi
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ReplicationConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return ReplicationConfiguration(
@@ -8887,7 +9309,7 @@ self.rules = rules
   }
 }
 
-public struct ReplicationRule: RestJsonSerializable, RestJsonDeserializable {
+public struct ReplicationRule: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -8919,6 +9341,11 @@ The rule is ignored if status is not Enabled.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> ReplicationRule {
     guard case let .xml(node) = body else { fatalError() }
     return ReplicationRule(
@@ -8944,7 +9371,7 @@ self.status = status
   }
 }
 
-enum Replicationrulestatus: String, RestJsonDeserializable, RestJsonSerializable {
+enum Replicationrulestatus: String, AwswiftDeserializable, AwswiftSerializable {
   case `enabled` = "Enabled"
   case `disabled` = "Disabled"
 
@@ -8961,7 +9388,7 @@ enum Replicationrulestatus: String, RestJsonDeserializable, RestJsonSerializable
 }
 
 
-enum Replicationstatus: String, RestJsonDeserializable, RestJsonSerializable {
+enum Replicationstatus: String, AwswiftDeserializable, AwswiftSerializable {
   case `cOMPLETE` = "COMPLETE"
   case `pENDING` = "PENDING"
   case `fAILED` = "FAILED"
@@ -8982,7 +9409,7 @@ enum Replicationstatus: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 If present, indicates that the requester was successfully charged for the request.
  */
-enum Requestcharged: String, RestJsonDeserializable, RestJsonSerializable {
+enum Requestcharged: String, AwswiftDeserializable, AwswiftSerializable {
   case `requester` = "requester"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Requestcharged {
@@ -9000,7 +9427,7 @@ enum Requestcharged: String, RestJsonDeserializable, RestJsonSerializable {
 /**
 Confirms that the requester knows that she or he will be charged for the request. Bucket owners need not specify this parameter in their requests. Documentation on downloading objects from requester pays buckets can be found at http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectsinRequesterPaysBuckets.html
  */
-enum Requestpayer: String, RestJsonDeserializable, RestJsonSerializable {
+enum Requestpayer: String, AwswiftDeserializable, AwswiftSerializable {
   case `requester` = "requester"
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Requestpayer {
@@ -9015,7 +9442,7 @@ enum Requestpayer: String, RestJsonDeserializable, RestJsonSerializable {
   }
 }
 
-public struct RequestPaymentConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct RequestPaymentConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies who pays for the download and request fees.
  */
@@ -9030,6 +9457,11 @@ Specifies who pays for the download and request fees.
     body["Payer"] = payer
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RequestPaymentConfiguration {
@@ -9055,12 +9487,16 @@ self.payer = payer
 
 
 
-public struct RestoreObjectOutput: RestJsonDeserializable {
+public struct RestoreObjectOutput: AwswiftDeserializable {
 /**
 
  */
   public let requestCharged: Requestcharged?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RestoreObjectOutput {
   
@@ -9078,7 +9514,7 @@ self.requestCharged = requestCharged
   }
 }
 
-public struct RestoreObjectRequest: RestJsonSerializable {
+public struct RestoreObjectRequest: AwswiftSerializable {
 /**
 
  */
@@ -9133,7 +9569,7 @@ self.versionId = versionId
   }
 }
 
-public struct RestoreRequest: RestJsonSerializable {
+public struct RestoreRequest: AwswiftSerializable {
 /**
 Lifetime of the active copy in days
  */
@@ -9161,7 +9597,7 @@ self.days = days
 }
 
 
-public struct RoutingRule: RestJsonSerializable, RestJsonDeserializable {
+public struct RoutingRule: AwswiftSerializable, AwswiftDeserializable {
 /**
 A container for describing a condition that must be met for the specified redirect to apply. For example, 1. If request is for pages in the /docs folder, redirect to the /documents folder. 2. If request results in HTTP error 4xx, redirect request to another host where you might process the error.
  */
@@ -9181,6 +9617,11 @@ Container for redirect information. You can redirect requests to another host, t
     body["Redirect"] = redirect
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> RoutingRule {
@@ -9203,7 +9644,7 @@ self.redirect = redirect
 }
 
 
-public struct Rule: RestJsonSerializable, RestJsonDeserializable {
+public struct Rule: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -9255,6 +9696,11 @@ If 'Enabled', the rule is currently being applied. If 'Disabled', the rule is no
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Rule {
     guard case let .xml(node) = body else { fatalError() }
     return Rule(
@@ -9296,7 +9742,7 @@ self.transition = transition
 /**
 Container for object key name prefix and suffix filtering rules.
  */
-public struct S3KeyFilter: RestJsonSerializable, RestJsonDeserializable {
+public struct S3KeyFilter: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -9311,6 +9757,11 @@ public struct S3KeyFilter: RestJsonSerializable, RestJsonDeserializable {
     if filterRules != nil { body["FilterRule"] = filterRules! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> S3KeyFilter {
@@ -9333,7 +9784,7 @@ self.filterRules = filterRules
 
 
 
-enum Serversideencryption: String, RestJsonDeserializable, RestJsonSerializable {
+enum Serversideencryption: String, AwswiftDeserializable, AwswiftSerializable {
   case `aES256` = "AES256"
   case `awskms` = "aws:kms"
 
@@ -9351,7 +9802,7 @@ enum Serversideencryption: String, RestJsonDeserializable, RestJsonSerializable 
 
 
 
-enum Storageclass: String, RestJsonDeserializable, RestJsonSerializable {
+enum Storageclass: String, AwswiftDeserializable, AwswiftSerializable {
   case `sTANDARD` = "STANDARD"
   case `rEDUCED_REDUNDANCY` = "REDUCED_REDUNDANCY"
   case `sTANDARD_IA` = "STANDARD_IA"
@@ -9369,7 +9820,7 @@ enum Storageclass: String, RestJsonDeserializable, RestJsonSerializable {
 }
 
 
-public struct Tag: RestJsonSerializable, RestJsonDeserializable {
+public struct Tag: AwswiftSerializable, AwswiftDeserializable {
 /**
 Name of the tag.
  */
@@ -9389,6 +9840,11 @@ Value of the tag.
     body["Value"] = value
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Tag {
@@ -9411,7 +9867,7 @@ self.value = value
 }
 
 
-public struct Tagging: RestJsonSerializable, RestJsonDeserializable {
+public struct Tagging: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -9426,6 +9882,11 @@ public struct Tagging: RestJsonSerializable, RestJsonDeserializable {
     body["TagSet"] = tagSet
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Tagging {
@@ -9445,7 +9906,7 @@ self.tagSet = tagSet
 }
 
 
-public struct TargetGrant: RestJsonSerializable, RestJsonDeserializable {
+public struct TargetGrant: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -9465,6 +9926,11 @@ Logging permissions assigned to the Grantee for the bucket.
     if permission != nil { body["Permission"] = permission! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TargetGrant {
@@ -9493,7 +9959,7 @@ self.permission = permission
 /**
 Container for specifying the configuration when you want Amazon S3 to publish events to an Amazon Simple Notification Service (Amazon SNS) topic.
  */
-public struct TopicConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct TopicConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -9525,6 +9991,11 @@ Amazon SNS topic ARN to which Amazon S3 will publish a message when it detects e
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TopicConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return TopicConfiguration(
@@ -9550,7 +10021,7 @@ self.topicArn = topicArn
   }
 }
 
-public struct TopicConfigurationDeprecated: RestJsonSerializable, RestJsonDeserializable {
+public struct TopicConfigurationDeprecated: AwswiftSerializable, AwswiftDeserializable {
 /**
 Bucket event for which to send notifications.
  */
@@ -9582,6 +10053,11 @@ Amazon SNS topic to which Amazon S3 will publish a message to report the specifi
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> TopicConfigurationDeprecated {
     guard case let .xml(node) = body else { fatalError() }
     return TopicConfigurationDeprecated(
@@ -9608,7 +10084,7 @@ self.topic = topic
 }
 
 
-public struct Transition: RestJsonSerializable, RestJsonDeserializable {
+public struct Transition: AwswiftSerializable, AwswiftDeserializable {
 /**
 Indicates at what date the object is to be moved or deleted. Should be in GMT ISO 8601 Format.
  */
@@ -9635,6 +10111,11 @@ The class of storage used to store the object.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> Transition {
     guard case let .xml(node) = body else { fatalError() }
     return Transition(
@@ -9658,7 +10139,7 @@ self.storageClass = storageClass
 }
 
 
-enum Transitionstorageclass: String, RestJsonDeserializable, RestJsonSerializable {
+enum Transitionstorageclass: String, AwswiftDeserializable, AwswiftSerializable {
   case `gLACIER` = "GLACIER"
   case `sTANDARD_IA` = "STANDARD_IA"
 
@@ -9674,7 +10155,7 @@ enum Transitionstorageclass: String, RestJsonDeserializable, RestJsonSerializabl
   }
 }
 
-enum S3Type: String, RestJsonDeserializable, RestJsonSerializable {
+enum S3Type: String, AwswiftDeserializable, AwswiftSerializable {
   case `canonicalUser` = "CanonicalUser"
   case `amazonCustomerByEmail` = "AmazonCustomerByEmail"
   case `group` = "Group"
@@ -9693,7 +10174,7 @@ enum S3Type: String, RestJsonDeserializable, RestJsonSerializable {
 
 
 
-public struct UploadPartCopyOutput: RestJsonDeserializable {
+public struct UploadPartCopyOutput: AwswiftDeserializable {
 /**
 
  */
@@ -9723,6 +10204,11 @@ The Server-side encryption algorithm used when storing this object in S3 (e.g., 
  */
   public let serverSideEncryption: Serversideencryption?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UploadPartCopyOutput {
     guard case let .xml(node) = body else { fatalError() }
@@ -9758,7 +10244,7 @@ self.serverSideEncryption = serverSideEncryption
   }
 }
 
-public struct UploadPartCopyRequest: RestJsonSerializable {
+public struct UploadPartCopyRequest: AwswiftSerializable {
 /**
 
  */
@@ -9897,7 +10383,7 @@ self.uploadId = uploadId
   }
 }
 
-public struct UploadPartOutput: RestJsonDeserializable {
+public struct UploadPartOutput: AwswiftDeserializable {
 /**
 Entity tag for the uploaded object.
  */
@@ -9923,6 +10409,10 @@ The Server-side encryption algorithm used when storing this object in S3 (e.g., 
  */
   public let serverSideEncryption: Serversideencryption?
 
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    fatalError()
+  }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> UploadPartOutput {
   
@@ -9955,7 +10445,7 @@ self.serverSideEncryption = serverSideEncryption
   }
 }
 
-public struct UploadPartRequest: RestJsonSerializable {
+public struct UploadPartRequest: AwswiftSerializable {
 /**
 Object data.
  */
@@ -10054,7 +10544,7 @@ self.uploadId = uploadId
 
 
 
-public struct VersioningConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct VersioningConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 Specifies whether MFA delete is enabled in the bucket versioning configuration. This element is only returned if the bucket has been configured with MFA delete. If the bucket has never been so configured, this element is not returned.
  */
@@ -10076,6 +10566,11 @@ The versioning state of the bucket.
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
   }
 
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
+  }
+
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> VersioningConfiguration {
     guard case let .xml(node) = body else { fatalError() }
     return VersioningConfiguration(
@@ -10095,7 +10590,7 @@ self.status = status
   }
 }
 
-public struct WebsiteConfiguration: RestJsonSerializable, RestJsonDeserializable {
+public struct WebsiteConfiguration: AwswiftSerializable, AwswiftDeserializable {
 /**
 
  */
@@ -10125,6 +10620,11 @@ public struct WebsiteConfiguration: RestJsonSerializable, RestJsonDeserializable
     if routingRules != nil { body["RoutingRules"] = routingRules! }
   
     return SerializedForm(uri: uri, queryString: querystring, header: header, body: .json(body))
+  }
+
+  static func deserializableBody(data: Data) -> DeserializableBody {
+    let node = try! XMLDocument(data: data, options: 0).child(at: 0)!
+  return .xml(node)
   }
 
   static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> WebsiteConfiguration {

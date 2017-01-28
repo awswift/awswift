@@ -269,7 +269,7 @@ final class AwsEnum: Shape {
     var str = ""
     let e = { line in str = str + line + "\n" }
     
-    e("enum \(memberType()): String, RestJsonDeserializable, RestJsonSerializable {")
+    e("enum \(memberType()): String, AwswiftDeserializable, AwswiftSerializable {")
     cases.forEach { e("  case `\(enumize($0))` = \"\($0)\"") }
     
     e("")
@@ -408,19 +408,28 @@ final class Structure: Shape {
     let fieldInitLines = members.map { $0.deserialization() }
     let fieldLines = fieldInitLines.joined(separator: ",\n")
     let dictLine: String
+    let bodyLine: String
     
     if members.filter({ $0.location == .body }).count == 0 {
       dictLine = ""
+        bodyLine = "  fatalError()"
     } else {
       switch context.apiProtocol {
-      case .restJson: dictLine = "  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]"
-      case .restXml: dictLine = "  guard case let .xml(node) = body else { fatalError() }"
+      case .restJson:
+        dictLine = "  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]"
+        bodyLine = "  let json = try! JSONSerialization.jsonObject(with: data, options: [])\n  return .json(json)"
+      case .restXml:
+        dictLine = "  guard case let .xml(node) = body else { fatalError() }"
+        bodyLine = "  let node = try! XMLDocument(data: data, options: 0).child(at: 0)!\n  return .xml(node)"
       default: fatalError()
       }
     }
     
     
     return [
+        "static func deserializableBody(data: Data) -> DeserializableBody {",
+        bodyLine,
+        "}\n",
       "static func deserialize(response: HTTPURLResponse, body: DeserializableBody) -> \(memberType()) {",
       dictLine,
       "  return \(memberType())(",
@@ -436,15 +445,15 @@ final class Structure: Shape {
     
     let protocols: String
     if name == "CancelledSpotInstanceRequest" || name == "SpotInstanceRequest" {
-      protocols = "RestJsonSerializable, RestJsonDeserializable"
+      protocols = "AwswiftSerializable, AwswiftDeserializable"
     } else if name.hasSuffix("Request") {
-      protocols = "RestJsonSerializable"
+      protocols = "AwswiftSerializable"
     } else if name.hasSuffix("Response") || name.hasSuffix("Output") {
-      protocols = "RestJsonDeserializable"
+      protocols = "AwswiftDeserializable"
     } else if name.hasSuffix("Exception") {
-      protocols = "Error, RestJsonDeserializable"
+      protocols = "Error, AwswiftDeserializable"
     } else {
-      protocols = "RestJsonSerializable, RestJsonDeserializable"
+      protocols = "AwswiftSerializable, AwswiftDeserializable"
     }
     
     e("public struct \(memberType()): \(protocols) {")
@@ -578,7 +587,7 @@ class Operation {
     switch api.endpoint {
     case .regional(let prefix): hostname = "\(prefix).\\(self.region).amazonaws.com"
     case .global(let endpoint): hostname = endpoint
-    case .s3: hostname = "s3-\\(self.region).amazonaws.com"
+    case .s3: hostname = "s3.dualstack.\\(self.region).amazonaws.com"
     }
     
     e("func \(name.lowercaseFirst())(input: \(inputType)) -> ApiCallTask<\(outputType)> {")
