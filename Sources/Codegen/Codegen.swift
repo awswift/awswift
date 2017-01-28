@@ -80,9 +80,9 @@ class ApiContext {
   let name: String
   var LUT: [String: Shape]
   let docs: Docs
-  let apiProtocol: API.ApiProtocol
+  let apiProtocol: ApiProtocol
   
-  init(name: String, LUT: [String : Shape], docs: Docs, apiProtocol: API.ApiProtocol) {
+  init(name: String, LUT: [String : Shape], docs: Docs, apiProtocol: ApiProtocol) {
     self.name = name
     self.LUT = LUT
     self.docs = docs
@@ -146,18 +146,7 @@ class Member {
     case .statusCode: return "      \(memberName()): response.statusCode"
     case .header: return "      \(memberName()): response.allHeaderFields[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
     case .body:
-      switch shape.context.apiProtocol {
-      case .restJson:
-        return "      \(memberName()): jsonDict[\"\(locationName)\"].flatMap { ($0 is NSNull) ? nil : \(shape.memberType()).deserialize(response: response, body: .json($0)) }\(required ? "!" : "")"
-      case .restXml:
-        if let list = shape as? List {
-          return "      \(memberName()): try! node.nodes(forXPath: \"\(locationName)\").map { \(list.memberShape.memberType()).deserialize(response: response, body: .xml($0)) }"
-        } else {
-          return "      \(memberName()): try! node.nodes(forXPath: \"\(locationName)\").first.map { \(shape.memberType()).deserialize(response: response, body: .xml($0)) }\(required ? "!" : "")"
-        }
-        
-      default: fatalError()
-      }
+      return shape.context.apiProtocol.memberDeserialization(member: self)
     case .headers: return "      \(memberName()): Dictionary(response.allHeaderFields.map { (key: $0 as! String, value: $1 as! String) }.filter { $0.key.lowercased().hasPrefix(\"\(locationName)\") })"
     default: fatalError()
     }
@@ -414,17 +403,10 @@ final class Structure: Shape {
       dictLine = ""
         bodyLine = "  fatalError()"
     } else {
-      switch context.apiProtocol {
-      case .restJson:
-        dictLine = "  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]"
-        bodyLine = "  let json = try! JSONSerialization.jsonObject(with: data, options: [])\n  return .json(json)"
-      case .restXml:
-        dictLine = "  guard case let .xml(node) = body else { fatalError() }"
-        bodyLine = "  let node = try! XMLDocument(data: data, options: 0).child(at: 0)!\n  return .xml(node)"
-      default: fatalError()
-      }
+        let tup = context.apiProtocol.structureDeserializeLines(structure: self)
+        dictLine = tup.dictLine
+        bodyLine = tup.bodyLine
     }
-    
     
     return [
         "static func deserializableBody(data: Data) -> DeserializableBody {",
@@ -612,14 +594,75 @@ class Operation {
   }
 }
 
+protocol ApiProtocol {
+    func memberDeserialization(member: Member) -> String
+    func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String)
+}
+
+struct RestJson: ApiProtocol {
+    func memberDeserialization(member m: Member) -> String {
+        return "      \(m.memberName()): jsonDict[\"\(m.locationName)\"].flatMap { ($0 is NSNull) ? nil : \(m.shape.memberType()).deserialize(response: response, body: .json($0)) }\(m.required ? "!" : "")"
+    }
+    
+    func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String) {
+        return ("  guard case let .json(json) = body else { fatalError() }\n  let jsonDict = json as! [String: Any]", "  let json = try! JSONSerialization.jsonObject(with: data, options: [])\n  return .json(json)")
+    }
+}
+
+struct RestXml: ApiProtocol {
+    func memberDeserialization(member m: Member) -> String {
+        if let list = m.shape as? List {
+            return "      \(m.memberName()): try! node.nodes(forXPath: \"\(m.locationName)\").map { \(list.memberShape.memberType()).deserialize(response: response, body: .xml($0)) }"
+        } else {
+            return "      \(m.memberName()): try! node.nodes(forXPath: \"\(m.locationName)\").first.map { \(m.shape.memberType()).deserialize(response: response, body: .xml($0)) }\(m.required ? "!" : "")"
+        }
+    }
+    
+    func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String) {
+        return ("  guard case let .xml(node) = body else { fatalError() }", "  let node = try! XMLDocument(data: data, options: 0).child(at: 0)!\n  return .xml(node)")
+    }
+}
+
+struct Ec2: ApiProtocol {
+    func memberDeserialization(member: Member) -> String {
+        fatalError()
+    }
+    
+    func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String) {
+        fatalError()
+    }
+}
+
+struct Query: ApiProtocol {
+    func memberDeserialization(member: Member) -> String {
+        fatalError()
+    }
+    
+    func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String) {
+        fatalError()
+    }
+}
+
+struct Json: ApiProtocol {
+    func memberDeserialization(member: Member) -> String {
+        fatalError()
+    }
+    
+    func structureDeserializeLines(structure: Structure) -> (dictLine: String, bodyLine: String) {
+        fatalError()
+    }
+}
+
+
+
 struct API {
-  enum ApiProtocol {
-    case restJson
-    case restXml
-    case ec2
-    case query
-    case json
-  }
+//  enum ApiProtocol {
+//    case restJson
+//    case restXml
+//    case ec2
+//    case query
+//    case json
+//  }
   
   enum SignatureVersion {
     case v4
@@ -652,11 +695,11 @@ struct API {
     
     let apiProtocol: ApiProtocol
     switch metadata["protocol"]!.string! {
-    case "rest-json": apiProtocol = .restJson
-    case "rest-xml": apiProtocol = .restXml
-    case "ec2": apiProtocol = .ec2
-    case "query": apiProtocol = .query
-    case "json": apiProtocol = .json
+    case "rest-json": apiProtocol = RestJson()
+    case "rest-xml": apiProtocol = RestXml()
+    case "ec2": apiProtocol = Ec2()
+    case "query": apiProtocol = Query()
+    case "json": apiProtocol = Json()
     default: fatalError()
     }
     
