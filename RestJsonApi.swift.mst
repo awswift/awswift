@@ -1,0 +1,131 @@
+import Foundation
+import Signer
+
+struct {{name}} {
+    struct Client {
+        let region: String
+        let credentialsProvider: AwsCredentialsProvider
+        let session: URLSession
+        let queue: DispatchQueue
+
+        init(region: String) {
+            self.region = region
+            self.credentialsProvider = DefaultChainProvider()
+            self.session = URLSession(configuration: URLSessionConfiguration.default)
+            self.queue = DispatchQueue(label: "awswift.Lambda.Client.queue")
+        }
+
+        func scope() -> AwsCredentialsScope {
+           return AwsCredentialsScope(url: URL(string: "https://")!)!
+        }
+
+        func credentials() -> AwsCredentials {
+            return credentialsProvider.provideAwsCredentials()!
+        }
+
+        func baseURL() -> URL {
+            return URL(string: "")!
+        }
+
+        {{#operations}}
+        func {{name}}(input: {{input.name}}) -> {{output.name}} {
+            let body = input.restJsonSerialize()!
+            let request = RestJsonRequest(
+                method: "{{method}}",
+                relativeUrl: "{{uri}}",
+                expectedStatus: {{respCode}},
+                headers: [:],
+                uriSubs: [:],
+                body: body
+            )
+
+            let unsignedRequest = RestJsonRequestSerializer(input: request, baseURL: baseURL())
+            let httpRequest = dateAndSignRequest(request: unsignedRequest, credentials: credentials(), scope: scope())
+
+            let response = HTTPURLResponse(url: URL(string: "")!, statusCode: 200, httpVersion: "1.1", headerFields: [:])!
+            return {{output.name}}.deserialize(response: response, body: nil)
+        }
+        {{/operations}}
+    }
+
+    {{#structures}}
+    struct {{name}}: RestJsonSerializable, AwswiftDeserializable {
+        {{#members}}public let {{identifier(name)}}: {{shape.memberType}}{{^required}}?{{/}}
+        {{/members}}
+
+        init(
+            {{#each(members)}}{{identifier(name)}}: {{shape.memberType}}{{^required}}?{{/}}{{^ @last }},{{/}}
+            {{/}}
+        ) {
+            {{#members}}self.{{identifier(name)}} = {{identifier(name)}}
+            {{/}}
+        }
+
+        func restJsonSerialize() -> Any? {
+            let body = [
+                {{^bodyMembers}}
+                "": ""
+                {{/}}
+                {{#each(bodyMembers)}}
+                {{#required}}
+                "{{locationName}}": {{identifier(name)}}.restJsonSerialize() {{^ @last }},{{/}}
+                {{/}}
+                {{^required}}
+                "{{locationName}}": {{identifier(name)}}.flatMap { $0.restJsonSerialize() } {{^ @last }},{{/}}
+                {{/}}
+                {{/}}
+            ]
+            return body
+        }
+
+        {{^isResponse}}
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
+            fatalError()
+        }
+        {{/}}
+        {{#isResponse}}
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
+            guard let body = body as? [String: Any] else { fatalError() }
+            
+            {{#bodyMembers}}
+            let {{identifier(name)}} = body["{{locationName}}"].flatMapNoNulls { v in
+                return {{shape.memberType}}.deserialize(response: response, body: v)
+            }
+            {{/}}
+            {{#headerMembers}}
+            let {{identifier(name)}} = response.allHeaderFields["{{locationName}}"] as{{#required}}!{{/}}{{^required}}?{{/}} {{shape.memberType}}
+            {{/}}
+            {{#statusCodeMembers}}
+            let {{identifier(name)}} = response.statusCode            
+            {{/}}
+
+            return {{name}}(
+                {{#each(members)}}
+                {{identifier(name)}}: {{identifier(name)}}{{^ @last }},{{/}}
+                {{/}}
+            )
+        }
+        {{/isResponse}}
+    }
+    {{/structures}}
+
+    {{#enums}}
+    enum {{name}}: String, RestJsonSerializable, AwswiftDeserializable {
+        {{#cases}}case {{identifier(.)}} = "{{.}}"
+        {{/}}
+
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
+            guard let body = body as? String else { fatalError() }
+            if let e = {{name}}(rawValue: body) {
+                return e
+            } else {
+                fatalError()
+            }
+        }
+
+        func restJsonSerialize() -> Any? {
+            return rawValue
+        }
+    }
+    {{/enums}}
+}

@@ -18,5 +18,6 @@ let package = Package(
     .Package(url: "https://github.com/kylef/Commander.git", majorVersion: 0, minor: 5),
     .Package(url: "https://github.com/czechboy0/Jay.git", majorVersion: 1),
     .Package(url: "https://github.com/kylef/URITemplate.swift", majorVersion: 2),
+    .Package(url: "https://github.com/groue/GRMustache.swift", majorVersion: 2, minor: 0)
   ] + platformPackages
 )

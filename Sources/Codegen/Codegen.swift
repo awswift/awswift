@@ -1,5 +1,6 @@
 import Foundation
 import Jay
+import Mustache
 
 let ReservedKeywords = ["Error", "Protocol", "Type", "Return", "Public", "Body"]
 
@@ -81,16 +82,18 @@ class ApiContext {
   var LUT: [String: Shape]
   let docs: Docs
   let apiProtocol: ApiProtocol
+  var operations: [Operation]
   
   init(name: String, LUT: [String : Shape], docs: Docs, apiProtocol: ApiProtocol) {
     self.name = name
     self.LUT = LUT
     self.docs = docs
     self.apiProtocol = apiProtocol
+    self.operations = []
   }
 }
 
-class Member {
+class Member: MustacheBoxable {
   enum Location: String {
     case body
     case header
@@ -99,6 +102,16 @@ class Member {
     case uri
     case querystring
   }
+    
+    var mustacheBox: MustacheBox {
+        return Box([
+            "name": name,
+            "required": required,
+            "shape": shape,
+            "location": location,
+            "locationName": locationName
+            ])
+    }
   
   let name: String
   let required: Bool
@@ -170,7 +183,7 @@ enum ShapeType {
   case unknown
 }
 
-protocol Shape {
+protocol Shape: MustacheBoxable {
   var name: String { get }
   var context: ApiContext { get }
   func emit() -> String
@@ -183,6 +196,15 @@ final class Primitive: Shape {
   let name: String
   let context: ApiContext
   let memberTypeStr: String
+    
+    
+    var mustacheBox: MustacheBox {
+        return Box([
+            "name": name,
+            "context": context,
+            "memberType": memberTypeStr
+            ])
+    }
   
   func emit() -> String {
     return ""
@@ -220,6 +242,16 @@ final class List: Shape {
   let name: String
   let context: ApiContext
   let memberShape: Shape
+    
+    
+    var mustacheBox: MustacheBox {
+        return Box([
+            "name": name,
+            "context": context,
+            "memberShape": memberShape,
+            "memberType": memberType()
+            ])
+    }
   
   static func fromJSON(name: String, json: JSON, context: ApiContext) -> List {
     guard let json = json.dictionary else { fatalError() }
@@ -253,6 +285,16 @@ final class AwsEnum: Shape {
   let name: String
   let context: ApiContext
   let cases: [String]
+    
+    
+    var mustacheBox: MustacheBox {
+        return Box([
+            "name": name,
+            "context": context,
+            "cases": cases,
+            "memberType": memberType()
+            ])
+    }
   
   func emit() -> String {
     var str = ""
@@ -286,10 +328,11 @@ final class AwsEnum: Shape {
   }
   
   func memberType() -> String {
-    let n = name.capitalized
+    let n = name
     if ReservedKeywords.contains(n) {
       return "\(context.name.capitalized)\(n)"
     } else {
+        
       return n
     }
   }
@@ -312,6 +355,24 @@ final class Structure: Shape {
   let name: String
   let context: ApiContext
   let members: [Member]
+    
+    var mustacheBox: MustacheBox {
+        let isResponse = context.operations.contains { $0.output?.name == name }
+        let bodyMembers = members.filter { $0.location == .body }
+        let headerMembers = members.filter { $0.location == .header }
+        let statusCodeMembers = members.filter { $0.location == .statusCode }
+        
+        return Box([
+            "name": name,
+            "context": context,
+            "members": members,
+            "memberType": memberType(),
+            "isResponse": isResponse,
+            "bodyMembers": bodyMembers,
+            "headerMembers": headerMembers,
+            "statusCodeMembers": statusCodeMembers
+        ])
+    }
   
   static func fromJSON(name: String, json: JSON, context: ApiContext) -> Structure {
     guard let json = json.dictionary else { fatalError() }
@@ -476,6 +537,16 @@ final class Map: Shape {
   let key: Shape
   let value: Shape
   
+    
+    var mustacheBox: MustacheBox {
+        return Box([
+            "name": name,
+            "context": context,
+            "key": key,
+            "value": value
+            ])
+    }
+    
   func emit() -> String {
     return ""
   }
@@ -500,7 +571,7 @@ final class Map: Shape {
   }
 }
 
-class Operation {
+class Operation: MustacheBoxable {
   let name: String
   let method: String
   let uri: String
@@ -509,6 +580,19 @@ class Operation {
   let output: Shape?
   let errors: [Shape]
   let docs: Docs
+    
+    var mustacheBox: MustacheBox {
+        let voidOut = Primitive(name: "AwsApiVoidOutput", memberTypeStr: "AwsApiVoidOutput", context: ApiContext(name: "", LUT: [:], docs: docs, apiProtocol: RestJson()))
+        return Box([
+            "name": name,
+            "method": method,
+            "uri": uri,
+            "respCode": respCode ?? "nil",
+            "input": input,
+            "output": output ?? voidOut,
+            "errors": errors
+        ] as [String: Any])
+    }
   
   static func fromJSON(json: JSON, docs: Docs, LUT: [String: Shape]) -> Operation {
     guard let json = json.dictionary else { fatalError() }
@@ -659,7 +743,7 @@ struct Json: ApiProtocol {
 
 
 
-struct API {
+struct API: MustacheBoxable {
 //  enum ApiProtocol {
 //    case restJson
 //    case restXml
@@ -681,13 +765,31 @@ struct API {
   }
   
   let name: String
-  let shapes: [String: Shape]
+  let shapes: [Shape]
   let operations: [Operation]
   let version: String
   let endpoint: EndpointType
   let apiProtocol: ApiProtocol
   let signatureVersion: SignatureVersion
   let docs: Docs
+    
+    var mustacheBox: MustacheBox {
+        let structures = shapes.filter { $0 is Structure }
+        let enums = shapes.filter { $0 is AwsEnum }
+        
+        return Box([
+            "name": name,
+            "shapes": shapes,
+            "operations": operations,
+            "version": version,
+            "endpoint": endpoint,
+            "apiProtocol": apiProtocol,
+            "signatureVersion": signatureVersion,
+            
+            "structures": structures,
+            "enums": enums
+        ])
+    }
   
   static func fromJSON(json: JSON, docs: Docs) -> API {
     guard let json = json.dictionary else { fatalError() }
@@ -728,16 +830,23 @@ struct API {
     
     let shapesJson = json["shapes"]!
     let sortedNames = sortedShapeNames(unsorted: shapesJson)
+    var shapes: [Shape] = []
     for name in sortedNames {
       let shapeJson = shapesJson.dictionary![name]!
-      context.LUT[name] = shapeFromJSON(name: name, json: shapeJson, context: context)
+      let shape = shapeFromJSON(name: name, json: shapeJson, context: context)
+        context.LUT[name] = shape
+        shapes.append(shape)
     }
+    
+    shapes.sort { $0.name < $1.name }
     
     let operations: [Operation] = json["operations"]!.dictionary!.map { (key, json) in
       return Operation.fromJSON(json: json, docs: docs, LUT: context.LUT)
     }.sorted { $0.name < $1.name }
     
-    return API(name: name, shapes: context.LUT, operations: operations, version: version, endpoint: endpoint, apiProtocol: apiProtocol, signatureVersion: signatureVersion, docs: docs)
+    context.operations = operations
+    
+    return API(name: name, shapes: shapes, operations: operations, version: version, endpoint: endpoint, apiProtocol: apiProtocol, signatureVersion: signatureVersion, docs: docs)
   }
   
   static func sortedShapeNames(unsorted: JSON) -> [String] {
@@ -776,7 +885,7 @@ struct API {
     }
   }
   
-  init(name: String, shapes: [String: Shape], operations: [Operation], version: String, endpoint: EndpointType, apiProtocol: ApiProtocol, signatureVersion: SignatureVersion, docs: Docs) {
+  init(name: String, shapes: [Shape], operations: [Operation], version: String, endpoint: EndpointType, apiProtocol: ApiProtocol, signatureVersion: SignatureVersion, docs: Docs) {
     self.name = name
     self.shapes = shapes
     self.operations = operations
@@ -816,20 +925,23 @@ struct API {
       e("    func scope() -> AwsCredentialsScope {")
       e("      return AwsCredentialsScope(url: URL(string: \"https://\")!)!")
       e("    }")
+        
+        e("func AwsQueryApiCallTask<I: AwswiftSerializable, O: AwswiftDeserializable>(input: I) completionHandler: @escaping (_: O?, _: Error?) -> ()) -> URLSessionTask {")
+        e("")
+        e("}")
       e("")
     }
     
     operations.forEach { e($0.emit(api: self)) }
     e("  }")
     
-    let shapeNames = shapes.keys.sorted()
-    shapeNames.forEach { name in
-      let shape = shapes[name]!
-      if let doc = docs.shapes[name] {
-        e("/**")
-        e(doc)
-        e(" */")
-      }
+//    let shapeNames = [""]//shapes.keys.sorted()
+    shapes.forEach { shape in
+//      if let doc = docs.shapes[name] {
+//        e("/**")
+//        e(doc)
+//        e(" */")
+//      }
       e(shape.emit())
     }
 
