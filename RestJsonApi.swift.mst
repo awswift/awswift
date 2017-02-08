@@ -27,23 +27,39 @@ struct {{name}} {
             return URL(string: "")!
         }
 
+        func awsApiCallTask<O: AwswiftDeserializable>(request: RestJsonRequest, completionHandler: @escaping (_: O?, _: Error?) -> ()) -> URLSessionTask {
+            let unsignedRequest = RestJsonRequestSerializer(input: request, baseURL: baseURL())
+            let httpRequest = dateAndSignRequest(request: unsignedRequest, credentials: credentials(), scope: scope())
+            
+            return session.dataTask(with: httpRequest, completionHandler: { (data, response, error) in
+                self.queue.async {
+                    let http = response as! HTTPURLResponse
+                    if error != nil {
+                        completionHandler(nil, error)
+                    } else if request.expectedStatus == nil || http.statusCode == request.expectedStatus {
+                        let json = try! JSONSerialization.jsonObject(with: data!, options: [])
+                        let ret = O.deserialize(response: http, body: json)
+                        completionHandler(ret, nil)
+                    } else {
+                        completionHandler(nil, UnexpectedStatusResponse(response: http, data: data))
+                    }
+                }
+            })
+        }
+
         {{#operations}}
-        func {{name}}(input: {{input.name}}) -> {{output.name}} {
-            let body = input.restJsonSerialize()
+        func {{name}}(input: {{input.name}}, completionHandler: @escaping (_: {{output.name}}?, _: Error?) -> ()) -> URLSessionTask {
+            let serial = input.restJsonSerialize()
+            guard case let .object(fields) = serial else { fatalError() }
+
             let request = RestJsonRequest(
                 method: "{{method}}",
                 relativeUrl: "{{uri}}",
                 expectedStatus: {{respCode}},
-                headers: [:],
-                uriSubs: [:],
-                body: body
+                fields: fields
             )
-
-            let unsignedRequest = RestJsonRequestSerializer(input: request, baseURL: baseURL())
-            let httpRequest = dateAndSignRequest(request: unsignedRequest, credentials: credentials(), scope: scope())
-
-            let response = HTTPURLResponse(url: URL(string: "")!, statusCode: 200, httpVersion: "1.1", headerFields: [:])!
-            return {{output.name}}.deserialize(response: response, body: nil)
+            
+            return awsApiCallTask(request: request, completionHandler: completionHandler)
         }
         {{/operations}}
     }
@@ -61,21 +77,13 @@ struct {{name}} {
             {{/}}
         }
 
-        func restJsonSerialize() -> RestJsonField {
-            let body: [String: RestJsonField] = [
-                {{^bodyMembers}}
-                :
-                {{/}}
-                {{#each(bodyMembers)}}
-                {{#required}}
-                "{{locationName}}": {{identifier(name)}}.restJsonSerialize() {{^ @last }},{{/}}
-                {{/}}
-                {{^required}}
-                "{{locationName}}": {{identifier(name)}}.flatMap { $0.restJsonSerialize() }! /* for now */ {{^ @last }},{{/}}
-                {{/}}
-                {{/}}
+        func restJsonSerialize() -> RestJsonFieldValue {
+            let fields = [
+            {{#each(members)}}
+                RestJsonField(name: "{{locationName}}", location: .{{location}}, value: {{identifier(name)}}{{^required}}?{{/}}.restJsonSerialize()){{^ @last }},{{/}}
+            {{/}}
             ]
-            return .object(body)
+            return .object(fields)
         }
 
         {{^isResponse}}
@@ -123,7 +131,7 @@ struct {{name}} {
             }
         }
 
-        func restJsonSerialize() -> RestJsonField {
+        func restJsonSerialize() -> RestJsonFieldValue {
             return .string(rawValue)
         }
     }
