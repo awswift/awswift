@@ -29,7 +29,7 @@ struct {{name}} {
 
         {{#operations}}
         func {{name}}(input: {{input.name}}) -> {{output.name}} {
-            let body = input.restJsonSerialize()!
+            let body = input.restJsonSerialize()
             let request = RestJsonRequest(
                 method: "{{method}}",
                 relativeUrl: "{{uri}}",
@@ -61,21 +61,21 @@ struct {{name}} {
             {{/}}
         }
 
-        func restJsonSerialize() -> Any? {
-            let body = [
+        func restJsonSerialize() -> RestJsonField {
+            let body: [String: RestJsonField] = [
                 {{^bodyMembers}}
-                "": ""
+                :
                 {{/}}
                 {{#each(bodyMembers)}}
                 {{#required}}
                 "{{locationName}}": {{identifier(name)}}.restJsonSerialize() {{^ @last }},{{/}}
                 {{/}}
                 {{^required}}
-                "{{locationName}}": {{identifier(name)}}.flatMap { $0.restJsonSerialize() } {{^ @last }},{{/}}
+                "{{locationName}}": {{identifier(name)}}.flatMap { $0.restJsonSerialize() }! /* for now */ {{^ @last }},{{/}}
                 {{/}}
                 {{/}}
             ]
-            return body
+            return .object(body)
         }
 
         {{^isResponse}}
@@ -123,8 +123,8 @@ struct {{name}} {
             }
         }
 
-        func restJsonSerialize() -> Any? {
-            return rawValue
+        func restJsonSerialize() -> RestJsonField {
+            return .string(rawValue)
         }
     }
     {{/enums}}
