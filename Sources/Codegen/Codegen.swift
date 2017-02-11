@@ -94,13 +94,17 @@ class ApiContext {
 }
 
 class Member: MustacheBoxable {
-  enum Location: String {
+    enum Location: String, MustacheBoxable {
     case body
     case header
     case headers
     case statusCode
     case uri
     case querystring
+        
+        var mustacheBox: MustacheBox {
+            return Box(rawValue)
+        }
   }
     
     var mustacheBox: MustacheBox {
@@ -358,6 +362,7 @@ final class Structure: Shape {
     
     var mustacheBox: MustacheBox {
         let isResponse = context.operations.contains { $0.output?.name == name }
+        let isRequest = context.operations.contains { $0.input?.name == name }
         let bodyMembers = members.filter { $0.location == .body }
         let headerMembers = members.filter { $0.location == .header }
         let statusCodeMembers = members.filter { $0.location == .statusCode }
@@ -368,6 +373,7 @@ final class Structure: Shape {
             "members": members,
             "memberType": memberType(),
             "isResponse": isResponse,
+            "isRequest": isRequest,
             "bodyMembers": bodyMembers,
             "headerMembers": headerMembers,
             "statusCodeMembers": statusCodeMembers
@@ -776,13 +782,21 @@ struct API: MustacheBoxable {
     var mustacheBox: MustacheBox {
         let structures = shapes.filter { $0 is Structure }
         let enums = shapes.filter { $0 is AwsEnum }
+        let awsDomain: String
+        
+        
+        switch endpoint { // TODO: support china
+        case .global(let name): awsDomain = "\(name).amazonaws.com"
+        case .regional(let prefix): awsDomain = "\(prefix).\\(region).amazonaws.com"
+        case .s3: awsDomain = "s3-\\(region).amazonaws.com"
+        }
         
         return Box([
             "name": name,
             "shapes": shapes,
             "operations": operations,
             "version": version,
-            "endpoint": endpoint,
+            "awsDomain": awsDomain,
             "apiProtocol": apiProtocol,
             "signatureVersion": signatureVersion,
             

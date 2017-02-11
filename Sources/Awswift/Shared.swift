@@ -107,41 +107,65 @@ protocol AwswiftDeserializable {
     static func deserializableBody(data: Data) -> DeserializableBody
 }
 
+indirect enum RestJsonFieldValue {
+    case string(String)
+    case numberI(Int)
+    case date(Date)
+    case data(Data)
+    case bool(Bool)
+    case array([RestJsonFieldValue])
+    case object([RestJsonField])
+    //case null
+}
+
+struct RestJsonField {
+    enum Location {
+        case body
+        case header
+        case statusCode
+        case uri
+        case querystring
+    }
+    
+    let name: String
+    let location: Location
+    let value: RestJsonFieldValue?
+}
+
 struct RestJsonRequest {
     let method: String
     let relativeUrl: String
     let expectedStatus: Int?
-    let headers: [String: String]
-    let uriSubs: [String: String]
-    let body: Any?
+    let fields: [RestJsonField]
 }
 
 protocol RestJsonSerializable {
-    func restJsonSerialize() -> Any?
-//    func httpMethod() -> String
-//    func relativeUriPattern() -> String
-//    func expectedStatus() -> Int?
-//    func headers() -> [String: String]
-//    func uriParts() -> [String: String]
-//    func body() -> Any?
+    func restJsonSerialize() -> RestJsonFieldValue
 }
 
 func RestJsonRequestSerializer(input: RestJsonRequest, baseURL: URL) -> URLRequest {
-    let uriSubs = Dictionary<String, String>.filterNils(input.uriSubs)
+    // TODO: recurse into sub structs
+    let byLoc = { (loc: RestJsonField.Location) in input.fields.filter { $0.location == loc } }
+    let headers = byLoc(.header)
+    let body = byLoc(.body)
+    
+    let uriFields = (byLoc(.uri) + byLoc(.querystring)).filter { $0.value != nil }
+    let uriSubs = Dictionary(uriFields.map { ($0.name, "\($0.value!)") })
+    
     let template = URITemplate(template: input.relativeUrl)
     let expandedString = template.expand(uriSubs)
 
-    let url = URL(string: expandedString)!
+    let url = URL(string: expandedString, relativeTo: baseURL)!
     var req = URLRequest(url: url)
     req.httpMethod = input.method
     
-    for (field, value) in input.headers {
-        req.addValue(value, forHTTPHeaderField: field)
+    for field in headers {
+        req.addValue("\(field.value)", forHTTPHeaderField: field.name)
     }
     
-    if let body = input.body, let json = try? JSONSerialization.data(withJSONObject: body, options: []) {
-        req.httpBody = json
-    }
+//    if let json = try? JSONSerialization.data(withJSONObject: body, options: []) {
+//        req.httpBody = json
+//    }
     
     return req
 }
@@ -152,7 +176,7 @@ extension AwswiftDeserializable {
     }
 }
 
-struct AwsApiVoidOutput {
+struct AwsApiVoidOutput: AwswiftDeserializable {
     static func deserialize(response: HTTPURLResponse, body: Any?) -> AwsApiVoidOutput {
         return AwsApiVoidOutput()
     }
@@ -188,61 +212,4 @@ func dateAndSignRequest(request: URLRequest, credentials: AwsCredentials, scope:
     req.addValue(auth, forHTTPHeaderField: "Authorization")
     
     return req
-}
-
-func awsApiCallTask<I: AwswiftSerializable, O: AwswiftDeserializable>(session: URLSession, credentials: AwsCredentials, scope: AwsCredentialsScope, queue: DispatchQueue, urlString: String, httpMethod: String, expectedStatus: Int?, input: I, completionHandler: @escaping (_: O?, _: Error?) -> ()) -> URLSessionTask {
-    let serialized = input.serialize()
-    
-    let uriSubs = Dictionary<String, String>.filterNils(serialized.uri)
-    let template = URITemplate(template: urlString)
-    let expandedString = template.expand(uriSubs)
-    
-    var urlComponents = URLComponents(string: expandedString)!
-    let queryItems = Dictionary<String, String>.filterNils(serialized.queryString).map { URLQueryItem(name: $0, value: $1) }
-    if queryItems.count > 0 { urlComponents.queryItems = queryItems }
-    var request = URLRequest(url: urlComponents.url!)
-    request.httpMethod = httpMethod
-    
-    Dictionary<String, String>.filterNils(serialized.header).forEach { (field, value) in
-        request.addValue(value, forHTTPHeaderField: field)
-    }
-    
-    
-    
-    let payload: AwsRequestSigner.Payload
-    switch serialized.body {
-    case .json(let json):
-        let data = try! JSONSerialization.data(withJSONObject: json, options: [])
-        request.httpBody = data
-        payload = .data(data)
-    case .raw(let data):
-        request.httpBody =  data
-        payload = .data(data)
-    case .empty:
-        payload = .empty
-    }
-    
-    let date = Date()
-    let dateHeader = DateFormatter.awsDateTimeFormatter().string(from: date)
-    request.addValue(dateHeader, forHTTPHeaderField: "X-Amz-Date")
-    
-    let signer = AwsRequestSigner(credentials: credentials, scope: scope, request: request, payload: payload)
-    let auth = signer.authorizationHeader()
-    request.addValue(auth, forHTTPHeaderField: "Authorization")
-    request.addValue("e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855", forHTTPHeaderField: "x-amz-content-sha256")
-    
-    return session.dataTask(with: request, completionHandler: { (data, response, error) in
-        queue.async {
-            let http = response as! HTTPURLResponse
-            if error != nil {
-                completionHandler(nil, error)
-            } else if expectedStatus == nil || http.statusCode == expectedStatus {
-                let body = O.deserializableBody(data: data!)
-                let ret = O.deserialize(response: http, body: body)
-                completionHandler(ret, nil)
-            } else {
-                completionHandler(nil, UnexpectedStatusResponse(response: http, data: data))
-            }
-        }
-    })
 }

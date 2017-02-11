@@ -16,7 +16,7 @@ struct {{name}} {
         }
 
         func scope() -> AwsCredentialsScope {
-           return AwsCredentialsScope(url: URL(string: "https://")!)!
+           return AwsCredentialsScope(url: baseURL())!
         }
 
         func credentials() -> AwsCredentials {
@@ -24,7 +24,7 @@ struct {{name}} {
         }
 
         func baseURL() -> URL {
-            return URL(string: "")!
+            return URL(string: "https://{{awsDomain}}/")!
         }
 
         func awsApiCallTask<O: AwswiftDeserializable>(request: RestJsonRequest, completionHandler: @escaping (_: O?, _: Error?) -> ()) -> URLSessionTask {
@@ -86,12 +86,12 @@ struct {{name}} {
             return .object(fields)
         }
 
-        {{^isResponse}}
+        {{#isRequest}}
         static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
             fatalError()
         }
         {{/}}
-        {{#isResponse}}
+        {{^isRequest}}
         static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
             guard let body = body as? [String: Any] else { fatalError() }
             
@@ -113,7 +113,7 @@ struct {{name}} {
                 {{/}}
             )
         }
-        {{/isResponse}}
+        {{/isRequest}}
     }
     {{/structures}}
 

@@ -9,21 +9,35 @@ extension Array where Element: AwswiftDeserializable {
 }
 
 extension Array where Element: RestJsonSerializable {
-    func restJsonSerialize() -> Any? {
-        return map { $0.restJsonSerialize() }
+    func restJsonSerialize() -> RestJsonFieldValue {
+        let arr = map { $0.restJsonSerialize() }
+        return .array(arr)
     }
 }
 
 extension Dictionary where Key: AwswiftDeserializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> [Key: Value] {
-    let dict = body as! [Key: Value]
+      let dict = body as! [Key: Value]
       return Dictionary(dict.map { (key: Key.deserialize(response: response, body: $0), value: $1) })
     
   }
 }
 
+extension Dictionary where Value: RestJsonSerializable {
+    func restJsonSerialize() -> RestJsonFieldValue {
+        var arr: [RestJsonField] = []
+        
+        for (key, val) in self {
+            let field = RestJsonField(name: key as! String, location: .body, value: val.restJsonSerialize())
+            arr.append(field)
+        }
+        
+        return .object(arr)
+    }
+}
+
 //extension Optional: RestJsonSerializable {
-//    func restJsonSerialize() -> Any? {
+//    func restJsonSerialize() -> RestJsonFieldValue {
 //        return nil
 //    }
 //}
@@ -33,8 +47,8 @@ extension String: RestJsonSerializable, AwswiftDeserializable {
     return body as! String
   }
     
-    func restJsonSerialize() -> Any? {
-        return self
+    func restJsonSerialize() -> RestJsonFieldValue {
+        return .string(self)
     }
 }
 extension Int: RestJsonSerializable, AwswiftDeserializable {
@@ -42,36 +56,36 @@ extension Int: RestJsonSerializable, AwswiftDeserializable {
     return body as! Int
   }
     
-    func restJsonSerialize() -> Any? {
-        return self
+    func restJsonSerialize() -> RestJsonFieldValue {
+        return .numberI(self)
     }
 }
 
-extension Float: RestJsonSerializable, AwswiftDeserializable {
-  static func deserialize(response: HTTPURLResponse, body: Any?) -> Float {
-    return body as! Float
-  }
-    
-    func restJsonSerialize() -> Any? {
-        return self
-    }
-}
-extension Double: RestJsonSerializable, AwswiftDeserializable {
-  static func deserialize(response: HTTPURLResponse, body: Any?) -> Double {
-    return body as! Double
-  }
-    
-    func restJsonSerialize() -> Any? {
-        return self
-    }
-}
+//extension Float: RestJsonSerializable, AwswiftDeserializable {
+//  static func deserialize(response: HTTPURLResponse, body: Any?) -> Float {
+//    return body as! Float
+//  }
+//    
+//    func restJsonSerialize() -> RestJsonFieldValue {
+//        return self
+//    }
+//}
+//extension Double: RestJsonSerializable, AwswiftDeserializable {
+//  static func deserialize(response: HTTPURLResponse, body: Any?) -> Double {
+//    return body as! Double
+//  }
+//    
+//    func restJsonSerialize() -> RestJsonFieldValue {
+//        return self
+//    }
+//}
 extension Bool: RestJsonSerializable, AwswiftDeserializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> Bool {
     return body as! Bool
   }
     
-    func restJsonSerialize() -> Any? {
-        return self
+    func restJsonSerialize() -> RestJsonFieldValue {
+        return .bool(self)
     }
 }
 extension Date: RestJsonSerializable, AwswiftDeserializable {
@@ -80,8 +94,8 @@ extension Date: RestJsonSerializable, AwswiftDeserializable {
     fatalError()
   }
     
-    func restJsonSerialize() -> Any? {
-        return self
+    func restJsonSerialize() -> RestJsonFieldValue {
+        return .date(self)
     }
 }
 extension Data: RestJsonSerializable, AwswiftDeserializable {
@@ -89,7 +103,7 @@ extension Data: RestJsonSerializable, AwswiftDeserializable {
     return (body as! String).data(using: .utf8)!
   }
     
-    func restJsonSerialize() -> Any? {
-        return self
+    func restJsonSerialize() -> RestJsonFieldValue {
+        return .data(self)
     }
 }
