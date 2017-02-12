@@ -23,7 +23,7 @@ func doAllServices() {
   
   let allApiDefUrls = try! FileManager.default.contentsOfDirectory(at: apiDefRootUrl, includingPropertiesForKeys: [], options: [])
 #if true
-  let interestingSubset = ["lambda"]//, "lambda", "cloudformation"]
+  let interestingSubset = ["cloudformation"]//, "lambda", "cloudformation"]
   let interestingApiDefs = allApiDefUrls.filter { interestingSubset.contains($0.pathComponents[$0.pathComponents.endIndex - 1]) }
 #else
   let interestingApiDefs = allApiDefs
@@ -50,7 +50,7 @@ func doMustache(apiUrl: URL, docsUrl: URL, swiftUrl: URL) {
     let docs = Docs.fromJSON(docs: docsJson)
     let api = API.fromJSON(json: apiJson, docs: docs)
     
-    let template = try! Template(path: "/Users/aidan/dev/awswift/awswift/RestJsonApi.swift.mst")
+    let template = try! Template(path: "/Users/aidan/dev/awswift/awswift/QueryApi.swift.mst")
     template.register(StandardLibrary.each, forKey: "each")
     
     let identifierRender = Filter { (identifier: String?) in

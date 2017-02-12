@@ -2,8 +2,16 @@ import Foundation
 
 extension Array where Element: AwswiftDeserializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> [Element] {
-    let arr = body as! [Any]
-      return arr.map { Element.deserialize(response: response, body: $0) }
+    let arr: [Any]
+    
+    if let node = body as? XMLNode { // todo remove hack
+        arr = node.children!
+    } else {
+        arr = body as! [Any]
+    }
+    
+    return arr.map { Element.deserialize(response: response, body: $0) }
+    
     
   }
 }
@@ -14,6 +22,15 @@ extension Array where Element: RestJsonSerializable {
         return .array(arr)
     }
 }
+
+
+extension Array where Element: QuerySerializable {
+    func querySerialize() -> QueryFieldValue {
+        let arr = map { $0.querySerialize() }
+        return .array(arr)
+    }
+}
+
 
 extension Dictionary where Key: AwswiftDeserializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> [Key: Value] {
@@ -42,22 +59,34 @@ extension Dictionary where Value: RestJsonSerializable {
 //    }
 //}
 
-extension String: RestJsonSerializable, AwswiftDeserializable {
+extension String: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> String {
-    return body as! String
+    if let node = body as? XMLNode { // todo remove hack
+        return node.stringValue!
+    } else {
+        return body as! String
+    }
   }
     
     func restJsonSerialize() -> RestJsonFieldValue {
         return .string(self)
     }
+    
+    func querySerialize() -> QueryFieldValue {
+        return .string(self)
+    }
 }
-extension Int: RestJsonSerializable, AwswiftDeserializable {
+extension Int: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> Int {
     return body as! Int
   }
     
     func restJsonSerialize() -> RestJsonFieldValue {
         return .numberI(self)
+    }
+    
+    func querySerialize() -> QueryFieldValue {
+        return .string("")
     }
 }
 
@@ -79,7 +108,7 @@ extension Int: RestJsonSerializable, AwswiftDeserializable {
 //        return self
 //    }
 //}
-extension Bool: RestJsonSerializable, AwswiftDeserializable {
+extension Bool: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> Bool {
     return body as! Bool
   }
@@ -87,15 +116,37 @@ extension Bool: RestJsonSerializable, AwswiftDeserializable {
     func restJsonSerialize() -> RestJsonFieldValue {
         return .bool(self)
     }
+    
+    func querySerialize() -> QueryFieldValue {
+        return .string("\(self)")
+    }
 }
-extension Date: RestJsonSerializable, AwswiftDeserializable {
+extension Date: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> Date {
     // TODO: check service date format
-    fatalError()
+    
+    let format = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+    let formatter = DateFormatter()
+    formatter.dateFormat = format
+    formatter.timeZone = TimeZone(secondsFromGMT: 0)
+    
+    let str: String
+    if let node = body as? XMLNode {
+        str = node.stringValue!
+    } else {
+        str = body as! String
+    }
+    return formatter.date(from: str)!
   }
     
     func restJsonSerialize() -> RestJsonFieldValue {
         return .date(self)
+    }
+    
+    
+    
+    func querySerialize() -> QueryFieldValue {
+        return .string("")
     }
 }
 extension Data: RestJsonSerializable, AwswiftDeserializable {

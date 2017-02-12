@@ -2,7 +2,7 @@ import Foundation
 import Jay
 import Mustache
 
-let ReservedKeywords = ["Error", "Protocol", "Type", "Return", "Public", "Body"]
+let ReservedKeywords = ["error", "protocol", "type", "return", "public", "body", "static", "dynamic", "true", "false"]
 
 struct Docs {
   let operations: [String: String]
@@ -333,7 +333,7 @@ final class AwsEnum: Shape {
   
   func memberType() -> String {
     let n = name
-    if ReservedKeywords.contains(n) {
+    if ReservedKeywords.contains(n.lowercased()) {
       return "\(context.name.capitalized)\(n)"
     } else {
         

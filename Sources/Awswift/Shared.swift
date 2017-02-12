@@ -115,6 +115,13 @@ indirect enum RestJsonFieldValue {
     case bool(Bool)
     case array([RestJsonFieldValue])
     case object([RestJsonField])
+    
+    func stringValue() -> String {
+        switch self {
+        case .string(let s): return s
+        default: fatalError()
+        }
+    }
     //case null
 }
 
@@ -143,6 +150,56 @@ protocol RestJsonSerializable {
     func restJsonSerialize() -> RestJsonFieldValue
 }
 
+enum QueryFieldValue {
+    case string(String)
+    case array([QueryFieldValue])
+    case object([String: QueryFieldValue?])
+    
+    func serialize(stack: [Any]) -> [URLQueryItem] {
+        let name = stack.map { "\($0)" }.joined(separator: ".")
+        
+        switch self {
+        case .string(let s): return [URLQueryItem(name: name, value: s)]
+        case .array(let arr):
+            return arr.enumerated().flatMap { (offset, value) -> [URLQueryItem] in
+                var newstack = stack
+                newstack.append(contentsOf: ["member", offset + 1])
+                return value.serialize(stack: newstack)
+            }
+        case .object(let dict):
+            return dict.flatMap { (key, value) -> [URLQueryItem] in
+                var newstack = stack
+                newstack.append(key)
+                return value?.serialize(stack: newstack) ?? []
+            }
+        }
+    }
+}
+
+struct QueryRequest {
+    let action: String
+    let method: String
+    let params: QueryFieldValue
+}
+
+protocol QuerySerializable {
+    func querySerialize() -> QueryFieldValue
+}
+
+func QueryRequestSerializer(input: QueryRequest, baseURL: URL) -> URLRequest {
+    var queryItems = input.params.serialize(stack: [])
+    queryItems.append(URLQueryItem(name: "Action", value: input.action))
+    
+    let url = URL(string: "/", relativeTo: baseURL)!
+    var components = URLComponents(url: url, resolvingAgainstBaseURL: true)!
+    components.queryItems = queryItems
+    
+    var req = URLRequest(url: components.url!)
+    req.httpMethod = input.method
+    
+    return req
+}
+
 func RestJsonRequestSerializer(input: RestJsonRequest, baseURL: URL) -> URLRequest {
     // TODO: recurse into sub structs
     let byLoc = { (loc: RestJsonField.Location) in input.fields.filter { $0.location == loc } }
@@ -150,7 +207,7 @@ func RestJsonRequestSerializer(input: RestJsonRequest, baseURL: URL) -> URLReque
     let body = byLoc(.body)
     
     let uriFields = (byLoc(.uri) + byLoc(.querystring)).filter { $0.value != nil }
-    let uriSubs = Dictionary(uriFields.map { ($0.name, "\($0.value!)") })
+    let uriSubs = Dictionary(uriFields.map { ($0.name, $0.value!.stringValue()) })
     
     let template = URITemplate(template: input.relativeUrl)
     let expandedString = template.expand(uriSubs)
@@ -160,7 +217,7 @@ func RestJsonRequestSerializer(input: RestJsonRequest, baseURL: URL) -> URLReque
     req.httpMethod = input.method
     
     for field in headers {
-        req.addValue("\(field.value)", forHTTPHeaderField: field.name)
+        field.value.map { req.addValue($0.stringValue(), forHTTPHeaderField: field.name) }
     }
     
 //    if let json = try? JSONSerialization.data(withJSONObject: body, options: []) {
