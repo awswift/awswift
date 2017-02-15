@@ -4,6 +4,7 @@ import URITemplate
     import PromiseKit
 #endif
 import Signer
+import Cryptor
 
 extension Optional {
     func flatMapNoNulls<U>(_ transform: (Wrapped) throws -> U?) rethrows -> U? {
@@ -274,15 +275,25 @@ func dateAndSignRequest(request: URLRequest, credentials: AwsCredentials, scope:
     var req = request
     
     let payload: AwsRequestSigner.Payload
+    let payloadHash: String
+    
     if let data = req.httpBody {
         payload = .data(data)
+        let bytes = Digest(using: .sha256).update(data: data)!.final()
+        payloadHash = CryptoUtils.hexString(from: bytes)
     } else {
         payload = .empty
+        payloadHash = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855" // sha256 of empty string
     }
     
     let date = Date()
     let dateHeader = DateFormatter.awsDateTimeFormatter().string(from: date)
     req.addValue(dateHeader, forHTTPHeaderField: "X-Amz-Date")
+    
+    // NOTE: the presence of the following header is _required_ for S3, but rather
+    // than special-casing the S3 client, i guess it can't hurt to always include it?
+    // TODO: revisit this poor decision later
+    req.addValue(payloadHash, forHTTPHeaderField: "X-Amz-Content-Sha256")
     
     let signer = AwsRequestSigner(credentials: credentials, scope: scope, request: req, payload: payload)
     let auth = signer.authorizationHeader()
