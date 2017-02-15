@@ -1679,7 +1679,7 @@
       "type":"string",
       "enum":["url"]
     },
-    "Error":{
+    "S3Error":{
       "type":"structure",
       "members":{
         "Key":{"shape":"ObjectKey"},
@@ -1697,7 +1697,7 @@
     },
     "Errors":{
       "type":"list",
-      "member":{"shape":"Error"},
+      "member":{"shape":"S3Error"},
       "flattened":true
     },
     "Event":{
@@ -2358,7 +2358,7 @@
         "EmailAddress":{"shape":"EmailAddress"},
         "ID":{"shape":"ID"},
         "Type":{
-          "shape":"Type",
+          "shape":"S3Type",
           "locationName":"xsi:type",
           "xmlAttribute":true
         },
@@ -3292,7 +3292,7 @@
     },
     "Policy":{"type":"string"},
     "Prefix":{"type":"string"},
-    "Protocol":{
+    "S3Protocol":{
       "type":"string",
       "enum":[
         "http",
@@ -3962,7 +3962,7 @@
       "members":{
         "HostName":{"shape":"HostName"},
         "HttpRedirectCode":{"shape":"HttpRedirectCode"},
-        "Protocol":{"shape":"Protocol"},
+        "Protocol":{"shape":"S3Protocol"},
         "ReplaceKeyPrefixWith":{"shape":"ReplaceKeyPrefixWith"},
         "ReplaceKeyWith":{"shape":"ReplaceKeyWith"}
       }
@@ -3972,7 +3972,7 @@
       "required":["HostName"],
       "members":{
         "HostName":{"shape":"HostName"},
-        "Protocol":{"shape":"Protocol"}
+        "Protocol":{"shape":"S3Protocol"}
       }
     },
     "ReplaceKeyPrefixWith":{"type":"string"},
@@ -4277,7 +4277,7 @@
         "STANDARD_IA"
       ]
     },
-    "Type":{
+    "S3Type":{
       "type":"string",
       "enum":[
         "CanonicalUser",
