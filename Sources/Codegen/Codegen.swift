@@ -2,7 +2,7 @@ import Foundation
 import Jay
 import Mustache
 
-let ReservedKeywords = ["error", "protocol", "type", "return", "public", "body", "static", "dynamic", "true", "false"]
+let ReservedKeywords = ["error", "protocol", "type", "return", "public", "body", "static", "dynamic", "true", "false", "private"]
 
 struct Docs {
   let operations: [String: String]
@@ -549,7 +549,9 @@ final class Map: Shape {
             "name": name,
             "context": context,
             "key": key,
-            "value": value
+            "value": value,
+            
+            "memberType": memberType()
             ])
     }
     
@@ -589,12 +591,14 @@ class Operation: MustacheBoxable {
     
     var mustacheBox: MustacheBox {
         let voidOut = Primitive(name: "AwsApiVoidOutput", memberTypeStr: "AwsApiVoidOutput", context: ApiContext(name: "", LUT: [:], docs: docs, apiProtocol: RestJson()))
+        let voidIn = Primitive(name: "AwsApiVoidInput", memberTypeStr: "AwsApiVoidInput", context: ApiContext(name: "", LUT: [:], docs: docs, apiProtocol: RestJson()))
+        
         return Box([
             "name": name,
             "method": method,
             "uri": uri,
             "respCode": respCode ?? "nil",
-            "input": input,
+            "input": input ?? voidIn,
             "output": output ?? voidOut,
             "errors": errors
         ] as [String: Any])

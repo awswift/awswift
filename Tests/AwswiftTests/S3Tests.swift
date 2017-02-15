@@ -10,13 +10,17 @@ class S3Tests: XCTestCase {
             sessionToken: nil
         )
         
-        let client = cloudformation.Client(region: "ap-southeast-2")
+        let client = s3.Client(region: "us-east-1")
         
         let exp = expectation(description: "moo")
         
-        let input = cloudformation.ListStacksInput(nextToken: nil, stackStatusFilter: [.cREATE_COMPLETE])
-        let task = client.ListStacks(input: input) { (resp, error) in
+        let input = s3.ListObjectsV2Request(bucket: "iconicalapp.com", continuationtoken: nil, delimiter: nil, encodingtype: nil, fetchowner: nil, maxkeys: nil, prefix: nil, requestpayer: nil, startafter: nil)
+        let task = client.ListObjectsV2(input: input) { (resp, error) in
             
+        
+//        let input = cloudformation.ListStacksInput(nextToken: nil, stackStatusFilter: [.cREATE_COMPLETE])
+//        let task = client.ListStacks(input: input) { (resp, error) in
+        
 //        }
         
 //        let input2 = lambda.GetFunctionConfigurationRequest(functionName: "moo-MyFunction-C3QSD7CZXASY", qualifier: nil)

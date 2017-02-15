@@ -50,12 +50,13 @@ struct {{name}} {
         }
 
         {{#operations}}
-        func {{name}}(input: {{type(input.name)}}, completionHandler: @escaping (_: {{type(output.name)}}?, _: Error?) -> ()) -> URLSessionTask {
+        func {{name}}(input: {{input.name}}, completionHandler: @escaping (_: {{output.name}}?, _: Error?) -> ()) -> URLSessionTask {
             let serial = input.querySerialize()
 
             let request = QueryRequest(
                 action: "{{name}}",
                 method: "{{method}}",
+                relativeUrl: "{{uri}}",
                 params: serial
             )
             
@@ -65,12 +66,12 @@ struct {{name}} {
     }
 
     {{#structures}}
-    struct {{type(name)}}: QuerySerializable, AwswiftDeserializable {
-        {{#members}}public let {{identifier(name)}}: {{type(shape.memberType)}}{{^required}}?{{/}}
+    struct {{name}}: QuerySerializable, AwswiftDeserializable {
+        {{#members}}public let {{identifier(name)}}: {{shape.memberType}}{{^required}}?{{/}}
         {{/members}}
 
         init(
-            {{#each(members)}}{{identifier(name)}}: {{type(shape.memberType)}}{{^required}}?{{/}}{{^ @last }},{{/}}
+            {{#each(members)}}{{identifier(name)}}: {{shape.memberType}}{{^required}}?{{/}}{{^ @last }},{{/}}
             {{/}}
         ) {
             {{#members}}self.{{identifier(name)}} = {{identifier(name)}}
@@ -97,16 +98,16 @@ struct {{name}} {
         }
         {{/}}
         {{^isRequest}}
-        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{type(name)}} {
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
             guard let body = body as? XMLElement else { fatalError() }
             
             {{#members}}
             let {{identifier(name)}} = try! body.nodes(forXPath: "{{locationName}}").first.flatMapNoNulls { v in
-                return {{type(shape.memberType)}}.deserialize(response: response, body: v)
+                return {{shape.memberType}}.deserialize(response: response, body: v)
             }
             {{/}}
 
-            return {{type(name)}}(
+            return {{name}}(
                 {{#each(members)}}
                 {{identifier(name)}}: {{identifier(name)}}{{#required}}!{{/}}{{^ @last }},{{/}}
                 {{/}}
@@ -117,14 +118,14 @@ struct {{name}} {
     {{/structures}}
 
     {{#enums}}
-    enum {{type(name)}}: String, QuerySerializable, AwswiftDeserializable {
+    enum {{name}}: String, QuerySerializable, AwswiftDeserializable {
         {{#cases}}case {{identifier(.)}} = "{{.}}"
         {{/}}
 
-        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{type(name)}} {
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
             guard let body = body as? XMLNode else { fatalError() }
 
-            if let e = {{type(name)}}(rawValue: body.stringValue!) {
+            if let e = {{name}}(rawValue: body.stringValue!) {
                 return e
             } else {
                 fatalError()

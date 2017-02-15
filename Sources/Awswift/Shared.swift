@@ -179,6 +179,7 @@ enum QueryFieldValue {
 struct QueryRequest {
     let action: String
     let method: String
+    let relativeUrl: String
     let params: QueryFieldValue
 }
 
@@ -195,6 +196,20 @@ func QueryRequestSerializer(input: QueryRequest, baseURL: URL) -> URLRequest {
     components.queryItems = queryItems
     
     var req = URLRequest(url: components.url!)
+    req.httpMethod = input.method
+    
+    return req
+}
+
+func RestXmlRequestSerializer(input: QueryRequest, baseURL: URL) -> URLRequest {
+    let queryItems = input.params.serialize(stack: [])
+    let uriSubs = Dictionary(queryItems.map { ($0.name, $0.value!) })
+    
+    let template = URITemplate(template: input.relativeUrl)
+    let expandedString = template.expand(uriSubs)
+    
+    let url = URL(string: expandedString, relativeTo: baseURL)!
+    var req = URLRequest(url: url)
     req.httpMethod = input.method
     
     return req
@@ -239,9 +254,14 @@ struct AwsApiVoidOutput: AwswiftDeserializable {
     }
 }
 
-struct AwsApiVoidInput: AwswiftSerializable {
+struct AwsApiVoidInput: AwswiftSerializable, QuerySerializable {
     func serialize() -> SerializedForm {
         return SerializedForm(uri: [:], queryString: [:], header: [:], body: .empty)
+    }
+    
+    
+    func querySerialize() -> QueryFieldValue {
+        return .string("")
     }
 }
 

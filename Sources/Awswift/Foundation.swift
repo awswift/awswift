@@ -53,6 +53,19 @@ extension Dictionary where Value: RestJsonSerializable {
     }
 }
 
+extension Dictionary where Value: QuerySerializable {
+    func querySerialize() -> QueryFieldValue {
+        var obj: [String: QueryFieldValue] = [:]
+        
+        for (key, val) in self {
+            let qval = val.querySerialize()
+            obj["\(key)"] = qval
+        }
+        
+        return .object(obj)
+    }
+}
+
 //extension Optional: RestJsonSerializable {
 //    func restJsonSerialize() -> RestJsonFieldValue {
 //        return nil
@@ -149,12 +162,16 @@ extension Date: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
         return .string("")
     }
 }
-extension Data: RestJsonSerializable, AwswiftDeserializable {
+extension Data: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> Data {
     return (body as! String).data(using: .utf8)!
   }
     
     func restJsonSerialize() -> RestJsonFieldValue {
         return .data(self)
+    }
+    
+    func querySerialize() -> QueryFieldValue {
+        return .string("")
     }
 }

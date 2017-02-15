@@ -13,7 +13,7 @@ enum AwsHostnameType {
     let match: (NSRegularExpression) -> (NSTextCheckingResult?) = { regex in regex.firstMatch(in: url.host!, options: [], range: hostRange) }
     
     let regionalRegex = r("^([a-zA-Z0-9-]+)\\.([a-zA-Z0-9-]+)\\.amazonaws.com(?:.cn)?$")
-    let s3Regex = r("^(?:(?:[a-zA-Z0-9-]+)\\.)?s3(?:\\.|-)([a-zA-Z0-9-]+)\\.amazonaws.com(?:.cn)?$") // TODO: support dualstack
+    let s3Regex = r("^(?:(?:[a-zA-Z0-9-]+)\\.)?s3(?:.dualstack)?(?:\\.|-)([a-zA-Z0-9-]+)\\.amazonaws.com(?:.cn)?$") // TODO: support dualstack
     let globalRegex = r("^([a-zA-Z0-9-]+)\\.amazonaws.com(?:.cn)?$")
     let iotDataApiRegex = r("^(?:[a-zA-Z0-9-]+)\\.iot\\.([a-zA-Z0-9-]+)\\.amazonaws.com(?:.cn)?$")
     
