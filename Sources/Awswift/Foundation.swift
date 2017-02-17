@@ -72,7 +72,7 @@ extension Dictionary where Value: QuerySerializable {
 //    }
 //}
 
-extension String: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
+extension String: RestJsonSerializable, AwswiftDeserializable, QuerySerializable, RestXmlSerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> String {
     if let node = body as? XMLNode { // todo remove hack
         return node.stringValue!
@@ -80,6 +80,10 @@ extension String: RestJsonSerializable, AwswiftDeserializable, QuerySerializable
         return body as! String
     }
   }
+    
+    func restXmlSerialize() -> RestXmlFieldValue {
+        return RestXmlFieldValue(node: XMLNode.text(withStringValue: self) as! XMLNode)
+    }
     
     func restJsonSerialize() -> RestJsonFieldValue {
         return .string(self)
@@ -151,6 +155,24 @@ extension Date: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
     }
     return formatter.date(from: str)!
   }
+    
+    /*
+     https://github.com/aws/aws-sdk-go/blob/25fa088918bba994b0f4ad6537739f7e88d9a7f8/private/model/api/shape.go#L349
+     if ref.Shape.Type == "timestamp" {
+         t := ShapeTag{Key: "timestampFormat"}
+         if ref.Location == "header" {
+             t.Val = "rfc822"
+         } else {
+             switch ref.API.Metadata.Protocol {
+             case "json", "rest-json":
+                 t.Val = "unix"
+             case "rest-xml", "ec2", "query":
+                 t.Val = "iso8601"
+             }
+         }
+         tags = append(tags, t)
+     }
+ */
     
     func restJsonSerialize() -> RestJsonFieldValue {
         return .date(self)

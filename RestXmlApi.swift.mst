@@ -1,0 +1,145 @@
+import Foundation
+import Signer
+
+struct {{name}} {
+    struct Client {
+        let region: String
+        let credentialsProvider: AwsCredentialsProvider
+        let session: URLSession
+        let queue: DispatchQueue
+
+        init(region: String) {
+            self.region = region
+            self.credentialsProvider = DefaultChainProvider()
+            self.session = URLSession(configuration: URLSessionConfiguration.default)
+            self.queue = DispatchQueue(label: "awswift.{{name}}.Client.queue")
+        }
+
+        func scope() -> AwsCredentialsScope {
+           return AwsCredentialsScope(url: baseURL())!
+        }
+
+        func credentials() -> AwsCredentials {
+            return credentialsProvider.provideAwsCredentials()!
+        }
+
+        func baseURL() -> URL {
+            return URL(string: "https://{{awsDomain}}/")!
+        }
+
+        func awsApiCallTask<O: AwswiftDeserializable>(request: RestXmlRequest, completionHandler: @escaping (_: O?, _: Error?) -> ()) -> URLSessionTask {
+            let unsignedRequest = RestXmlRequestSerializer(input: request, baseURL: baseURL())
+            let httpRequest = dateAndSignRequest(request: unsignedRequest, credentials: credentials(), scope: scope())
+            
+            return session.dataTask(with: httpRequest, completionHandler: { (data, response, error) in
+                self.queue.async {
+                    let http = response as! HTTPURLResponse
+                    if error != nil {
+                        completionHandler(nil, error)
+                    } else if 200..<300 ~= http.statusCode {
+                        let doc = try! XMLDocument(data: data!, options: 0)
+                        let root = doc.rootElement()!
+                        let hackRoot = root.child(at: 0)
+                        let ret = O.deserialize(response: http, body: hackRoot)
+                        completionHandler(ret, nil)
+                    } else {
+                        completionHandler(nil, UnexpectedStatusResponse(response: http, data: data))
+                    }
+                }
+            })
+        }
+
+        {{#operations}}
+        func {{name}}(input: {{input.name}}, completionHandler: @escaping (_: {{output.name}}?, _: Error?) -> ()) -> URLSessionTask {
+            let serial = input.restXmlSerialize()
+
+            let request = RestXmlRequest(
+                method: "{{method}}",
+                relativeUrl: "{{uri}}",
+                node: serial
+            )
+            
+            return awsApiCallTask(request: request, completionHandler: completionHandler)
+        }
+        {{/operations}}
+    }
+
+    {{#structures}}
+    struct {{name}}: RestXmlSerializable, AwswiftDeserializable {
+        {{#members}}public let {{identifier(name)}}: {{shape.memberType}}{{^required}}?{{/}}
+        {{/members}}
+
+        init(
+            {{#each(members)}}{{identifier(name)}}: {{shape.memberType}}{{^required}}?{{/}}{{^ @last }},{{/}}
+            {{/}}
+        ) {
+            {{#members}}self.{{identifier(name)}} = {{identifier(name)}}
+            {{/}}
+        }
+
+        func restXmlSerialize() -> RestXmlFieldValue {
+            {{^members.count}}
+            return .object([:])
+            {{/}}
+            {{#members.count}}
+            let element = XMLElement(name: "")
+            {{^isResponse}}
+            {{^isRequest}}
+            {{#headerMembers}}
+            WHATTHE
+            {{/}}
+            {{/}}
+            {{/}}
+            {{#each(members)}}
+            element.addChild({{identifier(name)}}{{^required}}?{{/}}.restXmlSerialize().node)
+            {{/}}
+            return RestXmlFieldValue(node: element)
+            {{/}}
+        }
+
+        {{#isRequest}}
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
+            fatalError()
+        }
+        {{/}}
+        {{^isRequest}}
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
+            guard let body = body as? XMLElement else { fatalError() }
+            
+            {{#members}}
+            let {{identifier(name)}} = try! body.nodes(forXPath: "{{locationName}}").first.flatMapNoNulls { v in
+                return {{shape.memberType}}.deserialize(response: response, body: v)
+            }
+            {{/}}
+
+            return {{name}}(
+                {{#each(members)}}
+                {{identifier(name)}}: {{identifier(name)}}{{#required}}!{{/}}{{^ @last }},{{/}}
+                {{/}}
+            )
+        }
+        {{/isRequest}}
+    }
+    {{/structures}}
+
+    {{#enums}}
+    enum {{name}}: String, RestXmlSerializable, AwswiftDeserializable {
+        {{#cases}}case {{identifier(.)}} = "{{.}}"
+        {{/}}
+
+        static func deserialize(response: HTTPURLResponse, body: Any?) -> {{name}} {
+            guard let body = body as? XMLNode else { fatalError() }
+
+            if let e = {{name}}(rawValue: body.stringValue!) {
+                return e
+            } else {
+                fatalError()
+            }
+        }
+
+        func restXmlSerialize() -> RestXmlFieldValue {
+            return RestXmlFieldValue(node: XMLNode.text(withStringValue: rawValue) as! XMLNode)
+        }
+    }
+    {{/enums}}
+}

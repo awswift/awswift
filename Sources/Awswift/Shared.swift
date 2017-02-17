@@ -202,16 +202,34 @@ func QueryRequestSerializer(input: QueryRequest, baseURL: URL) -> URLRequest {
     return req
 }
 
-func RestXmlRequestSerializer(input: QueryRequest, baseURL: URL) -> URLRequest {
-    let queryItems = input.params.serialize(stack: [])
-    let uriSubs = Dictionary(queryItems.map { ($0.name, $0.value!) })
+struct RestXmlRequest {
+    let method: String
+    let relativeUrl: String
+    let node: XMLNode
+}
+
+struct RestXmlFieldValue {
+    let node: XMLNode
+}
+
+protocol RestXmlSerializable {
+    func restXmlSerialize() -> RestXmlFieldValue
+}
+
+func RestXmlRequestSerializer(input: RestXmlRequest, baseURL: URL) -> URLRequest {
+//    let queryItems = input.params.serialize(stack: [])
+//    let uriSubs = Dictionary(queryItems.map { ($0.name, $0.value!) })
+//    
+//    let template = URITemplate(template: input.relativeUrl)
+//    let expandedString = template.expand(uriSubs)
     
-    let template = URITemplate(template: input.relativeUrl)
-    let expandedString = template.expand(uriSubs)
-    
-    let url = URL(string: expandedString, relativeTo: baseURL)!
+    let url = URL(string: "", relativeTo: baseURL)!
     var req = URLRequest(url: url)
     req.httpMethod = input.method
+    
+//    let node = XMLElement(name: "")
+//    node.name = ""
+//    node.addChild(<#T##child: XMLNode##XMLNode#>)
     
     return req
 }
