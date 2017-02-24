@@ -56,7 +56,7 @@ struct {{name}} {
             let request = RestXmlRequest(
                 method: "{{method}}",
                 relativeUrl: "{{uri}}",
-                node: serial
+                node: serial.node
             )
             
             return awsApiCallTask(request: request, completionHandler: completionHandler)
@@ -78,20 +78,17 @@ struct {{name}} {
         }
 
         func restXmlSerialize() -> RestXmlFieldValue {
-            {{^members.count}}
-            return .object([:])
-            {{/}}
-            {{#members.count}}
             let element = XMLElement(name: "")
             {{^isResponse}}
             {{^isRequest}}
-            {{#headerMembers}}
-            WHATTHE
-            {{/}}
-            {{/}}
             {{/}}
             {{#each(members)}}
+            {{#required}}
             element.addChild({{identifier(name)}}{{^required}}?{{/}}.restXmlSerialize().node)
+            {{/}}
+            {{^required}}
+            {{identifier(name)}}.map { element.addChild($0.restXmlSerialize().node) }
+            {{/}}
             {{/}}
             return RestXmlFieldValue(node: element)
             {{/}}

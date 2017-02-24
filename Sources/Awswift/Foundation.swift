@@ -23,6 +23,17 @@ extension Array where Element: RestJsonSerializable {
     }
 }
 
+extension Array where Element: RestXmlSerializable {
+  func restXmlSerialize() -> RestXmlFieldValue {
+    let elem = XMLElement(name: "member")
+    for e in self {
+      elem.addChild(e.restXmlSerialize().node)
+    }
+//    let arr = map { $0.restXmlSerialize() }
+    return RestXmlFieldValue(node: elem)
+  }
+}
+
 
 extension Array where Element: QuerySerializable {
     func querySerialize() -> QueryFieldValue {
@@ -101,7 +112,13 @@ extension Int: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
     func restJsonSerialize() -> RestJsonFieldValue {
         return .numberI(self)
     }
-    
+
+
+  func restXmlSerialize() -> RestXmlFieldValue {
+    return RestXmlFieldValue(node: XMLNode.text(withStringValue: "") as! XMLNode)
+  }
+
+
     func querySerialize() -> QueryFieldValue {
         return .string("")
     }
@@ -137,6 +154,10 @@ extension Bool: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
     func querySerialize() -> QueryFieldValue {
         return .string("\(self)")
     }
+
+  func restXmlSerialize() -> RestXmlFieldValue {
+    return RestXmlFieldValue(node: XMLNode.text(withStringValue: "") as! XMLNode)
+  }
 }
 extension Date: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
   static func deserialize(response: HTTPURLResponse, body: Any?) -> Date {
@@ -178,8 +199,10 @@ extension Date: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
         return .date(self)
     }
     
-    
-    
+  func restXmlSerialize() -> RestXmlFieldValue {
+    return RestXmlFieldValue(node: XMLNode.text(withStringValue: "") as! XMLNode)
+  }
+
     func querySerialize() -> QueryFieldValue {
         return .string("")
     }
@@ -196,4 +219,8 @@ extension Data: RestJsonSerializable, AwswiftDeserializable, QuerySerializable {
     func querySerialize() -> QueryFieldValue {
         return .string("")
     }
+
+  func restXmlSerialize() -> RestXmlFieldValue {
+    return RestXmlFieldValue(node: XMLNode.text(withStringValue: "") as! XMLNode)
+  }
 }
